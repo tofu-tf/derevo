@@ -4,13 +4,9 @@ import scala.reflect.macros.blackbox
 class DerevoMacro(val c: blackbox.Context) {
   import c.universe._
 
-  def instanceMacro[I: c.WeakTypeTag](name: c.Expr[String])(expr: c.Expr[I]): c.Expr[Quoted] = {
-    val q"${s: String}" = name
+  def delegateMacro[TC[_], I](expr: c.Expr[TC[I]]): c.Expr[TC[I]] = expr
 
-    c.Expr[Quoted](q"__root__.org.manatki.derevo.Quoted($s, $expr)")
-  }
-
-  def deriveMacro(annottees: Tree*): Tree =
+  def deriveMacro(annottees: Tree*): Tree = {
     annottees match {
       case Seq(cls: ClassDef) =>
         q"""
@@ -32,7 +28,43 @@ class DerevoMacro(val c: blackbox.Context) {
            }
          """
     }
+  }
 
-  def instances(cls: ClassDef): Vector[Tree] =
-    Vector(q"""override def toString = "Hello, " + ${cls.name.toString} """)
+  def instances(cls: ClassDef): List[Tree] = {
+    val values = c.prefix.tree match {
+      case q"new derive(..${instances})" =>
+        instances
+          .map(buildInstance)
+    }
+
+    List(q"""override def toString = "Hello, " + ${cls.name.toString} + " "  + ${values.toString}""")
+  }
+
+
+  def buildInstance(tree: Tree): Tree = {
+    val (name, typ, call) = tree match {
+      case q"$obj.$method(..$args)" =>
+        val (name, typ) = nameAndType(obj)
+        (name, typ, tree)
+      case q"$obj" =>
+        val (name, typ) = nameAndType(obj)
+        (name, typ, q"$obj.apply()")
+    }
+
+    val tn = TermName(name)
+    q"val $tn: $typ = $call"
+  }
+
+  def nameAndType(obj: Tree): (String, Type) = {
+    debug(obj.symbol)
+    debug(obj.isTerm)
+    val name = obj match {
+      case Ident(name) => name.toString
+    }
+    val x = obj.tpe
+    (name, x)
+  }
+
+  def debug(s: Any) = c.info(c.enclosingPosition, s.toString, false)
 }
+
