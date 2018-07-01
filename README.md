@@ -1,2 +1,2 @@
 # derevo
-Adding multiple instance derivations into single macro annotation
+Multiple instance derivations inside single macro annotation
