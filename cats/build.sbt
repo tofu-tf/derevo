@@ -5,5 +5,6 @@ addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.pa
 
 scalacOptions ++= Vector(
   "-language:experimental.macros",
-  "-Xlog-free-terms"
+  "-Xlog-free-terms",
+  "-Ymacro-debug-lite"
 )

@@ -1,4 +1,4 @@
-package org.manatki.derevo.cats.impl
+package org.manatki.derevo.catsInstances.impl
 import cats.Show
 import magnolia.{CaseClass, Magnolia, SealedTrait}
 
