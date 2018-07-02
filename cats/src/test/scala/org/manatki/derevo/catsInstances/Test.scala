@@ -3,14 +3,18 @@ package catsInstances
 
 import cats.implicits._
 
-@derive(catsShow)
+@derive(show, order, monoid)
 case class Foo(bar: String, baz: Int)
 
 
-object Test {
+class CatsSuite {
   def main(args: Array[String]): Unit = {
-    println(Foo)
-//    val u: Show[Foo] = catsShow.instance(())
-    println(Foo("lol", 3).show)
+    println(show" === ${Foo("lol", 3)} ===")
+
+    println(Foo("bbb", 1) comparison Foo("aaa", 2))
+    println(Foo("bbb", 1) comparison Foo("bbb", 2))
+    println(Foo("bbb", 1) comparison Foo("bbb", 1))
+
+    println(Foo("aaa", 2) |+| Foo("bbb", 3))
   }
 }

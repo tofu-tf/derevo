@@ -9,10 +9,16 @@ class Derevo(val c: blackbox.Context) {
 
   val DerivationSymbol = typeOf[Derivation[Dummy1]].typeConstructor.typeSymbol
 
-  def delegate[TC[_], I, Args](args: c.Expr[Args]): c.Expr[TC[I]] =
-    c.Expr(delegation(c.prefix.tree))
+  def delegate[TC[_], I]: c.Expr[TC[I]] =
+    c.Expr(delegation(c.prefix.tree, None, false))
 
-  private def delegation(tree: Tree): Tree = {
+  def delegateParam[TC[_], I, Arg](arg: c.Expr[Arg]): c.Expr[TC[I]] =
+    c.Expr(delegation(c.prefix.tree, Some(arg), true))
+
+  def delegateParams[TC[_], I, Args](args: c.Expr[Args]): c.Expr[TC[I]] =
+    c.Expr(delegation(c.prefix.tree, Some(args), false))
+
+  private def delegation[Args](tree: Tree, maybeArg: Option[c.Expr[Args]], single: Boolean): Tree = {
     val annots = tree.tpe.termSymbol.annotations
     val s = annots
       .map(_.tree)
@@ -22,7 +28,12 @@ class Derevo(val c: blackbox.Context) {
       }
       .getOrElse(abort(s"could not find @delegating annotation at $tree"))
 
-    s.split("\\.").map(TermName(_)).foldLeft[Tree](q"_root_")((a, b) => q"$a.$b")
+    val call = s.split("\\.").map(TermName(_)).foldLeft[Tree](q"_root_")((a, b) => q"$a.$b")
+
+    maybeArg.fold(call) {
+      case arg if single => q"$call($arg)"
+      case q"(..$args)" => q"$call(..$args)"
+    }
   }
 
   def deriveMacro(annottees: Tree*): Tree = {
@@ -36,9 +47,9 @@ class Derevo(val c: blackbox.Context) {
          """
 
       case Seq(
-          cls: ClassDef,
-          q"object $companion extends {..$earlyDefs} with ..$parents{$self => ..$defs}"
-          ) =>
+      cls: ClassDef,
+      q"object $companion extends {..$earlyDefs} with ..$parents{$self => ..$defs}"
+      ) =>
         q"""
            $cls
            object $companion extends {..$earlyDefs} with ..$parents{$self =>
@@ -50,7 +61,7 @@ class Derevo(val c: blackbox.Context) {
   }
 
   def instances(cls: ClassDef): List[Tree] =
-     c.prefix.tree match {
+    c.prefix.tree match {
       case q"new derive(..${instances})" =>
         instances
           .map(buildInstance(_, cls.name))
@@ -60,16 +71,20 @@ class Derevo(val c: blackbox.Context) {
     val typName = TypeName(clsName.toString)
 
     val (name, tc, call) = tree match {
+      case q"$obj(..$args)" =>
+        val (name, typ) = nameAndType(obj)
+        (name, typ, tree)
+
       case q"$obj.$method($args)" =>
         val (name, typ) = nameAndType(obj)
         (name, typ, tree)
       case q"$obj" =>
         val (name, typ) = nameAndType(obj)
-        (name, typ, q"$obj.instance[$typName](())")
+        (name, typ, q"$obj.instance[$typName]")
     }
 
     val tn = TermName(name)
-    val instTyp  = tq"$tc[$typName]"
+    val instTyp = tq"$tc[$typName]"
     val const = tc.typeSymbol
     q"implicit val $tn: $const[$typName] = $call"
   }
@@ -81,12 +96,12 @@ class Derevo(val c: blackbox.Context) {
 
     val t = c.typecheck(obj).tpe.baseType(DerivationSymbol) match {
       case TypeRef(_, sym, List(inst)) => inst
-      case _                           => abort(s"$obj seems not extending Derivation trait")
+      case _ => abort(s"$obj seems not extending Derivation trait")
     }
 
     (name, t)
   }
 
-  def debug(s: Any)    = c.info(c.enclosingPosition, s.toString, false)
+  def debug(s: Any) = c.info(c.enclosingPosition, s.toString, false)
   def abort(s: String) = c.abort(c.enclosingPosition, s)
 }
