@@ -1,4 +1,4 @@
-moduleName := "derevo-cats"
+moduleName := "derevo-circe"
 
 val circeVersion = "0.10.0-M1"
 

@@ -1,6 +1,6 @@
 organization in ThisBuild := "ru.tinkoff"
 
-val publishVersion = "0.2.0"
+val publishVersion = "0.1"
 
 publishMavenStyle in ThisBuild := true
 
