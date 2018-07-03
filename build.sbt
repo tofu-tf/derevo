@@ -1,7 +1,5 @@
 name := "derevo"
 
-version := "0.1"
-
 scalaVersion := "2.12.6"
 
 libraryDependencies in ThisBuild += scalaOrganization.value % "scala-reflect" % scalaVersion.value % Provided
