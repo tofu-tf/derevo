@@ -11,3 +11,4 @@ class phantom
 
 sealed trait InstanceDef
 trait Derivation[TC[_]] extends InstanceDef
+trait PolyDerivation[FromTC[_], ToTC[_]] extends InstanceDef
