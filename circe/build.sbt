@@ -1,3 +1,5 @@
+moduleName := "derevo-cats"
+
 val circeVersion = "0.10.0-M1"
 
 

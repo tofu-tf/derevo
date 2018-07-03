@@ -1,3 +1,5 @@
+moduleName := "derevo-tethys"
+
 val tethysVersion = "0.6.3"
 
 libraryDependencies += "com.tethys-json" %% "tethys-core" % tethysVersion

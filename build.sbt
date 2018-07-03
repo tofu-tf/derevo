@@ -13,8 +13,10 @@ scalacOptions in ThisBuild ++= Vector(
   "-language:experimental.macros"
 )
 
-lazy val derevo: Project = project in file(".")
+lazy val core = project
 
-lazy val cats = project dependsOn derevo
-lazy val circe = project dependsOn derevo
-lazy val tethys = project dependsOn derevo
+lazy val cats = project dependsOn core
+lazy val circe = project dependsOn core
+lazy val tethys = project dependsOn core
+
+lazy val derevo = project in file (".") aggregate (core, cats, circe, tethys)

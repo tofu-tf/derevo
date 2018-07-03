@@ -7,7 +7,7 @@ import cats.implicits._
 case class Foo(bar: String, baz: Int)
 
 
-class CatsSuite {
+object CatsTest {
   def main(args: Array[String]): Unit = {
     println(show" === ${Foo("lol", 3)} ===")
 
