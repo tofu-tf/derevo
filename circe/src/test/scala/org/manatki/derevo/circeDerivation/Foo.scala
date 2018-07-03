@@ -11,6 +11,9 @@ final case class Foo (string: String, int: Int)
 @derive(decoder(renaming.snakeCase), encoder(renaming.kebabCase))
 final case class Bar(stringName: String, integerAge: Int)
 
+@derive(encoder, decoder)
+final case class Baz[T](quux: List[T])
+
 object CirceTest{
   def main(args: Array[String]): Unit = {
     println(Foo("Lol", 42).asJson.spaces2)
@@ -25,5 +28,9 @@ object CirceTest{
       """.stripMargin).toOption.get
     println(bar)
     println(bar.asJson.spaces2)
+
+    println(Baz(List(1, 2, 3)).asJson)
   }
+
+
 }
