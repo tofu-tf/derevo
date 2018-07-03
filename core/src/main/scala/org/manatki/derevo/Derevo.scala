@@ -1,4 +1,6 @@
 package org.manatki.derevo
+
+import scala.language.higherKinds
 import scala.reflect.macros.blackbox
 
 private trait Dummy1[X]
