@@ -64,11 +64,11 @@ class Derevo(val c: blackbox.Context) {
     c.prefix.tree match {
       case q"new derive(..${instances})" =>
         instances
-          .map(buildInstance(_, cls.name))
+          .map(buildInstance(_, cls))
     }
 
-  def buildInstance(tree: Tree, clsName: Name): Tree = {
-    val typName = TypeName(clsName.toString)
+  def buildInstance(tree: Tree, cls: ClassDef): Tree = {
+    val typName = TypeName(cls.name.toString)
 
     val (name, tc, call) = tree match {
       case q"$obj(..$args)" =>
