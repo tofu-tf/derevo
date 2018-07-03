@@ -8,6 +8,7 @@ private trait Dummy1[X]
 class Derevo(val c: blackbox.Context) {
   import c.universe._
   val DelegatingSymbol = typeOf[delegating].typeSymbol
+  val PhantomSymbol    = typeOf[phantom].typeSymbol
 
   val DerivationSymbol = typeOf[Derivation[Dummy1]].typeConstructor.typeSymbol
 
@@ -34,7 +35,7 @@ class Derevo(val c: blackbox.Context) {
 
     maybeArg.fold(call) {
       case arg if single => q"$call($arg)"
-      case q"(..$args)" => q"$call(..$args)"
+      case q"(..$args)"  => q"$call(..$args)"
     }
   }
 
@@ -49,9 +50,9 @@ class Derevo(val c: blackbox.Context) {
          """
 
       case Seq(
-      cls: ClassDef,
-      q"object $companion extends {..$earlyDefs} with ..$parents{$self => ..$defs}"
-      ) =>
+          cls: ClassDef,
+          q"object $companion extends {..$earlyDefs} with ..$parents{$self => ..$defs}"
+          ) =>
         q"""
            $cls
            object $companion extends {..$earlyDefs} with ..$parents{$self =>
@@ -82,13 +83,31 @@ class Derevo(val c: blackbox.Context) {
         (name, typ, tree)
       case q"$obj" =>
         val (name, typ) = nameAndType(obj)
-        (name, typ, q"$obj.instance[$typName]")
+        (name, typ, q"$obj.instance")
     }
 
-    val tn = TermName(name)
+    val tn      = TermName(name)
     val instTyp = tq"$tc[$typName]"
-    val const = tc.typeSymbol
-    q"implicit val $tn: $const[$typName] = $call"
+    val const   = tc.typeSymbol
+    if (cls.tparams.isEmpty) q"implicit val $tn: $const[$typName] = $call"
+    else {
+      val tparams = cls.tparams
+      val implicits = tparams.flatMap { tparam =>
+        val phantom =
+          tparam.mods.annotations.exists { t =>
+            c.typecheck(t).tpe.typeSymbol == PhantomSymbol
+          }
+        if (phantom) None
+        else {
+          val name = c.freshName[TermName]("ev")
+          val typ  = tparam.name
+          Some(q"val $name: $const[$typ]")
+        }
+      }
+      val tps    = tparams.map(_.name)
+      val appTyp = tq"$typName[..$tps]"
+      q"implicit def $tn[..$tparams](implicit ..$implicits): $const[$appTyp] = $call"
+    }
   }
 
   def nameAndType(obj: Tree): (String, Type) = {
@@ -98,12 +117,12 @@ class Derevo(val c: blackbox.Context) {
 
     val t = c.typecheck(obj).tpe.baseType(DerivationSymbol) match {
       case TypeRef(_, sym, List(inst)) => inst
-      case _ => abort(s"$obj seems not extending Derivation trait")
+      case _                           => abort(s"$obj seems not extending Derivation trait")
     }
 
     (name, t)
   }
 
-  def debug(s: Any) = c.info(c.enclosingPosition, s.toString, false)
+  def debug(s: Any)    = c.info(c.enclosingPosition, s.toString, false)
   def abort(s: String) = c.abort(c.enclosingPosition, s)
 }
