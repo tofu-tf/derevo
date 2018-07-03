@@ -10,7 +10,8 @@ class Derevo(val c: blackbox.Context) {
   val DelegatingSymbol = typeOf[delegating].typeSymbol
   val PhantomSymbol    = typeOf[phantom].typeSymbol
 
-  val DerivationSymbol = typeOf[Derivation[Dummy1]].typeConstructor.typeSymbol
+  val DerivationSymbol         = typeOf[Derivation[Dummy1]].typeConstructor.typeSymbol
+  val SpecificDerivationSymbol = typeOf[PolyDerivation[Dummy1, Dummy1]].typeConstructor.typeSymbol
 
   def delegate[TC[_], I]: c.Expr[TC[I]] =
     c.Expr(delegation(c.prefix.tree, None, false))
@@ -73,23 +74,24 @@ class Derevo(val c: blackbox.Context) {
   def buildInstance(tree: Tree, cls: ClassDef): Tree = {
     val typName = TypeName(cls.name.toString)
 
-    val (name, tc, call) = tree match {
+    val (name, fromTc, toTc, call) = tree match {
       case q"$obj(..$args)" =>
-        val (name, typ) = nameAndType(obj)
-        (name, typ, tree)
+        val (name, from, to) = nameAndTypes(obj)
+        (name, from, to, tree)
 
       case q"$obj.$method($args)" =>
-        val (name, typ) = nameAndType(obj)
-        (name, typ, tree)
+        val (name, from, to) = nameAndTypes(obj)
+        (name, from, to, tree)
       case q"$obj" =>
-        val (name, typ) = nameAndType(obj)
-        (name, typ, q"$obj.instance")
+        val (name, from, to) = nameAndTypes(obj)
+        (name, from, to, q"$obj.instance")
     }
 
-    val tn      = TermName(name)
-    val instTyp = tq"$tc[$typName]"
-    val const   = tc.typeSymbol
-    if (cls.tparams.isEmpty) q"implicit val $tn: $const[$typName] = $call"
+    val tn        = TermName(name)
+    val instTyp   = tq"$toTc[$typName]"
+    val toConst   = toTc.typeSymbol
+    val fromConst = fromTc.typeSymbol
+    if (cls.tparams.isEmpty) q"implicit val $tn: $toConst[$typName] = $call"
     else {
       val tparams = cls.tparams
       val implicits = tparams.flatMap { tparam =>
@@ -101,26 +103,32 @@ class Derevo(val c: blackbox.Context) {
         else {
           val name = c.freshName[TermName]("ev")
           val typ  = tparam.name
-          Some(q"val $name: $const[$typ]")
+          Some(q"val $name: $fromConst[$typ]")
         }
       }
       val tps    = tparams.map(_.name)
       val appTyp = tq"$typName[..$tps]"
-      q"implicit def $tn[..$tparams](implicit ..$implicits): $const[$appTyp] = $call"
+      q"implicit def $tn[..$tparams](implicit ..$implicits): $toConst[$appTyp] = $call"
     }
   }
 
-  def nameAndType(obj: Tree): (String, Type) = {
+  def nameAndTypes(obj: Tree): (String, Type, Type) = {
     val name = obj match {
       case Ident(name) => c.freshName(name.toString)
     }
 
-    val t = c.typecheck(obj).tpe.baseType(DerivationSymbol) match {
-      case TypeRef(_, sym, List(inst)) => inst
-      case _                           => abort(s"$obj seems not extending Derivation trait")
+    val (from, to) = c.typecheck(obj).tpe.baseType(DerivationSymbol) match {
+      case TypeRef(_, sym, List(tc)) => (tc, tc)
+      case _ =>
+        c.typecheck(obj).tpe.baseType(SpecificDerivationSymbol) match {
+          case TypeRef(_, sym, List(from, to)) => (from, to)
+          case _ =>
+            abort(s"$obj seems not extending Derivation or SpecificDerivation traits")
+        }
+
     }
 
-    (name, t)
+    (name, from, to)
   }
 
   def debug(s: Any)    = c.info(c.enclosingPosition, s.toString, false)
