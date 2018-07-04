@@ -7,6 +7,7 @@ private trait Dummy1[X]
 
 class Derevo(val c: blackbox.Context) {
   import c.universe._
+  import internal.typeRef
   val DelegatingSymbol = typeOf[delegating].typeSymbol
   val PhantomSymbol    = typeOf[phantom].typeSymbol
 
@@ -103,7 +104,11 @@ class Derevo(val c: blackbox.Context) {
         else {
           val name = c.freshName[TermName]("ev")
           val typ  = tparam.name
-          Some(q"val $name: $fromConst[$typ]")
+          val reqT = fromTc match {
+            case TypeRef(pre, sym, ps) => tq"$sym[..$ps, $typ]"
+            case _ => tq"$fromTc[$typ]"
+          }
+          Some(q"val $name: $reqT")
         }
       }
       val tps    = tparams.map(_.name)
