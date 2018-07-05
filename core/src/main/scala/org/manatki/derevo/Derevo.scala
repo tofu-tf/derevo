@@ -65,14 +65,14 @@ class Derevo(val c: blackbox.Context) {
     }
   }
 
-  def instances(cls: ClassDef): List[Tree] =
+  private def instances(cls: ClassDef): List[Tree] =
     c.prefix.tree match {
       case q"new derive(..${instances})" =>
         instances
           .map(buildInstance(_, cls))
     }
 
-  def buildInstance(tree: Tree, cls: ClassDef): Tree = {
+  private def buildInstance(tree: Tree, cls: ClassDef): Tree = {
     val typName = TypeName(cls.name.toString)
 
     val (name, fromTc, toTc, call) = tree match {
@@ -89,11 +89,10 @@ class Derevo(val c: blackbox.Context) {
     }
 
     val tn        = TermName(name)
-    val instTyp   = tq"$toTc[$typName]"
-    val toConst   = toTc.typeSymbol
-    val fromConst = fromTc.typeSymbol
-    if (cls.tparams.isEmpty) q"implicit val $tn: $toConst[$typName] = $call"
-    else {
+    if (cls.tparams.isEmpty) {
+      val resT = mkAppliedType(toTc, tq"$typName")
+      q"implicit val $tn: $resT = $call"
+    } else {
       val tparams = cls.tparams
       val implicits = tparams.flatMap { tparam =>
         val phantom =
@@ -104,20 +103,23 @@ class Derevo(val c: blackbox.Context) {
         else {
           val name = c.freshName[TermName]("ev")
           val typ  = tparam.name
-          val reqT = fromTc match {
-            case TypeRef(pre, sym, ps) => tq"$sym[..$ps, $typ]"
-            case _ => tq"$fromTc[$typ]"
-          }
+          val reqT = mkAppliedType(fromTc, tq"$typ")
           Some(q"val $name: $reqT")
         }
       }
       val tps    = tparams.map(_.name)
       val appTyp = tq"$typName[..$tps]"
-      q"implicit def $tn[..$tparams](implicit ..$implicits): $toConst[$appTyp] = $call"
+      val resT   = mkAppliedType(toTc, appTyp)
+      q"implicit def $tn[..$tparams](implicit ..$implicits): $resT = $call"
     }
   }
 
-  def nameAndTypes(obj: Tree): (String, Type, Type) = {
+  private def mkAppliedType(tc: Type, arg: Tree): Tree = tc match {
+    case TypeRef(pre, sym, ps) => tq"$sym[..$ps, $arg]"
+    case _                     => tq"$tc[$arg]"
+  }
+
+  private def nameAndTypes(obj: Tree): (String, Type, Type) = {
     val name = obj match {
       case Ident(name) => c.freshName(name.toString)
     }
@@ -136,6 +138,6 @@ class Derevo(val c: blackbox.Context) {
     (name, from, to)
   }
 
-  def debug(s: Any)    = c.info(c.enclosingPosition, s.toString, false)
-  def abort(s: String) = c.abort(c.enclosingPosition, s)
+  private def debug(s: Any)    = c.info(c.enclosingPosition, s.toString, false)
+  private def abort(s: String) = c.abort(c.enclosingPosition, s)
 }
