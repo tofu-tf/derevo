@@ -1,6 +1,6 @@
 name := "derevo"
 
-version := "0.4.5"
+version := "0.5.0"
 
 scalaVersion := "2.12.6"
 
@@ -11,8 +11,11 @@ libraryDependencies in ThisBuild += scalaOrganization.value % "scala-reflect" % 
 libraryDependencies in ThisBuild += compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.patch)
 
 scalacOptions in ThisBuild ++= Vector(
+  "-deprecation",
+  "-feature",
   "-language:experimental.macros",
-  "-language:higherKinds"
+  "-language:higherKinds",
+  "-Xfatal-warnings"
 )
 
 lazy val core = project
