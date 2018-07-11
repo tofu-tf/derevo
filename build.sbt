@@ -2,9 +2,7 @@ name := "derevo"
 
 version := "0.5.0"
 
-scalaVersion := "2.12.6"
-
-crossScalaVersions := List("2.11.12", "2.12.6")
+crossScalaVersions in ThisBuild := List("2.11.12", "2.12.6")
 
 libraryDependencies in ThisBuild += scalaOrganization.value % "scala-reflect" % scalaVersion.value % Provided
 
