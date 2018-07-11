@@ -7,12 +7,12 @@ private trait Dummy1[X]
 
 class Derevo(val c: blackbox.Context) {
   import c.universe._
-  import internal.typeRef
   val DelegatingSymbol = typeOf[delegating].typeSymbol
   val PhantomSymbol    = typeOf[phantom].typeSymbol
 
   val DerivationSymbol         = typeOf[Derivation[Dummy1]].typeConstructor.typeSymbol
   val SpecificDerivationSymbol = typeOf[PolyDerivation[Dummy1, Dummy1]].typeConstructor.typeSymbol
+  val IIH                      = weakTypeOf[InjectInstancesHere].typeSymbol
 
   def delegate[TC[_], I]: c.Expr[TC[I]] =
     c.Expr(delegation(c.prefix.tree, None, false))
@@ -58,11 +58,25 @@ class Derevo(val c: blackbox.Context) {
         q"""
            $cls
            object $companion extends {..$earlyDefs} with ..$parents{$self =>
-             ..$defs
-             ..${instances(cls)}
+             ..${injectInstances(defs, instances(cls))}
            }
          """
     }
+  }
+
+  private def injectInstances(defs: Seq[Tree], instances: List[Tree]): Seq[Tree] = {
+    val (pre, post) = defs.span {
+      case tree@q"$call()" =>
+        def result = !(c.typecheck(tree).tpe.typeSymbol == IIH)
+        call match {
+          case q"insertInstancesHere" => result
+          case q"$_.insertInstancesHere" => result
+          case _ => true
+        }
+      case _ => true
+    }
+
+    pre ++ instances ++ post.drop(1)
   }
 
   private def instances(cls: ClassDef): List[Tree] =
@@ -83,12 +97,13 @@ class Derevo(val c: blackbox.Context) {
       case q"$obj.$method($args)" =>
         val (name, from, to) = nameAndTypes(obj)
         (name, from, to, tree)
+
       case q"$obj" =>
         val (name, from, to) = nameAndTypes(obj)
         (name, from, to, q"$obj.instance")
     }
 
-    val tn        = TermName(name)
+    val tn = TermName(name)
     if (cls.tparams.isEmpty) {
       val resT = mkAppliedType(toTc, tq"$typName")
       q"implicit val $tn: $resT = $call"
@@ -101,7 +116,7 @@ class Derevo(val c: blackbox.Context) {
           }
         if (phantom) None
         else {
-          val name = c.freshName[TermName]("ev")
+          val name = TermName(c.freshName("ev"))
           val typ  = tparam.name
           val reqT = mkAppliedType(fromTc, tq"$typ")
           Some(q"val $name: $reqT")

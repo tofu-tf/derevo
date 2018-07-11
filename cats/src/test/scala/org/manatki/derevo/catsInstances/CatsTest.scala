@@ -1,6 +1,7 @@
 package org.manatki.derevo
 package catsInstances
 
+import cats.Show
 import cats.implicits._
 
 @derive(show, order, monoid)
@@ -8,6 +9,19 @@ case class Foo(bar: String, baz: Int)
 
 @derive(show, order, monoid)
 case class Bar[T, Q, @org.manatki.derevo.phantom R](x: T, qs: List[Q])
+
+@derive(show)
+case class Lol(x: X)
+
+class X
+
+object Lol{
+  implicit private [this] val xShow: Show[X] = _ => "X"
+
+  insertInstancesHere()
+
+  val shown = Lol(new X).show
+}
 
 object CatsTest {
   def main(args: Array[String]): Unit = {
@@ -22,5 +36,7 @@ object CatsTest {
     println(show"  === ${Bar[Int, String, Any](2, List("lol", "kek"))} === ")
 
     println(Bar[Int, String, Any](1, List("a", "b")) |+| Bar(3, List("c")))
+
+    println(Lol.shown)
   }
 }
