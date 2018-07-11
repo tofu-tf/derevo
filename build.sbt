@@ -18,6 +18,13 @@ scalacOptions in ThisBuild ++= Vector(
   "-Xfatal-warnings"
 )
 
+scalacOptions in ThisBuild ++= {
+  CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, y)) if y == 11 => Seq("-Xexperimental")
+    case _                       => Seq.empty[String]
+  }
+}
+
 lazy val core = project
 
 lazy val cats          = project dependsOn core
