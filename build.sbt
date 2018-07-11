@@ -2,9 +2,7 @@ name := "derevo"
 
 version := "0.5.0"
 
-scalaVersion := "2.12.6"
-
-crossScalaVersions := List("2.11.12", "2.12.6")
+crossScalaVersions in ThisBuild := List("2.11.12", "2.12.6")
 
 libraryDependencies in ThisBuild += scalaOrganization.value % "scala-reflect" % scalaVersion.value % Provided
 
@@ -17,6 +15,13 @@ scalacOptions in ThisBuild ++= Vector(
   "-language:higherKinds",
   "-Xfatal-warnings"
 )
+
+scalacOptions in ThisBuild ++= {
+  CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, y)) if y == 11 => Seq("-Xexperimental")
+    case _                       => Seq.empty[String]
+  }
+}
 
 lazy val core = project
 

@@ -16,7 +16,7 @@ case class Lol(x: X)
 class X
 
 object Lol{
-  implicit private [this] val xShow: Show[X] = _ => "X"
+  implicit private [this] val xShow: Show[X] = (_:X) => "X"
 
   insertInstancesHere()
 

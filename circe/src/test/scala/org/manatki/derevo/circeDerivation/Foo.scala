@@ -4,6 +4,7 @@ import org.manatki.derevo.derive
 import io.circe.syntax._
 import io.circe.parser._
 import io.circe.derivation.renaming
+import cats.syntax.either._
 
 @derive(encoder, decoder)
 final case class Foo (string: String, int: Int)
