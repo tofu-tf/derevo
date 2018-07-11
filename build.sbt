@@ -1,7 +1,5 @@
 name := "derevo"
 
-version := "0.5.0"
-
 scalaVersion := "2.12.6"
 
 crossScalaVersions := List("2.11.12", "2.12.6")
@@ -17,6 +15,8 @@ scalacOptions in ThisBuild ++= Vector(
   "-language:higherKinds",
   "-Xfatal-warnings"
 )
+
+
 
 lazy val core = project
 
