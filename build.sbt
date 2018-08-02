@@ -1,6 +1,6 @@
 name := "derevo"
 
-version := "0.5.0"
+version := "0.5.1"
 
 crossScalaVersions in ThisBuild := List("2.11.12", "2.12.6")
 
@@ -31,4 +31,4 @@ lazy val tethys        = project dependsOn core
 lazy val tschema       = project dependsOn core
 lazy val reactivemongo = project dependsOn core
 
-lazy val derevo = project in file(".") aggregate (core, cats, circe, tethys, reactivemongo)
+lazy val derevo = project in file(".") aggregate (core, cats, circe, tethys, tschema, reactivemongo)
