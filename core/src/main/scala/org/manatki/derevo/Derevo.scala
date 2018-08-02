@@ -67,10 +67,9 @@ class Derevo(val c: blackbox.Context) {
   private def injectInstances(defs: Seq[Tree], instances: List[Tree]): Seq[Tree] = {
     val (pre, post) = defs.span {
       case tree@q"$call()" =>
-        def result = !(c.typecheck(tree).tpe.typeSymbol == IIH)
         call match {
-          case q"insertInstancesHere" => result
-          case q"$_.insertInstancesHere" => result
+          case q"insertInstancesHere" => false
+          case q"$_.insertInstancesHere" => false
           case _ => true
         }
       case _ => true
