@@ -30,7 +30,7 @@ developers in ThisBuild := List(
     url("https://github.com/odomontois")
   ))
 
-//credentials in ThisBuild += Credentials(Path.userHome / ".sbt" / ".manatki-credentials")
+credentials in ThisBuild += Credentials(Path.userHome / ".sbt" / "odo.credentials")
 
 version in ThisBuild := {
   val branch = git.gitCurrentBranch.value
