@@ -1,6 +1,6 @@
 moduleName := "derevo-rmongo"
 
-val reactivemongoVersion = "0.14.0"
+val reactivemongoVersion = "0.16.2"
 
 libraryDependencies += "org.reactivemongo" %% "reactivemongo" % reactivemongoVersion
 
