@@ -20,7 +20,10 @@ object cirisDecoder extends Derivation[ConfigValueDecoder] {
           case config: ConfigObject =>
             val cfg = (key: String) => readEntry(config.toConfig, originKeyType(config.origin), key, s"${entry.key}.$key")
             val params = ctx.parameters.foldLeft[Either[ConfigError, Map[String, Any]]](Right(Map.empty)) { (acc, param) =>
-              val value = param.typeclass.decode(cfg(param.label)).map((param.label, _))
+              val value = param.typeclass.decode(cfg(param.label)) match {
+                case Right(res) => Right(param.label -> res)
+                case err        => err.asInstanceOf[Either[ConfigError, (String, Any)]]
+              }
 
               (acc, value) match {
                 case (Right(map), Right(pair))      => Right(map + pair)
@@ -30,7 +33,10 @@ object cirisDecoder extends Derivation[ConfigValueDecoder] {
               }
             }
 
-            params.map(pMap => ctx.construct { p => pMap(p.label) })
+            params match {
+              case Right(par) => Right(ctx.construct { p => par(p.label) })
+              case err        => err.asInstanceOf[Either[ConfigError, T]]
+            }
           case other =>
             Left(ConfigError.wrongType(
               entry.key.toString,
