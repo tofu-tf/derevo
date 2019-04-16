@@ -1,6 +1,6 @@
 name := "derevo"
 
-version := "0.6"
+version := "0.7.0"
 
 scalaVersion in ThisBuild := "2.12.8"
 
@@ -29,8 +29,9 @@ lazy val core = project
 
 lazy val cats          = project dependsOn core
 lazy val circe         = project dependsOn core
+lazy val ciris         = project dependsOn core
 lazy val tethys        = project dependsOn core
 lazy val tschema       = project dependsOn core
 lazy val reactivemongo = project dependsOn core
 
-lazy val derevo = project in file(".") aggregate (core, cats, circe, tethys, tschema, reactivemongo)
+lazy val derevo = project in file(".") aggregate (core, cats, circe, ciris, tethys, tschema, reactivemongo)
