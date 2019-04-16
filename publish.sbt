@@ -1,10 +1,10 @@
 organization in ThisBuild := "org.manatki"
 
-val publishVersion = "0.5.1"
+val publishVersion = "0.7.0"
 
 publishMavenStyle in ThisBuild := true
 
-crossScalaVersions in ThisBuild := Seq("2.11.12", "2.12.6")
+crossScalaVersions in ThisBuild := Seq("2.11.12", "2.12.8")
 
 homepage in ThisBuild := Some(url("https://manatki.org/docs/derevo"))
 
