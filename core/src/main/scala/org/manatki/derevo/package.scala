@@ -14,6 +14,8 @@ package derevo {
 
   sealed trait InstanceDef
   trait Derivation[TC[_]]                  extends InstanceDef
+  trait DerivationK1[TC[_[_]]]             extends InstanceDef
+  trait DerivationK2[TC[_[_[_]]]]          extends InstanceDef
   trait PolyDerivation[FromTC[_], ToTC[_]] extends InstanceDef
 }
 
