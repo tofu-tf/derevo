@@ -36,4 +36,4 @@ lazy val tschema       = project dependsOn core
 lazy val reactivemongo = project dependsOn core
 lazy val catsTagless   = project dependsOn core
 
-lazy val derevo = project in file(".") aggregate (core, cats, circe, ciris, tethys, tschema, reactivemongo)
+lazy val derevo = project in file(".") aggregate (core, cats, circe, ciris, tethys, tschema, reactivemongo, catsTagless)
