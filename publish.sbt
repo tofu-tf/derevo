@@ -31,6 +31,7 @@ developers in ThisBuild := List(
   ))
 
 credentials in ThisBuild += Credentials(Path.userHome / ".sbt" / "odo.credentials")
+pgpSecretRing := Path.userHome / ".gnupg"/ "secring.gpg"
 
 version in ThisBuild := {
   val branch = git.gitCurrentBranch.value
