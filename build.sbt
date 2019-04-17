@@ -1,6 +1,6 @@
 name := "derevo"
 
-version := "0.7.0"
+version := "0.8.0"
 
 scalaVersion in ThisBuild := "2.12.8"
 
@@ -8,7 +8,8 @@ crossScalaVersions in ThisBuild := List("2.11.12", "2.12.8")
 
 libraryDependencies in ThisBuild += scalaOrganization.value % "scala-reflect" % scalaVersion.value % Provided
 
-libraryDependencies in ThisBuild += compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.patch)
+libraryDependencies in ThisBuild += compilerPlugin("org.scalamacros" % "paradise"        % "2.1.1" cross CrossVersion.patch)
+libraryDependencies in ThisBuild += compilerPlugin("org.typelevel"   %% "kind-projector" % "0.10.0")
 
 scalacOptions in ThisBuild ++= Vector(
   "-deprecation",

@@ -11,17 +11,17 @@ object functorK extends DerivationK2[FunctorK] {
 
 @delegating("cats.tagless.Derive.invariantK")
 object invariantK extends DerivationK2[InvariantK] {
-  def instance[T[_[_]]]: FunctorK[T] = macro Derevo.delegateK2[InvariantK, T]
+  def instance[T[_[_]]]: InvariantK[T] = macro Derevo.delegateK2[InvariantK, T]
 }
 
 @delegating("cats.tagless.Derive.semigroupalK")
 object semigroupalK extends DerivationK2[SemigroupalK] {
-  def instance[T[_[_]]]: FunctorK[T] = macro Derevo.delegateK2[SemigroupalK, T]
+  def instance[T[_[_]]]: SemigroupalK[T] = macro Derevo.delegateK2[SemigroupalK, T]
 }
 
 @delegating("cats.tagless.Derive.applyK")
 object applyK extends DerivationK2[ApplyK] {
-  def instance[T[_[_]]]: FunctorK[T] = macro Derevo.delegateK2[ApplyK, T]
+  def instance[T[_[_]]]: ApplyK[T] = macro Derevo.delegateK2[ApplyK, T]
 }
 
 @delegating("cats.tagless.Derive.functor")
