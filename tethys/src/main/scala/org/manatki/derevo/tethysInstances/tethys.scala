@@ -8,6 +8,6 @@ object tethysReader extends Derivation[JsonReader]{
 }
 
 @delegating("tethys.derivation.semiauto.jsonWriter")
-object tethysWriter extends Derivation[JsonWriter]{
-  def instance[A]: JsonObjectWriter[A] = macro Derevo.delegate[JsonWriter, A]
+object tethysWriter extends Derivation[JsonObjectWriter]{
+  def instance[A]: JsonObjectWriter[A] = macro Derevo.delegate[JsonObjectWriter, A]
 }
