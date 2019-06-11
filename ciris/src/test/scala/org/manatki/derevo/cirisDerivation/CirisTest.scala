@@ -32,7 +32,7 @@ object CirisTest {
       """.stripMargin
     )
 
-    val res = loadConfig(hoconSource[Data](cfg).read("data")) { hocon => hocon }
+    val res = loadConfig(hoconSource[ciris.api.Id, Data](cfg).read("data")) { hocon => hocon }
 
     res.result.fold(
       e => e.messages.foreach(println),
