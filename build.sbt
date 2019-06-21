@@ -1,6 +1,6 @@
 name := "derevo"
 
-version := "0.8.0"
+version := "0.8.1"
 
 scalaVersion in ThisBuild := "2.12.8"
 
