@@ -1,5 +1,5 @@
 package org.manatki.derevo.circeDerivation
-import io.circe.{Decoder, Encoder, ObjectEncoder}
+import io.circe.{Decoder, Encoder}
 import org.manatki.derevo.{Derevo, Derivation, PolyDerivation, delegating}
 
 @delegating("io.circe.derivation.deriveDecoder")
@@ -10,8 +10,8 @@ object decoder extends Derivation[Decoder] {
 }
 
 @delegating("io.circe.derivation.deriveEncoder")
-object encoder extends PolyDerivation[Encoder, ObjectEncoder] {
-  def instance[A]: ObjectEncoder[A] = macro Derevo.delegate[ObjectEncoder, A]
+object encoder extends PolyDerivation[Encoder, Encoder.AsObject] {
+  def instance[A]: Encoder.AsObject[A] = macro Derevo.delegate[Encoder.AsObject, A]
 
-  def apply[A](arg: String => String): ObjectEncoder[A] = macro Derevo.delegateParam[ObjectEncoder, A, String => String]
+  def apply[A](arg: String => String): Encoder.AsObject[A] = macro Derevo.delegateParam[Encoder.AsObject, A, String => String]
 }

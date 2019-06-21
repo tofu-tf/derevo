@@ -4,8 +4,6 @@ val publishVersion = "0.8.0"
 
 publishMavenStyle in ThisBuild := true
 
-crossScalaVersions in ThisBuild := Seq("2.11.12", "2.12.8")
-
 homepage in ThisBuild := Some(url("https://manatki.org/docs/derevo"))
 
 scmInfo in ThisBuild := Some(

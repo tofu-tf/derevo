@@ -1,5 +1,5 @@
 moduleName := "derevo-pureconfig"
 
-libraryDependencies += "com.github.pureconfig" %% "pureconfig" % "0.11.0"
+libraryDependencies += "com.github.pureconfig" %% "pureconfig" % Version.pureConfig
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % Version.scalaTest % "test"

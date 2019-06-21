@@ -1,8 +1,5 @@
 moduleName := "derevo-circe"
 
-val circeVersion = "0.11.1"
-
-
-libraryDependencies += "io.circe" %% "circe-core" % circeVersion
-libraryDependencies += "io.circe" %% "circe-derivation" % "0.11.0-M1"
-libraryDependencies += "io.circe" %% "circe-parser" % circeVersion % "test"
+libraryDependencies += "io.circe" %% "circe-core" % Version.circe
+libraryDependencies += "io.circe" %% "circe-derivation" % Version.circe
+libraryDependencies += "io.circe" %% "circe-parser" % Version.circe % "test"
