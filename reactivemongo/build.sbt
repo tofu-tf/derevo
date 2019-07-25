@@ -1,7 +1,7 @@
 moduleName := "derevo-rmongo"
 
-val reactivemongoVersion = "0.16.2"
 
-libraryDependencies += "org.reactivemongo" %% "reactivemongo" % reactivemongoVersion
+
+libraryDependencies += "org.reactivemongo" %% "reactivemongo" % Version.reactivemongo
 
 libraryDependencies += "org.scalatest" %% "scalatest" % Version.scalaTest % Test

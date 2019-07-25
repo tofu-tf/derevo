@@ -34,13 +34,13 @@ val compile213 = crossScalaVersions += "2.13.0"
 
 lazy val core = project settings common settings compile213
 
-lazy val cats          = project dependsOn core settings common
+lazy val cats          = project dependsOn core settings common settings compile213
 lazy val circe         = project dependsOn core settings common settings compile213
 lazy val ciris         = project dependsOn core settings common
-lazy val tethys        = project dependsOn core settings common
+lazy val tethys        = project dependsOn core settings common settings compile213
 lazy val tschema       = project dependsOn core settings common
 lazy val reactivemongo = project dependsOn core settings common
-lazy val catsTagless   = project dependsOn core settings common
+lazy val catsTagless   = project dependsOn core settings common settings compile213
 lazy val pureconfig    = project dependsOn core settings common settings compile213
 
 

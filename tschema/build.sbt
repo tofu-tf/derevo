@@ -1,3 +1,3 @@
 moduleName := "derevo-tschema"
 
-libraryDependencies += "ru.tinkoff" %% "typed-schema" % "0.11.0-beta1"
+libraryDependencies += "ru.tinkoff" %% "typed-schema" % Version.typedSchema
