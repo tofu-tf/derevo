@@ -3,7 +3,7 @@ object Version {
 
   val catsTagless = "0.8"
 
-  val cats = "1.6.1"
+  val cats = "2.0.0-M4"
 
   val circe = "0.12.0-M3"
 
@@ -15,7 +15,7 @@ object Version {
 
   val ciris = "0.12.1"
 
-  val reactivemongo = "0.16.2"
+  val reactivemongo = "0.18.0"
 
   val tethys = "0.10.0"
 
