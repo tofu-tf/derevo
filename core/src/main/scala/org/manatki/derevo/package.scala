@@ -5,7 +5,7 @@ import scala.annotation.{StaticAnnotation, compileTimeOnly}
 package derevo {
 
   @compileTimeOnly("enable macro paradise to expand macro annotations")
-  class derive(instances: InstanceDef*) extends StaticAnnotation {
+  class derive(instances: Any*) extends StaticAnnotation {
     def macroTransform(annottees: Any*): Any = macro Derevo.deriveMacro
   }
 
