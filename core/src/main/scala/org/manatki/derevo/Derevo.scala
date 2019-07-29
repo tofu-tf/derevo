@@ -19,21 +19,24 @@ class Derevo(val c: blackbox.Context) {
   val IIH                  = weakTypeOf[InjectInstancesHere].typeSymbol
 
   def delegate[TC[_], I]: c.Expr[TC[I]] =
-    c.Expr(delegation(c.prefix.tree, None, false))
+    c.Expr(delegation(c.prefix.tree, None))
 
   def delegateK1[TC[_[_]], I[_]]: c.Expr[TC[I]] =
-    c.Expr(delegation(c.prefix.tree, None, false))
+    c.Expr(delegation(c.prefix.tree, None))
 
   def delegateK2[TC[_[_[_]]], I[_[_]]]: c.Expr[TC[I]] =
-    c.Expr(delegation(c.prefix.tree, None, false))
+    c.Expr(delegation(c.prefix.tree, None))
 
   def delegateParam[TC[_], I, Arg](arg: c.Expr[Arg]): c.Expr[TC[I]] =
-    c.Expr(delegation(c.prefix.tree, Some(arg), true))
+    c.Expr(delegation(c.prefix.tree, Some(method => q"$method($arg)")))
+
+  def delegateParams2[TC[_], I, Arg1, Arg2](arg1: c.Expr[Arg1], arg2: c.Expr[Arg2]): c.Expr[TC[I]] =
+    c.Expr(delegation(c.prefix.tree, Some(method => q"$method($arg1, $arg2)")))
 
   def delegateParams[TC[_], I, Args](args: c.Expr[Args]): c.Expr[TC[I]] =
-    c.Expr(delegation(c.prefix.tree, Some(args), false))
+    c.Expr(delegation(c.prefix.tree, Some(method => q"$method($args)")))
 
-  private def delegation[Args](tree: Tree, maybeArg: Option[c.Expr[Args]], single: Boolean): Tree = {
+  private def delegation(tree: Tree, maybeCall: Option[Tree => Tree]): Tree = {
     val annots = tree.tpe.termSymbol.annotations
     val s = annots
       .map(_.tree)
@@ -43,12 +46,9 @@ class Derevo(val c: blackbox.Context) {
       }
       .getOrElse(abort(s"could not find @delegating annotation at $tree"))
 
-    val call = s.split("\\.").map(TermName(_)).foldLeft[Tree](q"_root_")((a, b) => q"$a.$b")
+    val method = s.split("\\.").map(TermName(_)).foldLeft[Tree](q"_root_")((a, b) => q"$a.$b")
 
-    maybeArg.fold(call) {
-      case arg if single => q"$call($arg)"
-      case q"(..$args)"  => q"$call(..$args)"
-    }
+    maybeCall.fold(method)(call => call(method))
   }
 
   def deriveMacro(annottees: Tree*): Tree = {
