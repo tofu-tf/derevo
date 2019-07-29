@@ -14,6 +14,9 @@ final case class First(a: Int, b: String) extends Choice
 @derive(tethysWriter)
 final case class Second(c: Boolean, f: Option[Foo]) extends Choice
 
+@derive(tethysWriter)
+final case class P[A, B](a: A, b: List[B])
+
 case object Third extends Choice {
   implicit val writer: JsonObjectWriter[Third.type] = (_, _) => ()
 }
@@ -35,5 +38,11 @@ class TethysTest extends FlatSpec with Matchers {
     val foo = Foo(100, "kek")
 
     """{"d":100,"e":"kek"}""".jsonAs[Foo] shouldBe Right(foo)
+  }
+
+  "Parametric derivation for case class" should "work correctly" in {
+    val p = P(123.0, List(1, 2, 3))
+
+    p.asJson shouldBe """{"a":123.0,"b":[1,2,3]}"""
   }
 }
