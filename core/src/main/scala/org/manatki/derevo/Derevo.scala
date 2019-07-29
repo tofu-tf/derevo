@@ -63,11 +63,11 @@ class Derevo(val c: blackbox.Context) {
 
       case Seq(
           cls: ClassDef,
-          q"object $companion extends {..$earlyDefs} with ..$parents{$self => ..$defs}"
+          q"$mods object $companion extends {..$earlyDefs} with ..$parents{$self => ..$defs}"
           ) =>
         q"""
            $cls
-           object $companion extends {..$earlyDefs} with ..$parents{$self =>
+           $mods object $companion extends {..$earlyDefs} with ..$parents{$self =>
              ..${injectInstances(defs, instances(cls))}
            }
          """
