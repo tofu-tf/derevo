@@ -1,6 +1,6 @@
 package org.manatki.derevo
 package tschemaInstances
-import ru.tinkoff.tschema.akkaHttp.HttpParam
+import ru.tinkoff.tschema.param.HttpParam
 import ru.tinkoff.tschema.swagger.{AsOpenApiParam, SwaggerTypeable}
 
 @delegating("ru.tinkoff.tschema.swagger.MagnoliaSwagger.derive")
@@ -13,7 +13,7 @@ object openapiParam extends Derivation[AsOpenApiParam]{
   def instance[T]: AsOpenApiParam[T] = macro Derevo.delegate[AsOpenApiParam, T]
 }
 
-@delegating("ru.tinkoff.tschema.akkaHttp.HttpParam.generate")
+@delegating("ru.tinkoff.tschema.param.HttpParam.generate")
 object httpParam extends Derivation[HttpParam]{
   def instance[T]: HttpParam[T] = macro Derevo.delegate[HttpParam, T]
 }

@@ -19,5 +19,5 @@ object Version {
 
   val tethys = "0.10.0"
 
-  val typedSchema = "0.11.0-beta6"
+  val typedSchema = "0.11.0-beta9"
 }

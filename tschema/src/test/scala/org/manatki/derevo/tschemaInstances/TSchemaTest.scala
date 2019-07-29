@@ -4,7 +4,7 @@ package tschemaInstances
 import io.circe.Printer
 import ru.tinkoff.tschema.swagger._
 import io.circe.syntax._
-import ru.tinkoff.tschema.akkaHttp.{HttpMultiParam, HttpParam}
+import ru.tinkoff.tschema.param.{HttpMultiParam, HttpParam}
 
 @derive(swagger)
 final case class Foo(string: Option[String], ints: List[Int], recursive: Foo)
