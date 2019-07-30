@@ -1,7 +1,7 @@
 # derevo
 Multiple instance derivations inside a single macro annotation
 ```
-version = "0.8.1"
+version = "0.10.0"
 
 "org.manatki" %% "derevo-core" % version  
 "org.manatki" %% "derevo-cats" % version  
