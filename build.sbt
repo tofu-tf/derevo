@@ -1,7 +1,5 @@
 name := "derevo"
 
-version := "0.10.0"
-
 scalaVersion in ThisBuild := "2.12.8"
 
 val common = List(
