@@ -4,8 +4,6 @@ import ciris.api.Monad
 import ciris.{ConfigDecoder, ConfigEntry, ConfigError}
 import com.typesafe.config.{ConfigException, ConfigMemorySize, ConfigValue}
 
-import scala.collection.generic.CanBuildFrom
-import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 
 abstract class ConfigValueDecoder[A] extends ConfigDecoder[ConfigValue, A]
@@ -38,15 +36,15 @@ private[hocon] trait ConfigValueDecoderCollectionInstances {
   implicit def seqConfigValueDecoder[C[_], A](
       implicit
       dec: ConfigValueDecoder[A],
-      cbf: CanBuildFrom[Nothing, A, C[A]]
+      cbf: FactoryCompat[A, C[A]]
   ): ConfigValueDecoder[C[A]] =
     catchNonFatal { cfg => path =>
       val list    = cfg.getList(path)
-      val builder = cbf()
+      val builder = cbf.newBuilder()
       var idx     = 0
 
       builder.sizeHint(list.size)
-      list.asScala.foreach { value =>
+      list.forEach { value =>
         builder += ConfigEntry(idx, SeqElementKeyType, Right(value)).decodeValue[A].orThrow()
         idx = 1
       }
@@ -61,7 +59,7 @@ private[hocon] trait ConfigValueDecoderCollectionInstances {
       val builder = Map.newBuilder[String, A]
 
       builder.sizeHint(entries.size)
-      entries.asScala.foreach { entry =>
+      entries.forEach { entry =>
         val key   = entry.getKey
         val value = ConfigEntry(key, MapEntryKeyType, Right(entry.getValue)).decodeValue[A].orThrow()
 
