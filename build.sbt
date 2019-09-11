@@ -1,7 +1,7 @@
 name := "derevo"
 
 val common = List(
-  scalaVersion  := "2.12.9",
+  scalaVersion  := "2.13.0",
   crossScalaVersions := List("2.12.9", "2.13.0"),
   libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % Provided,
   libraryDependencies ++= {
@@ -16,16 +16,18 @@ val common = List(
     "-feature",
     "-language:experimental.macros",
     "-language:higherKinds",
-    "-Xfatal-warnings"
-  )
+    "-Xfatal-warnings",
+  ),
+  scalacOptions ++= {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, y)) if y == 11 => Seq("-Xexperimental")
+      case Some((2, y)) if y == 13 => Seq("-Ymacro-annotations")
+      case _                       => Seq.empty[String]
+    }
+  }
 )
 
-scalacOptions in ThisBuild ++= {
-  CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, y)) if y == 11 => Seq("-Xexperimental")
-    case _                       => Seq.empty[String]
-  }
-}
+
 
 val compile211 = crossScalaVersions += "2.11.12"
 
