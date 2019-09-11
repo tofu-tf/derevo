@@ -73,6 +73,6 @@ lazy val reactivemongo = project dependsOn core settings common settings compile
 lazy val catsTagless   = project dependsOn core settings common settings compile211
 lazy val pureconfig    = project dependsOn core settings common settings compile211
 
-lazy val derevo = project in file(".") settings (common, publishTo := None) aggregate (
+lazy val derevo = project in file(".") settings (common, skip in publish := true) aggregate (
   core, cats, circe, ciris, tethys, tschema, reactivemongo, catsTagless, pureconfig
 )
