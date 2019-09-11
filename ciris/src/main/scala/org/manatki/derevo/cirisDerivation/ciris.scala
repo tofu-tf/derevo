@@ -44,7 +44,7 @@ object cirisDecoder extends Derivation[ConfigValueDecoder] {
           }
 
           if (err != null) Left(err)
-          else Right(ctx.rawConstruct(params))
+          else Right(ctx.rawConstruct(params.toSeq))
 
           val errorOrParams = ctx.parameters.foldLeft[ErrorOrParams](Right(Nil)) { (acc, param) =>
             val decoded = param.typeclass.decode(cfg(param.label)).asInstanceOf[Either[ConfigError, param.PType]]
@@ -56,7 +56,7 @@ object cirisDecoder extends Derivation[ConfigValueDecoder] {
               case (Right(_), err @ Left(_))   => err.asInstanceOf[ErrorOrParams]
             }
           }
-          errorOrParams.right.map(params => ctx.rawConstruct(params.reverse))
+          errorOrParams.map(params => ctx.rawConstruct(params.reverse))
         case other =>
           Left(
             ConfigError.wrongType(

@@ -3,10 +3,7 @@ package ciris.hocon
 import ciris.api.Monad
 import ciris.{ConfigDecoder, ConfigEntry, ConfigError}
 import com.typesafe.config.{ConfigException, ConfigMemorySize, ConfigValue}
-import org.manatki.derevo.cirisDerivation.internal.FromIterator
 
-import scala.collection.generic.CanBuildFrom
-import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 
 abstract class ConfigValueDecoder[A] extends ConfigDecoder[ConfigValue, A]
@@ -39,28 +36,36 @@ private[hocon] trait ConfigValueDecoderCollectionInstances {
   implicit def seqConfigValueDecoder[C[_], A](
       implicit
       dec: ConfigValueDecoder[A],
-      fromIter: FromIterator[A, C]
+      cbf: FactoryCompat[A, C[A]]
   ): ConfigValueDecoder[C[A]] =
     catchNonFatal { cfg => path =>
-      fromIter(cfg.getList(path).iterator().asScala.zipWithIndex.map {
-        case (value, idx) => ConfigEntry(idx, SeqElementKeyType, Right(value)).decodeValue[A].orThrow()
-      })
+      val list    = cfg.getList(path)
+      val builder = cbf.newBuilder()
+      var idx     = 0
+
+      builder.sizeHint(list.size)
+      list.forEach { value =>
+        builder += ConfigEntry(idx, SeqElementKeyType, Right(value)).decodeValue[A].orThrow()
+        idx = 1
+      }
+      builder.result
     }
 
   implicit def mapConfigValueDecoder[A](
       implicit dec: ConfigValueDecoder[A]
   ): ConfigValueDecoder[Map[String, A]] =
     catchNonFatal { cfg => path =>
-      cfg
-        .getObject(path)
-        .entrySet()
-        .iterator
-        .asScala
-        .map { entry =>
-          val key = entry.getKey
-          key -> ConfigEntry(key, MapEntryKeyType, Right(entry.getValue)).decodeValue[A].orThrow()
-        }
-        .toMap
+      val entries = cfg.getObject(path).entrySet
+      val builder = Map.newBuilder[String, A]
+
+      builder.sizeHint(entries.size)
+      entries.forEach { entry =>
+        val key   = entry.getKey
+        val value = ConfigEntry(key, MapEntryKeyType, Right(entry.getValue)).decodeValue[A].orThrow()
+
+        builder += ((key, value))
+      }
+      builder.result
     }
 }
 
