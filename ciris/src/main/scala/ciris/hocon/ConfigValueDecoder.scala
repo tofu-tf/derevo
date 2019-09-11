@@ -3,6 +3,7 @@ package ciris.hocon
 import ciris.api.Monad
 import ciris.{ConfigDecoder, ConfigEntry, ConfigError}
 import com.typesafe.config.{ConfigException, ConfigMemorySize, ConfigValue}
+import org.manatki.derevo.cirisDerivation.internal.FromIterator
 
 import scala.collection.generic.CanBuildFrom
 import scala.collection.JavaConverters._
@@ -38,36 +39,28 @@ private[hocon] trait ConfigValueDecoderCollectionInstances {
   implicit def seqConfigValueDecoder[C[_], A](
       implicit
       dec: ConfigValueDecoder[A],
-      cbf: CanBuildFrom[Nothing, A, C[A]]
+      fromIter: FromIterator[A, C]
   ): ConfigValueDecoder[C[A]] =
     catchNonFatal { cfg => path =>
-      val list    = cfg.getList(path)
-      val builder = cbf()
-      var idx     = 0
-
-      builder.sizeHint(list.size)
-      list.asScala.foreach { value =>
-        builder += ConfigEntry(idx, SeqElementKeyType, Right(value)).decodeValue[A].orThrow()
-        idx = 1
-      }
-      builder.result
+      fromIter(cfg.getList(path).iterator().asScala.zipWithIndex.map {
+        case (value, idx) => ConfigEntry(idx, SeqElementKeyType, Right(value)).decodeValue[A].orThrow()
+      })
     }
 
   implicit def mapConfigValueDecoder[A](
       implicit dec: ConfigValueDecoder[A]
   ): ConfigValueDecoder[Map[String, A]] =
     catchNonFatal { cfg => path =>
-      val entries = cfg.getObject(path).entrySet
-      val builder = Map.newBuilder[String, A]
-
-      builder.sizeHint(entries.size)
-      entries.asScala.foreach { entry =>
-        val key   = entry.getKey
-        val value = ConfigEntry(key, MapEntryKeyType, Right(entry.getValue)).decodeValue[A].orThrow()
-
-        builder += ((key, value))
-      }
-      builder.result
+      cfg
+        .getObject(path)
+        .entrySet()
+        .iterator
+        .asScala
+        .map { entry =>
+          val key = entry.getKey
+          key -> ConfigEntry(key, MapEntryKeyType, Right(entry.getValue)).decodeValue[A].orThrow()
+        }
+        .toMap
     }
 }
 
