@@ -1,6 +1,6 @@
 organization in ThisBuild := "org.manatki"
 
-val publishVersion = "0.10.0"
+val publishVersion = "0.10.2"
 
 publishMavenStyle in ThisBuild := true
 

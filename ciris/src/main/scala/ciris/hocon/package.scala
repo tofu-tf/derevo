@@ -50,7 +50,7 @@ package object hocon {
           sourceValue  <- entry.sourceValue
           errorOrValue <- entry.value
         } yield
-          errorOrValue.right.flatMap { value =>
+          errorOrValue.flatMap { value =>
             try Right(fn(value.atKey(DummyPath))(DummyPath))
             catch {
               case NonFatal(cause) =>
