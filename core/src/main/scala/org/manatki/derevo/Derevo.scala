@@ -33,8 +33,17 @@ class Derevo(val c: blackbox.Context) {
   def delegateParams2[TC[_], I, Arg1, Arg2](arg1: c.Expr[Arg1], arg2: c.Expr[Arg2]): c.Expr[TC[I]] =
     c.Expr(delegation(c.prefix.tree, Some(method => q"$method($arg1, $arg2)")))
 
+  def delegateParams3[TC[_], I, Arg1, Arg2, Arg3](arg1: c.Expr[Arg1], arg2: c.Expr[Arg2], arg3: c.Expr[Arg3]): c.Expr[TC[I]] =
+    c.Expr(delegation(c.prefix.tree, Some(method => q"$method($arg1, $arg2, $arg3)")))
+
+  private def unpackArgs(args: Tree): Seq[Tree] =
+    args match {
+      case q"(..$params)" => params
+      case _ => abort("argument of delegateParams must be tuple")
+    }
+
   def delegateParams[TC[_], I, Args](args: c.Expr[Args]): c.Expr[TC[I]] =
-    c.Expr(delegation(c.prefix.tree, Some(method => q"$method($args)")))
+    c.Expr(delegation(c.prefix.tree, Some(method => q"$method(..${unpackArgs(args.tree)})")))
 
   private def delegation(tree: Tree, maybeCall: Option[Tree => Tree]): Tree = {
     val annots = tree.tpe.termSymbol.annotations
