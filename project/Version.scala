@@ -15,7 +15,7 @@ object Version {
 
   val typesafeConfig = "1.4.0"
 
-  val ciris = "0.13.0-RC1"
+  val ciris = "1.0.2"
 
   val reactivemongo = "0.18.0"
 

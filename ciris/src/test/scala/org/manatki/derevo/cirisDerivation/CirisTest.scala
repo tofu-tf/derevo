@@ -1,21 +1,22 @@
 package org.manatki.derevo.cirisDerivation
 
-import org.manatki.derevo.derive
-import scala.concurrent.duration.FiniteDuration
-
-import ciris.loadConfig
-import ciris.hocon.instances._
+import cats.effect.IO
 import ciris.hocon._
+import ciris.hocon.instances._
 import com.typesafe.config.ConfigFactory
+import org.manatki.derevo.derive
 
+import scala.concurrent.ExecutionContext
 @derive(cirisDecoder)
 case class Data(name: String, list: List[String], map: Map[String, Int], rate: Rate)
 
 @derive(cirisDecoder)
-case class Rate(elements: Int, duration: FiniteDuration)
+case class Rate(elements: Int)
 
 object CirisTest {
   def main(args: Array[String]): Unit = {
+    implicit val contextShift = IO.contextShift(ExecutionContext.global)
+
     val cfg = ConfigFactory.parseString(
       """
         |data {
@@ -30,13 +31,7 @@ object CirisTest {
         |  }
         |}
       """.stripMargin
-      )
-
-    val res = loadConfig(hoconSource[ciris.api.Id, Data](cfg).read("data")) { hocon => hocon }
-
-    res.result.fold(
-      e => e.messages.foreach(println),
-      println(_)
-      )
+    )
+    println(hoconSource[Data](cfg, "data").load[IO].unsafeRunSync())
   }
 }
