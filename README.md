@@ -20,3 +20,17 @@ val version = "0.10.1"
 ```
 
 Requires ["paradise"](https://github.com/scalamacros/paradise) for scala older than "2.13" and "-Ymacro-annotations" scalac option for scala "2.13".
+
+### Tethys
+```scala
+import org.manatki.derevo.derive
+import tethys._
+import tethys.derivation.builder.{FieldStyle, WriterDerivationConfig}
+import tethys.jackson._
+
+@derive(
+      tethysReader,
+      tethysWriter(WriterDerivationConfig.withFieldStyle(FieldStyle.lowerSnakecase))
+    )
+final case class Bar(stringName: String, integerAge: Int)
+```
