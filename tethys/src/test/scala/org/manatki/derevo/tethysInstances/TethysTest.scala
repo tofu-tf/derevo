@@ -3,6 +3,7 @@ package org.manatki.derevo.tethysInstances
 import org.manatki.derevo.derive
 import org.scalatest.{FlatSpec, Matchers}
 import tethys._
+import tethys.derivation.builder.{FieldStyle, ReaderDerivationConfig, WriterDerivationConfig}
 import tethys.jackson._
 
 @derive(tethysWriter)
@@ -44,5 +45,30 @@ class TethysTest extends FlatSpec with Matchers {
     val p = P(123.0, List(1, 2, 3))
 
     p.asJson shouldBe """{"a":123.0,"b":[1,2,3]}"""
+  }
+
+  it should "derive codecs with case transformation" in {
+    @derive(
+      tethysReader(ReaderDerivationConfig.withFieldStyle(FieldStyle.lowerSnakecase)),
+      tethysWriter(WriterDerivationConfig.withFieldStyle(FieldStyle.lowerSnakecase))
+    )
+    final case class Bar(stringName: String, integerAge: Int)
+
+    val decodedBar = """
+        |{
+        |   "string_name": "Cheburek",
+        |   "integer_age": 146
+        |}
+        |""".stripMargin.jsonAs[Bar]
+
+    assert(decodedBar == Right(Bar("Cheburek", 146)))
+    val encodedBar =
+      """
+        |{
+        |   "string_name": "Lolkek",
+        |   "integer_age": -228
+        |}
+        |""".stripMargin.filterNot(_.isWhitespace)
+    assert(Bar("Lolkek", -228).asJson == encodedBar)
   }
 }
