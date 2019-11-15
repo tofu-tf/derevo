@@ -6,7 +6,7 @@ Multiple instance derivations inside a single macro annotation
 | [![Build Status](https://travis-ci.com/manatki/derevo.svg?branch=master)](https://travis-ci.com/Tmanatki/derevo) | [![Maven Central](https://img.shields.io/maven-central/v/org.manatki/derevo-core_2.12.svg)](https://search.maven.org/search?q=org.manatki.derevo) | 
 
 ```scala
-val version = "0.10.4"
+val version = "0.10.5"
 
 "org.manatki" %% "derevo-core"         % version  
 "org.manatki" %% "derevo-cats"         % version  

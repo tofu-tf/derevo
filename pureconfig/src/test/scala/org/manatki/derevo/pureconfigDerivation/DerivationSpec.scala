@@ -3,7 +3,7 @@ package org.manatki.derevo.pureconfigDerivation
 import com.typesafe.config.ConfigFactory
 import org.manatki.derevo.derive
 import org.scalatest.{FunSuite, Matchers}
-import pureconfig.{ConfigReader, ConfigWriter}
+import pureconfig.{ConfigReader, ConfigSource, ConfigWriter}
 import pureconfig.syntax._
 
 @derive(pureconfigReader, pureconfigWriter)
@@ -16,7 +16,7 @@ class DerivationSpec extends FunSuite with Matchers {
 
   def roundTrip[A: ConfigReader: ConfigWriter](value: A): Unit = {
     val raw = value.toConfig.render
-    pureconfig.loadConfig[A](ConfigFactory.parseString(raw)) shouldBe Right(value)
+    ConfigSource.fromConfig(ConfigFactory.parseString(raw)).load[A] shouldBe Right(value)
   }
 
   test("writes and reads simple config") {
