@@ -70,7 +70,7 @@ lazy val cats          = project dependsOn core settings common
 lazy val circe         = project dependsOn core settings common
 lazy val ciris         = project dependsOn core settings common settings (scalacOptions -= "-Xfatal-warnings")
 lazy val tethys        = project dependsOn core settings common settings compile211
-lazy val tschema       = project dependsOn core settings common settings compile211
+lazy val tschema       = project dependsOn core settings common
 lazy val reactivemongo = project dependsOn core settings common settings compile211
 lazy val catsTagless   = project dependsOn core settings common settings compile211
 lazy val pureconfig    = project dependsOn core settings common settings compile211
