@@ -1,15 +1,14 @@
 package org.manatki
 
-import scala.annotation.{StaticAnnotation, compileTimeOnly}
+import scala.annotation.StaticAnnotation
 
 package derevo {
-
   class derive(instances: Any*) extends StaticAnnotation {
     def macroTransform(annottees: Any*): Any = macro Derevo.deriveMacro
   }
 
   class delegating(to: String) extends StaticAnnotation
-  class phantom
+  class phantom extends StaticAnnotation
 
   sealed trait InstanceDef
   trait Derivation[TC[_]]                  extends InstanceDef

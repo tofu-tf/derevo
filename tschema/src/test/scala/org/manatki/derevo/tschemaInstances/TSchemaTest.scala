@@ -15,7 +15,7 @@ final case class Bar(name: Option[String], age: Long)
 object TSchemaTest {
   implicit val printer = Printer.spaces4.copy(dropNullValues = true)
   def main(args: Array[String]): Unit = {
-    println(SwaggerTypeable[Foo].typ.deref.value.asJson.pretty(printer))
+    println(SwaggerTypeable[Foo].typ.deref.value.asJson.printWith(printer))
 
     implicitly[HttpParam[Bar]] match {
       case bm: HttpMultiParam[Bar] =>

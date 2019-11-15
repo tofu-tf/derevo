@@ -1,11 +1,11 @@
 name := "derevo"
 import com.typesafe.sbt.SbtGit.git
 
-val publishVersion = "0.10.4"
+val publishVersion = "0.10.5"
 
 val common = List(
-  scalaVersion := "2.13.0",
-  crossScalaVersions := List("2.12.9", "2.13.0"),
+  scalaVersion := "2.13.1",
+  crossScalaVersions := List("2.12.10", "2.13.1"),
   libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % Provided,
   libraryDependencies ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
@@ -49,7 +49,9 @@ val common = List(
       url("https://github.com/odomontois")
     )
   ),
-  credentials += Credentials(Path.userHome / ".sbt" / "odo.credentials"),
+  credentials ++= ((Path.userHome / ".sbt" / "odo.credentials") :: Nil)
+    .filter(_.exists())
+    .map(Credentials.apply),
   pgpSecretRing := Path.userHome / ".gnupg" / "secring.gpg",
   organization := "org.manatki",
   version := {
