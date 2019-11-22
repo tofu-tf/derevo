@@ -3,34 +3,198 @@ Multiple instance derivations inside a single macro annotation
 
 | CI | Release | 
 | --- | --- |
-| [![Build Status](https://travis-ci.com/manatki/derevo.svg?branch=master)](https://travis-ci.com/Tmanatki/derevo) | [![Maven Central](https://img.shields.io/maven-central/v/org.manatki/derevo-core_2.12.svg)](https://search.maven.org/search?q=org.manatki.derevo) | 
+| [![Build Status](https://travis-ci.org/manatki/derevo.svg?branch=master)](https://travis-ci.org/manatki/derevo) | [![Maven Central](https://img.shields.io/maven-central/v/org.manatki/derevo-core_2.12.svg)](https://search.maven.org/search?q=org.manatki.derevo) | 
 
-```scala
-val version = "0.10.5"
-
-"org.manatki" %% "derevo-core"         % version  
-"org.manatki" %% "derevo-cats"         % version  
-"org.manatki" %% "derevo-circe"        % version  
-"org.manatki" %% "derevo-ciris"        % version  
-"org.manatki" %% "derevo-tethys"       % version  
-"org.manatki" %% "derevo-tschema"      % version  
-"org.manatki" %% "derevo-rmongo"       % version  
-"org.manatki" %% "derevo-cats-tagless" % version  
-"org.manatki" %% "derevo-pureconfig"   % version
+## Installation
+For Scala 2.12 and older:
+```sbt
+addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.full)
 ```
 
-Requires ["paradise"](https://github.com/scalamacros/paradise) for scala older than "2.13" and "-Ymacro-annotations" scalac option for scala "2.13".
+For Scala 2.13:
+```sbt
+scalacOptions += "-Ymacro-annotations"
+```
 
-### Tethys
+## Supported integrations
+
+### [Cats](https://github.com/typelevel/cats)
+```sbt
+libraryDependencies += "org.manatki" %% "derevo-cats" % "latest version in badge"
+```
+
 ```scala
 import org.manatki.derevo.derive
+import org.manatki.derevo.catsInstances.{eq => eqv, show, order, monoid}
+
+import cats.Monoid
+import cats.instances.string._
+import cats.instances.int._
+import cats.syntax.show._
+import cats.syntax.order._
+import cats.syntax.semigroup._
+import cats.syntax.monoid._
+
+@derive(eqv, show, order, monoid)
+case class Foo(bar: String, baz: Int)
+
+assert(Foo("111", 222) === Foo("111", 222))
+assert(show"${Foo("111", 222)}" === "Foo{bar=111,baz=222}")
+assert((Foo("111", 222) compare Foo("222", 333)) == -1)
+assert((Foo("1", 1) |+| Foo("2", 2)) == Foo("12", 3))
+assert(Monoid[Foo].empty == Foo("", 0))
+```
+
+### [Cats Tagless](https://github.com/typelevel/cats-tagless)
+```sbt
+libraryDependencies += "org.manatki" %% "derevo-cats-tagless" % "latest version in badge"
+```
+
+```scala
+import org.manatki.derevo.derive
+import org.manatki.derevo.tagless.{functor, flatMap, invariant, contravariant, functorK, invariantK, semigroupalK, applyK}
+
+// TODO
+```
+
+### [Tethys](https://github.com/tethys-json/tethys)
+```sbt
+libraryDependencies += "org.manatki" %% "derevo-tethys" % "latest version in badge"
+```
+
+```scala
+import org.manatki.derevo.derive
+import org.manatki.derevo.tethysInstances.{tethysReader, tethysWriter}
+
 import tethys._
 import tethys.derivation.builder.{FieldStyle, WriterDerivationConfig}
 import tethys.jackson._
 
 @derive(
-      tethysReader,
-      tethysWriter(WriterDerivationConfig.withFieldStyle(FieldStyle.lowerSnakecase))
-    )
+  tethysReader,
+  tethysWriter(WriterDerivationConfig.withFieldStyle(FieldStyle.lowerSnakecase))
+)
 final case class Bar(stringName: String, integerAge: Int)
+
+assert(Bar("Cotique", 27).asJson == """{"string_name":"Cotique","integer_age":27}""")
+assert("""{"stringName":"Elya","integerAge":32}""".jsonAs[Bar] == Right(Bar("Elya", 32)))
+```
+
+### [Circe](https://github.com/circe/circe)
+```sbt
+libraryDependencies += "org.manatki" %% "derevo-circe" % "latest version in badge"
+```
+
+```scala
+import org.manatki.derevo.derive
+import org.manatki.derevo.circeDerivation.{decoder, encoder}
+
+import io.circe._
+import io.circe.syntax._
+import io.circe.parser._
+
+@derive(decoder, encoder)
+final case class Bar(stringName: String, integerAge: Int)
+
+assert(Bar("KKK", 22).asJson.printWith(Printer.noSpaces) == """{"stringName":"KKK","integerAge":22}""")
+assert(parse("""{"stringName":"WWW","integerAge":20}""").flatMap(_.as[Bar]) == Right(Bar("WWW", 20)))
+```
+
+### [Ciris](https://github.com/vlovgr/ciris) + `HOCON`
+```sbt
+libraryDependencies += "org.manatki" %% "derevo-ciris" % "latest version in badge"
+```
+
+```scala
+import org.manatki.derevo.derive
+import org.manatki.derevo.cirisDerivation.cirisDecoder
+
+import com.typesafe.config.ConfigFactory
+import ciris.hocon._
+import ciris.hocon.instances._
+
+@derive(cirisDecoder)
+case class DataConfig(name: String, addresses: List[String], mapping: Map[String, Int])
+
+val source = hoconSource[DataConfig](
+    ConfigFactory.parseString(
+    """
+      |data {
+      |  name = AAA
+      |  addresses = [home, work, pub]
+      |  mapping.until = 1
+      |  mapping.from  = 2
+      |  mapping.to    = 3
+      |}
+      """.stripMargin
+    ),
+    "data"
+)
+
+// Load in F[_] context, cats.effect.IO just for example
+import cats.effect.IO
+import scala.concurrent.ExecutionContext.global
+
+implicit val cs = IO.contextShift(global)
+
+assert(source.load[IO].unsafeRunSync() == DataConfig("AAA", List("pub", "home", "work"), Map("until" -> 1, "from" -> 2, "to" -> 3)))
+```
+
+### [PureConfig](https://github.com/pureconfig/pureconfig)
+```sbt
+libraryDependencies += "org.manatki" %% "derevo-pureconfig" % "latest version in badge"
+```
+
+```scala
+import org.manatki.derevo.derive
+import org.manatki.derevo.pureconfigDerivation.{pureconfigReader, pureconfigWriter}
+
+import com.typesafe.config.ConfigFactory
+import pureconfig._
+import pureconfig.syntax._
+
+@derive(pureconfigReader, pureconfigWriter)
+case class DataConfig(name: String, addresses: List[String], mapping: Map[String, Int])
+
+val raw = ConfigFactory
+  .parseString(
+    """
+      |{
+      |  name = AAA
+      |  addresses = [home, work, pub]
+      |  mapping.until = 1
+      |  mapping.from  = 2
+      |  mapping.to    = 3
+      |}
+        """.stripMargin
+  )
+
+val parsed = ConfigSource.fromConfig(raw).load[DataConfig]
+
+assert(parsed == Right(DataConfig("AAA", List("home", "work", "pub"), Map("until" -> 1, "from" -> 2, "to" -> 3))))
+assert(parsed.map(_.toConfig.atPath("data").getConfig("data")) == Right(raw))
+```
+
+### [TypedSchema](https://github.com/TinkoffCreditSystems/typed-schema)
+```sbt
+libraryDependencies += "org.manatki" %% "derevo-tschema" % "latest version in badge"
+```
+
+```scala
+import org.manatki.derevo.derive
+import org.manatki.derevo.tschemaInstances.{swagger, openapiParam, httpParam}
+
+// TODO
+```
+
+### [RMongo](https://github.com/tc/RMongo)
+```sbt
+libraryDependencies += "org.manatki" %% "derevo-rmongo" % "latest version in badge"
+```
+
+```scala
+import org.manatki.derevo.derive
+import org.manatki.derevo.reactivemongoDerivation.{bsonDocumentReader, bsonDocumentWriter}
+
+// TODO
 ```
