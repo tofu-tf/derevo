@@ -22,4 +22,6 @@ object Version {
   val tethys = "0.10.0"
 
   val typedSchema = "0.11.1"
+
+  val scalaCheck = "1.14.1"
 }
