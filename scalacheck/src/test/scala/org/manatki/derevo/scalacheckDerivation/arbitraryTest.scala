@@ -17,6 +17,7 @@ case class Bek(baz: String) extends Lol
 object arbitraryTest {
   def main(args: Array[String]): Unit = {
     println(implicitly[Arbitrary[Foo]].arbitrary.sample)
-    println((0 until 10).map(_ => arbitrary.instance[Lol].arbitrary.sample).mkString("\n"))
+    val lolGen = arbitrary.instance[Lol].arbitrary
+    println((0 until 10).map(_ => lolGen.sample).mkString("\n"))
   }
 }
