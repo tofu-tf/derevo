@@ -1,5 +1,5 @@
 object Version {
-  val scalaTest = "3.0.8"
+  val scalaTest = "3.1.0"
 
   val catsTagless = "0.10"
 
@@ -11,17 +11,17 @@ object Version {
 
   val pureConfig = "0.12.1"
 
-  val magnolia = "0.12.0"
+  val magnolia = "0.12.5"
 
   val typesafeConfig = "1.4.0"
 
-  val ciris = "1.0.2"
+  val ciris = "1.0.3"
 
-  val reactivemongo = "0.18.0"
+  val reactivemongo = "0.19.4"
 
   val tethys = "0.10.0"
 
   val typedSchema = "0.11.1"
 
-  val scalaCheck = "1.14.1"
+  val scalaCheck = "1.14.3"
 }

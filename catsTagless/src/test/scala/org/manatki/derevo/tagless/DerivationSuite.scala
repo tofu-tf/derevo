@@ -5,12 +5,13 @@ import cats.arrow.FunctionK.lift
 import cats.data.Tuple2K
 import cats.tagless.{ApplyK, Derive}
 import org.manatki.derevo.derive
-import org.scalatest.{FlatSpec, Matchers}
 import cats.tagless.syntax.all._
 import cats.syntax.flatMap._
 import cats.syntax.functor._
 import cats.syntax.invariant._
 import cats.syntax.contravariant._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 @derive(functorK, semigroupalK)
 trait Foo[F[_]] {
@@ -48,7 +49,7 @@ trait Tento[X] {
 }
 
 
-class DerivationSuite extends FlatSpec with Matchers {
+class DerivationSuite extends AnyFlatSpec with Matchers {
   val listFoo: Foo[List]                       = name => name.toList
   val funFoo: Foo[Int => ?]                    = name => i => name(i)
   val optFoo: Foo[Option]                      = listFoo.mapK(functionK[List](_.headOption))

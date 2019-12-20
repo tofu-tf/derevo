@@ -1,13 +1,13 @@
 package org.manatki.derevo.circeDerivation
 
 import io.circe.Encoder
-import org.scalatest.FlatSpec
 import org.manatki.derevo.derive
 import io.circe.syntax._
 import io.circe.parser._
 import io.circe.derivation.renaming
+import org.scalatest.flatspec.AnyFlatSpec
 
-class CirceDerivationSpec extends FlatSpec {
+class CirceDerivationSpec extends AnyFlatSpec {
   "Circe derivation" should "derive simple codecs" in {
     @derive(encoder, decoder)
     final case class Foo (string: String, int: Int)

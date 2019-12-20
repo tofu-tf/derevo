@@ -1,7 +1,8 @@
 package org.manatki.derevo.tethysInstances
 
 import org.manatki.derevo.derive
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import tethys._
 import tethys.derivation.builder.{FieldStyle, ReaderDerivationConfig, WriterDerivationConfig}
 import tethys.jackson._
@@ -28,7 +29,7 @@ case class Foo(d: Int, e: String)
 @derive(tethysWriter)
 case class ChoiceList(list: List[Choice], amount: Int)
 
-class TethysTest extends FlatSpec with Matchers {
+class TethysTest extends AnyFlatSpec with Matchers {
   "Writer derivation for ADT" should "work correctly" in {
     val choices = ChoiceList(List(First(1, "lol"), Second(c = true, Some(Foo(1, "kek"))), Third), 3)
 

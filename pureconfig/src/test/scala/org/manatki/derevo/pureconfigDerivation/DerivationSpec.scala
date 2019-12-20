@@ -2,7 +2,8 @@ package org.manatki.derevo.pureconfigDerivation
 
 import com.typesafe.config.ConfigFactory
 import org.manatki.derevo.derive
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 import pureconfig.{ConfigReader, ConfigSource, ConfigWriter}
 import pureconfig.syntax._
 
@@ -12,7 +13,7 @@ case class Credentials(login: String, password: String)
 @derive(pureconfigReader, pureconfigWriter)
 case class Foo[A](m: A)
 
-class DerivationSpec extends FunSuite with Matchers {
+class DerivationSpec extends AnyFunSuite with Matchers {
 
   def roundTrip[A: ConfigReader: ConfigWriter](value: A): Unit = {
     val raw = value.toConfig.render
