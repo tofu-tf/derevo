@@ -17,7 +17,7 @@ object Version {
 
   val ciris = "1.0.3"
 
-  val reactivemongo = "0.19.4"
+  val reactivemongo = "0.19.5"
 
   val tethys = "0.10.0"
 
