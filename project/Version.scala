@@ -19,7 +19,7 @@ object Version {
 
   val reactivemongo = "0.19.4"
 
-  val tethys = "0.10.0"
+  val tethys = "0.11.0"
 
   val typedSchema = "0.11.1"
 
