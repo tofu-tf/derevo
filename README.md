@@ -111,6 +111,49 @@ assert(Bar("KKK", 22).asJson.printWith(Printer.noSpaces) == """{"stringName":"KK
 assert(parse("""{"stringName":"WWW","integerAge":20}""").flatMap(_.as[Bar]) == Right(Bar("WWW", 20)))
 ```
 
+### [Circe Magnolia](https://github.com/circe/circe-magnolia) 
+```sbt
+libraryDependencies += "org.manatki" %% "derevo-circe-magnolia" % "latest version in badge"
+```
+
+```scala
+import derevo.derive
+import derevo.circe.magnolia.{decoder, encoder}
+
+import io.circe._
+import io.circe.syntax._
+import io.circe.parser._
+
+@derive(decoder, encoder)
+final case class Bar(stringName: String, integerAge: Int)
+
+assert(Bar("KKK", 22).asJson.printWith(Printer.noSpaces) == """{"stringName":"KKK","integerAge":22}""")
+assert(parse("""{"stringName":"WWW","integerAge":20}""").flatMap(_.as[Bar]) == Right(Bar("WWW", 20)))
+```
+
+To change default `io.circe.magnolia.configured.Configuration`:
+```
+import derevo.derive
+import derevo.circe.magnolia.{customizableDecoder, customizableEncoder}
+
+import io.circe._
+import io.circe.syntax._
+import io.circe.parser._
+
+@derive(customizableEncoder, customizableDecoder)
+sealed trait SealedTrait
+
+object SealedTrait {
+  implicit val configuration:Configuration = Configuration.default.withDiscriminator("type")
+
+  @derive(encoder, decoder)
+  case class Bar(bar: Int) extends SealedTrait
+
+  @derive(encoder, decoder)
+  case class Baz(baz: String) extends SealedTrait
+}
+```
+
 ### [Ciris](https://github.com/vlovgr/ciris) + `HOCON`
 ```sbt
 libraryDependencies += "org.manatki" %% "derevo-ciris" % "latest version in badge"

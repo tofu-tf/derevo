@@ -68,6 +68,7 @@ lazy val core = project settings common settings compile211
 
 lazy val cats          = project dependsOn core settings common
 lazy val circe         = project dependsOn core settings common
+lazy val circeMagnolia = project dependsOn core settings common
 lazy val ciris         = project dependsOn core settings common settings (scalacOptions -= "-Xfatal-warnings")
 lazy val tethys        = project dependsOn core settings common settings compile211
 lazy val tschema       = project dependsOn core settings common
@@ -77,5 +78,5 @@ lazy val pureconfig    = project dependsOn core settings common settings compile
 lazy val scalacheck    = project dependsOn core settings common
 
 lazy val derevo = project in file(".") settings (common, skip in publish := true) aggregate (
-  core, cats, circe, ciris, tethys, tschema, reactivemongo, catsTagless, pureconfig, scalacheck
+  core, cats, circe, circeMagnolia, ciris, tethys, tschema, reactivemongo, catsTagless, pureconfig, scalacheck
 )
