@@ -124,7 +124,10 @@ class Derevo(val c: blackbox.Context) {
     val tn = TermName(name)
     if (cls.tparams.isEmpty) {
       val resT = mkAppliedType(toTc, tq"$typName")
-      q"implicit val $tn: $resT = $call"
+      q"""
+      @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
+      implicit val $tn: $resT = $call
+      """
     } else {
       val tparams = cls.tparams.drop(drop)
       val implicits = tparams.flatMap { tparam =>
@@ -143,7 +146,10 @@ class Derevo(val c: blackbox.Context) {
       val tps    = tparams.map(_.name)
       val appTyp = tq"$typName[..$tps]"
       val resT   = mkAppliedType(toTc, appTyp)
-      q"implicit def $tn[..$tparams](implicit ..$implicits): $resT = $call"
+      q"""
+      @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
+      implicit def $tn[..$tparams](implicit ..$implicits): $resT = $call
+      """
     }
   }
 
