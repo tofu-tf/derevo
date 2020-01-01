@@ -1,5 +1,6 @@
+import Publish._
+
 name := "derevo"
-import com.typesafe.sbt.SbtGit.git
 
 val publishVersion = "0.11.0"
 
@@ -14,21 +15,21 @@ val common = List(
     }
   },
   libraryDependencies += compilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3"),
-  scalacOptions ++= Vector(
+  scalacOptions ++= Seq(
     "-deprecation",
     "-feature",
     "-language:experimental.macros",
     "-language:higherKinds",
-    "-Xfatal-warnings",
+    "-Xfatal-warnings"
   ),
   scalacOptions ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, y)) if y == 11 => Seq("-Xexperimental")
       case Some((2, y)) if y == 13 => Seq("-Ymacro-annotations")
-      case _                       => Seq.empty[String]
+      case _                       => Nil
     }
   },
-  publishMavenStyle := true,
+  organization := "org.manatki",
   homepage := Some(url("https://manatki.org/docs/derevo")),
   scmInfo := Some(
     ScmInfo(
@@ -36,11 +37,6 @@ val common = List(
       "git@github.com:manatki/derevo.git"
     )
   ),
-  publishTo := {
-    if (isSnapshot.value) {
-      Some(Opts.resolver.sonatypeSnapshots)
-    } else sonatypePublishToBundle.value
-  },
   developers := List(
     Developer(
       "odomontois",
@@ -49,17 +45,33 @@ val common = List(
       url("https://github.com/odomontois")
     )
   ),
-  credentials ++= ((Path.userHome / ".sbt" / "odo.credentials") :: Nil)
-    .filter(_.exists())
-    .map(Credentials.apply),
-  pgpSecretRing := Path.userHome / ".gnupg" / "secring.gpg",
-  organization := "org.manatki",
-  version := {
-    val branch = git.gitCurrentBranch.value
-    if (branch == "master") publishVersion
-    else s"$publishVersion-$branch-SNAPSHOT"
+  licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
+
+  publishToGitHub := sys.env.contains("GITHUB_PUBLISH"),
+  publishTo := {
+    if (publishToGitHub.value) Some("GitHub Package Registry" at "https://maven.pkg.github.com/manatki/derevo")
+    else if (isSnapshot.value) Some(Opts.resolver.sonatypeSnapshots)
+    else sonatypePublishToBundle.value
   },
-  licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
+  publishMavenStyle := true,
+  version := {
+    if (publishToGitHub.value) s"$publishVersion-${git.gitHeadCommit.value.get}-SNAPSHOT"
+    else git.gitCurrentBranch.value match {
+      case "master" => publishVersion
+      case branch   => s"$publishVersion-$branch-SNAPSHOT"
+    }
+  },
+  credentials ++= {
+    if (publishToGitHub.value)
+      for {
+        user  <- sys.env.get("GITHUB_USER")
+        token <- sys.env.get("GITHUB_TOKEN")
+      } yield Credentials("GitHub Package Registry", "maven.pkg.github.com", user, token)
+    else Some(Path.userHome / ".sbt" / "odo.credentials")
+      .filter(_.exists())
+      .map(Credentials.apply)
+  },
+  pgpSecretRing := Path.userHome / ".gnupg" / "secring.gpg"
 )
 
 val compile211 = crossScalaVersions += "2.11.12"
