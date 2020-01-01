@@ -6,7 +6,7 @@ import io.circe.{Decoder, Encoder}
 @delegating("io.circe.derivation.deriveDecoder")
 object decoder extends Derivation[Decoder] {
   def instance[A]: Decoder[A] = macro Derevo.delegate[Decoder, A]
-  io.circe.derivation.deriveDecoder
+
   /**
    * @param arg1 naming function. For example io.circe.derivation.renaming.snakeCase
    * @param arg2 useDefaults
