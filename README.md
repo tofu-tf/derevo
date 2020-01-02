@@ -210,9 +210,9 @@ libraryDependencies += "org.manatki" %% "derevo-scalacheck" % "latest version in
 ```
 
 ```scala
-import org.manatki.derevo.derive
+import derevo.derive
 import org.scalacheck.Arbitrary
-import org.manatki.derevo.scalacheckDerivation.arbitrary
+import derevo.scalacheckDerivation.arbitrary
 
 // for existing classes
 sealed trait Bear
