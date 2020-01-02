@@ -3,7 +3,12 @@ Multiple instance derivations inside a single macro annotation
 
 | CI | Release | 
 | --- | --- |
-| [![Build Status](https://travis-ci.org/manatki/derevo.svg?branch=master)](https://travis-ci.org/manatki/derevo) | [![Maven Central](https://img.shields.io/maven-central/v/org.manatki/derevo-core_2.12.svg)](https://search.maven.org/search?q=org.manatki.derevo) | 
+| [![Build Status](https://travis-ci.org/manatki/derevo.svg?branch=master)](https://travis-ci.org/manatki/derevo) | [![Maven Central](https://img.shields.io/maven-central/v/org.manatki/derevo-core_2.12.svg)](https://search.maven.org/search?q=derevo) | 
+
+## Breaking changes in 0.11
+`org.manatki.derevo` pkg was shortened to `derevo`.
+
+Use [scalafix](https://scalacenter.github.io/scalafix/docs/users/installation) and [this rule](https://gist.github.com/REDNBLACK/9bc56ad71e4b01a63001339fa61b4cfd) for migration
 
 ## Installation
 For Scala 2.12 and older:
@@ -24,8 +29,8 @@ libraryDependencies += "org.manatki" %% "derevo-cats" % "latest version in badge
 ```
 
 ```scala
-import org.manatki.derevo.derive
-import org.manatki.derevo.catsInstances.{eq => eqv, show, order, monoid}
+import derevo.derive
+import derevo.cats.{eq => eqv, show, order, monoid}
 
 import cats.Monoid
 import cats.instances.string._
@@ -51,8 +56,8 @@ libraryDependencies += "org.manatki" %% "derevo-cats-tagless" % "latest version 
 ```
 
 ```scala
-import org.manatki.derevo.derive
-import org.manatki.derevo.tagless.{functor, flatMap, invariant, contravariant, functorK, invariantK, semigroupalK, applyK}
+import derevo.derive
+import derevo.tagless.{functor, flatMap, invariant, contravariant, functorK, invariantK, semigroupalK, applyK}
 
 // TODO
 ```
@@ -63,8 +68,8 @@ libraryDependencies += "org.manatki" %% "derevo-tethys" % "latest version in bad
 ```
 
 ```scala
-import org.manatki.derevo.derive
-import org.manatki.derevo.tethysInstances.{tethysReader, tethysWriter}
+import derevo.derive
+import derevo.tethys.{tethysReader, tethysWriter}
 
 import tethys._
 import tethys.derivation.builder.{FieldStyle, WriterDerivationConfig}
@@ -86,8 +91,8 @@ libraryDependencies += "org.manatki" %% "derevo-circe" % "latest version in badg
 ```
 
 ```scala
-import org.manatki.derevo.derive
-import org.manatki.derevo.circeDerivation.{decoder, encoder}
+import derevo.derive
+import derevo.circe.{decoder, encoder}
 
 import io.circe._
 import io.circe.syntax._
@@ -106,8 +111,8 @@ libraryDependencies += "org.manatki" %% "derevo-ciris" % "latest version in badg
 ```
 
 ```scala
-import org.manatki.derevo.derive
-import org.manatki.derevo.cirisDerivation.cirisDecoder
+import derevo.derive
+import derevo.ciris.cirisDecoder
 
 import com.typesafe.config.ConfigFactory
 import ciris.hocon._
@@ -146,8 +151,8 @@ libraryDependencies += "org.manatki" %% "derevo-pureconfig" % "latest version in
 ```
 
 ```scala
-import org.manatki.derevo.derive
-import org.manatki.derevo.pureconfigDerivation.{pureconfigReader, pureconfigWriter}
+import derevo.derive
+import derevo.pureconfig.{pureconfigReader, pureconfigWriter}
 
 import com.typesafe.config.ConfigFactory
 import pureconfig._
@@ -181,8 +186,8 @@ libraryDependencies += "org.manatki" %% "derevo-tschema" % "latest version in ba
 ```
 
 ```scala
-import org.manatki.derevo.derive
-import org.manatki.derevo.tschemaInstances.{swagger, openapiParam, httpParam}
+import derevo.derive
+import derevo.tschema.{swagger, openapiParam, httpParam}
 
 // TODO
 ```
@@ -193,15 +198,15 @@ libraryDependencies += "org.manatki" %% "derevo-rmongo" % "latest version in bad
 ```
 
 ```scala
-import org.manatki.derevo.derive
-import org.manatki.derevo.reactivemongoDerivation.{bsonDocumentReader, bsonDocumentWriter}
+import derevo.derive
+import derevo.reactivemongo.{bsonDocumentReader, bsonDocumentWriter}
 
 // TODO
 ```
 
 ### [Scalacheck](https://github.com/typelevel/scalacheck)
 ```sbt
-libraryDependencies += "org.manatki" %% "derevo-scalacheck" % "latest version in badge"
+libraryDependencies += "org.manatki" %% "derevo-scalacheck" % "latest version in badge" % Test
 ```
 
 ```scala

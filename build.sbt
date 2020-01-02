@@ -1,7 +1,7 @@
 name := "derevo"
 import com.typesafe.sbt.SbtGit.git
 
-val publishVersion = "0.10.6"
+val publishVersion = "0.11.0"
 
 val common = List(
   scalaVersion := "2.13.1",
