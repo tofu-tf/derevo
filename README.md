@@ -6,15 +6,9 @@ Multiple instance derivations inside a single macro annotation
 | [![Build Status](https://travis-ci.org/manatki/derevo.svg?branch=master)](https://travis-ci.org/manatki/derevo) | [![Maven Central](https://img.shields.io/maven-central/v/org.manatki/derevo-core_2.12.svg)](https://search.maven.org/search?q=derevo) | 
 
 ## Breaking changes in 0.11
-```scala
-import org.manatki.derevo._
-import org.manatki.derevo.${x}Instances
-```
-was shortened to
-```scala
-import derevo._
-import derevo.${x}
-```
+`org.manatki.derevo` pkg was shortened to `derevo`.
+
+Use [scalafix](https://scalacenter.github.io/scalafix/docs/users/installation) and [this rule](https://gist.github.com/REDNBLACK/9bc56ad71e4b01a63001339fa61b4cfd) for migration
 
 ## Installation
 For Scala 2.12 and older:
@@ -251,4 +245,28 @@ import derevo.derive
 import derevo.reactivemongo.{bsonDocumentReader, bsonDocumentWriter}
 
 // TODO
+```
+
+### [Scalacheck](https://github.com/typelevel/scalacheck)
+```sbt
+libraryDependencies += "org.manatki" %% "derevo-scalacheck" % "latest version in badge" % Test
+```
+
+```scala
+import derevo.derive
+import org.scalacheck.Arbitrary
+import derevo.scalacheck.arbitrary
+
+// for existing classes
+sealed trait Bear
+case class Beer(b: String, t: Boolean) extends Bear
+case class Gear(g: Int) extends Bear
+
+println(arbitrary.instance[Bear].arbitrary.sample)
+
+// for classes in tests
+@derive(arbitrary)
+case class Test(x: String, y: List[Int])
+
+println(implicitly[Arbitrary[Test]].arbitrary.sample)
 ```
