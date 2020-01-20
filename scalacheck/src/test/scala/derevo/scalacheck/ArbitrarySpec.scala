@@ -7,14 +7,10 @@ import org.scalacheck.Arbitrary
 case class Foo(bar: String, baz: Int)
 
 sealed trait Lol
+case class Kek(bar: Int)          extends Lol
+case class Bek(baz: List[String]) extends Lol
 
-@derive(arbitrary)
-case class Kek(bar: Int) extends Lol
-
-@derive(arbitrary)
-case class Bek(baz: String) extends Lol
-
-object arbitraryTest {
+object ArbitrarySpec {
   def main(args: Array[String]): Unit = {
     println(implicitly[Arbitrary[Foo]].arbitrary.sample)
     val lolGen = arbitrary.instance[Lol].arbitrary
