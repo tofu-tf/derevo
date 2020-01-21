@@ -1,0 +1,32 @@
+plugins {
+    id 'org.jetbrains.intellij' version '0.4.15'
+    id 'scala'
+}
+
+group 'org.manatki'
+version '2019.3.0.1'
+
+repositories {
+    mavenCentral()
+}
+
+// See https://github.com/JetBrains/gradle-intellij-plugin/
+intellij {
+    version '2019.3'
+    plugins 'org.intellij.scala:2019.3.23', 'java'
+}
+
+dependencies {
+    compileOnly 'org.scala-lang:scala-library:2.12.10'
+    testCompileOnly 'org.scala-lang:scala-library:2.12.10'
+}
+
+jar {
+    archiveName = "derevo-intellij.jar"
+}
+
+patchPluginXml {
+    changeNotes """
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>"""
+}

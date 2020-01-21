@@ -17,3 +17,4 @@ object ArbitrarySpec {
     println((0 until 10).map(_ => lolGen.sample).mkString("\n"))
   }
 }
+

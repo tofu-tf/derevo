@@ -21,6 +21,15 @@ For Scala 2.13:
 scalacOptions += "-Ymacro-annotations"
 ```
 
+## IntelliJ Integration
+Provides full support and visibility of implicits declared in `@derive` annotation
+
+### Build locally:
+1. `cd intellij`
+2. `gradle buildPlugin`
+3. `.zip` with plugin will be created in the `build/distributions` directory
+4. In IntelliJ open `Preferences | Plugins` and select "Install Plugin from Disk..."
+
 ## Supported integrations
 
 ### [Cats](https://github.com/typelevel/cats)
