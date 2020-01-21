@@ -24,6 +24,9 @@ scalacOptions += "-Ymacro-annotations"
 ## IntelliJ Integration
 Provides full support and visibility of implicits declared in `@derive` annotation
 
+### Download from JetBrains Marketplace
+https://plugins.jetbrains.com/plugin/13697-derevo-for-intellij-idea
+
 ### Build locally:
 1. `cd intellij`
 2. `gradle buildPlugin`
