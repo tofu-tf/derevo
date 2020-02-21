@@ -28,36 +28,44 @@ class Derevo(val c: blackbox.Context) {
     c.Expr(delegation(c.prefix.tree, None))
 
   def delegateParam[TC[_], I, Arg](arg: c.Expr[Arg]): c.Expr[TC[I]] =
-    c.Expr(delegation(c.prefix.tree, Some(method => q"$method($arg)")))
+    c.Expr(delegation(c.prefix.tree, Some((method, args) => q"$method($arg, ..$args)")))
 
   def delegateParams2[TC[_], I, Arg1, Arg2](arg1: c.Expr[Arg1], arg2: c.Expr[Arg2]): c.Expr[TC[I]] =
-    c.Expr(delegation(c.prefix.tree, Some(method => q"$method($arg1, $arg2)")))
+    c.Expr(delegation(c.prefix.tree, Some((method, args) => q"$method($arg1, $arg2, ..$args)")))
 
-  def delegateParams3[TC[_], I, Arg1, Arg2, Arg3](arg1: c.Expr[Arg1], arg2: c.Expr[Arg2], arg3: c.Expr[Arg3]): c.Expr[TC[I]] =
-    c.Expr(delegation(c.prefix.tree, Some(method => q"$method($arg1, $arg2, $arg3)")))
+  def delegateParams3[TC[_], I, Arg1, Arg2, Arg3](
+      arg1: c.Expr[Arg1],
+      arg2: c.Expr[Arg2],
+      arg3: c.Expr[Arg3]
+  ): c.Expr[TC[I]] =
+    c.Expr(delegation(c.prefix.tree, Some((method, args) => q"$method($arg1, $arg2, $arg3, ..$args)")))
 
   private def unpackArgs(args: Tree): Seq[Tree] =
     args match {
       case q"(..$params)" => params
-      case _ => abort("argument of delegateParams must be tuple")
+      case _              => abort("argument of delegateParams must be tuple")
     }
 
   def delegateParams[TC[_], I, Args](args: c.Expr[Args]): c.Expr[TC[I]] =
-    c.Expr(delegation(c.prefix.tree, Some(method => q"$method(..${unpackArgs(args.tree)})")))
+    c.Expr(delegation(c.prefix.tree, Some((method, rest) => q"$method(..${unpackArgs(args.tree) ++ rest})")))
 
-  private def delegation(tree: Tree, maybeCall: Option[Tree => Tree]): Tree = {
+  private def delegation(tree: Tree, maybeCall: Option[(Tree, List[Tree]) => Tree]): Tree = {
     val annots = tree.tpe.termSymbol.annotations
-    val s = annots
+    val (delegatee, args) = annots
       .map(_.tree)
       .collectFirst {
-        case q"new $cls(${to: Tree})" if cls.symbol == DelegatingSymbol =>
-          c.eval(c.Expr[String](to))
+        case q"new $cls(${to: Tree}, ..$rest)" if cls.symbol == DelegatingSymbol =>
+          c.eval(c.Expr[String](to)) -> rest
       }
       .getOrElse(abort(s"could not find @delegating annotation at $tree"))
 
-    val method = s.split("\\.").map(TermName(_)).foldLeft[Tree](q"_root_")((a, b) => q"$a.$b")
+    val method = delegatee.split("\\.").map(TermName(_)).foldLeft[Tree](q"_root_")((a, b) => q"$a.$b")
 
-    maybeCall.fold(method)(call => call(method))
+    def default = args match {
+      case Nil => method
+      case _   => q"$method(..$args)"
+    }
+    maybeCall.fold(default)(call => call(method, args))
   }
 
   def deriveMacro(annottees: Tree*): Tree = {

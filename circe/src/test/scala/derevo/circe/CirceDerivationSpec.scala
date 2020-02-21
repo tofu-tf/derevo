@@ -1,20 +1,19 @@
 package derevo.circe
 
 import derevo.derive
-
-import io.circe.Encoder
+import io.circe.{DecodingFailure, Encoder}
 import io.circe.syntax._
 import io.circe.parser._
 import io.circe.derivation.renaming
-
 import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.must.Matchers
 
-class CirceDerivationSpec extends AnyFlatSpec {
+class CirceDerivationSpec extends AnyFlatSpec with Matchers {
   "Circe derivation" should "derive simple codecs" in {
-    @derive(encoder, decoder)
-    final case class Foo (string: String, int: Int)
+    @derive(codec)
+    final case class Foo(string: String, int: Int)
 
-    val foo = Foo("kek", -42)
+    val foo     = Foo("kek", -42)
     val fooJson = """{"string":"kek","int":-42}"""
 
     assert(foo.asJson.noSpaces == fooJson)
@@ -25,8 +24,7 @@ class CirceDerivationSpec extends AnyFlatSpec {
     @derive(decoder(renaming.snakeCase, false, None), encoder(renaming.kebabCase, None))
     final case class Bar(stringName: String, integerAge: Int)
 
-    val decodedBar = decode[Bar](
-      """
+    val decodedBar = decode[Bar]("""
         |{
         |   "string_name": "Cheburek",
         |   "integer_age": 146
@@ -70,6 +68,25 @@ class CirceDerivationSpec extends AnyFlatSpec {
     assert(decode[SealedTrait](barJson) == Right(bar))
     assert(decode[SealedTrait](bazJson) == Right(baz))
   }
+
+  @derive(snakeDecoder, kebabEncoder)
+  case class ShelloBaz(bazzShell: String)
+
+  val shelloBaz   = ShelloBaz("hello")
+  val shelloSnake = """{"bazz_shell":"hello"}"""
+  val shelloKebab = """{"bazz-shell":"hello"}"""
+
+  it should "encode with inserted params" in {
+    assert(shelloBaz.asJson.noSpaces === shelloKebab)
+  }
+
+  it should "decode with inserted params" in {
+    assert(decode[ShelloBaz](shelloSnake) === Right(shelloBaz))
+  }
+
+  it should "reject decode with inserted params" in {
+    decode[ShelloBaz](shelloKebab).left.getOrElse(null) mustBe a[DecodingFailure]
+  }
 }
 
 @derive(encoder(identity, Some("type")), decoder(identity, false, Some("type")))
@@ -81,4 +98,5 @@ object SealedTrait {
 
   @derive(encoder, decoder)
   case class Baz(baz: String) extends SealedTrait
+
 }
