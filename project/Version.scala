@@ -3,7 +3,7 @@ object Version {
 
   val catsTagless = "0.11"
 
-  val cats = "2.1.0"
+  val cats = "2.1.1"
 
   val circe = "0.12.3"
 
