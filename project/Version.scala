@@ -11,7 +11,7 @@ object Version {
 
   val circeDerivation = "0.12.0-M7"
 
-  val pureConfig = "0.12.2"
+  val pureConfig = "0.12.3"
 
   val magnolia = "0.12.6"
 
