@@ -5,7 +5,7 @@ object Version {
 
   val cats = "2.1.1"
 
-  val circe = "0.12.3"
+  val circe = "0.13.0"
 
   val circeMagnolia = "0.6.1"
 
