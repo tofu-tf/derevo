@@ -5,7 +5,7 @@ package derevo {
     def macroTransform(annottees: Any*): Any = macro Derevo.deriveMacro
   }
 
-  class delegating(to: String) extends StaticAnnotation
+  class delegating(to: String, args: Any*) extends StaticAnnotation
   class phantom extends StaticAnnotation
 
   sealed trait InstanceDef
