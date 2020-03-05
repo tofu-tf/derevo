@@ -70,6 +70,15 @@ class Derevo(val c: blackbox.Context) {
 
   def deriveMacro(annottees: Tree*): Tree = {
     annottees match {
+      case Seq(obj: ModuleDef) =>
+        obj match {
+          case q"$mods object $companion extends {..$earlyDefs} with ..$parents{$self => ..$defs}" =>
+            q"""
+              $mods object $companion extends {..$earlyDefs} with ..$parents{$self =>
+                ..${injectInstances(defs, instances(obj))}
+             }"""
+        }
+
       case Seq(cls: ClassDef) =>
         q"""
            $cls
@@ -105,15 +114,18 @@ class Derevo(val c: blackbox.Context) {
     pre ++ instances ++ post.drop(1)
   }
 
-  private def instances(cls: ClassDef): List[Tree] =
+  private def instances(cls: ImplDef): List[Tree] =
     c.prefix.tree match {
       case q"new derive(..${instances})" =>
         instances
           .map(buildInstance(_, cls))
     }
 
-  private def buildInstance(tree: Tree, cls: ClassDef): Tree = {
-    val typName = TypeName(cls.name.toString)
+  private def buildInstance(tree: Tree, impl: ImplDef): Tree = {
+    val typRef = impl match {
+      case cls: ClassDef  => tq"${impl.name.toTypeName}"
+      case obj: ModuleDef => tq"${obj.name}.type"
+    }
 
     val (name, fromTc, toTc, drop, call) = tree match {
       case q"$obj(..$args)" =>
@@ -130,19 +142,22 @@ class Derevo(val c: blackbox.Context) {
     }
 
     val tn = TermName(name)
-    if (cls.tparams.isEmpty) {
-      val resT = mkAppliedType(toTc, tq"$typName")
+    val allTparams = impl match {
+      case cls: ClassDef  => cls.tparams
+      case obj: ModuleDef => Nil
+    }
+
+    if (allTparams.isEmpty) {
+      val resT = mkAppliedType(toTc, tq"$typRef")
       q"""
       @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
       implicit val $tn: $resT = $call
       """
     } else {
-      val tparams = cls.tparams.drop(drop)
+      val tparams = allTparams.drop(drop)
       val implicits = tparams.flatMap { tparam =>
         val phantom =
-          tparam.mods.annotations.exists { t =>
-            c.typecheck(t).tpe.typeSymbol == PhantomSymbol
-          }
+          tparam.mods.annotations.exists { t => c.typecheck(t).tpe.typeSymbol == PhantomSymbol }
         if (phantom) None
         else {
           val name = TermName(c.freshName("ev"))
@@ -152,7 +167,7 @@ class Derevo(val c: blackbox.Context) {
         }
       }
       val tps    = tparams.map(_.name)
-      val appTyp = tq"$typName[..$tps]"
+      val appTyp = tq"$typRef[..$tps]"
       val resT   = mkAppliedType(toTc, appTyp)
       q"""
       @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
@@ -194,6 +209,9 @@ class Derevo(val c: blackbox.Context) {
   }
   def isInstanceDef[T: TypeTag](dropTParams: Int = 0) = new IsInstanceDef(typeOf[T], dropTParams)
 
-  private def debug(s: Any)    = c.info(c.enclosingPosition, s.toString, false)
+  private def debug(s: Any, pref: String = "") = c.info(c.enclosingPosition, pref + (s match {
+    case null => "null"
+    case _    => s.toString
+  }), false)
   private def abort(s: String) = c.abort(c.enclosingPosition, s)
 }
