@@ -74,7 +74,7 @@ lazy val tethys        = project dependsOn core settings common settings compile
 lazy val tschema       = project dependsOn core settings common
 lazy val reactivemongo = project dependsOn core settings common settings compile211
 lazy val catsTagless   = project dependsOn core settings common settings compile211
-lazy val pureconfig    = project dependsOn core settings common settings compile211
+lazy val pureconfig    = project dependsOn core settings common
 lazy val scalacheck    = project dependsOn core settings common
 
 lazy val derevo = project in file(".") settings (common, skip in publish := true) aggregate (
