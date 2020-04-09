@@ -13,7 +13,7 @@ object Version {
 
   val pureConfig = "0.12.3"
 
-  val magnolia = "0.14.1"
+  val magnolia = "0.14.2"
 
   val typesafeConfig = "1.4.0"
 
