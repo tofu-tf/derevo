@@ -15,8 +15,23 @@ final case class Second(c: Boolean, f: Option[Foo]) extends Choice
 
 case object Third extends Choice
 
+@derive(jsonWriter, jsonReader)
+sealed trait ChoiceX
+
+final case class FirstX(a: Int, b: String) extends ChoiceX
+
+final case class SecondX(c: Boolean, f: Option[Foo]) extends ChoiceX
+
+case object ThirdX extends ChoiceX
+
 object Choice {
   implicit val jsonCfg: CodecConfig = CodecConfig.default.withDiscriminator("type")
+}
+
+object ChoiceX{
+  implicit val jsonCfg: CodecConfig = CodecConfig.default.copy(
+    constrRename = _.replace("X", "")
+  )
 }
 
 @derive(jsonWriter)
@@ -28,17 +43,31 @@ case class Foo(d: Int, e: String)
 @derive(jsonWriter, jsonReader)
 case class ChoiceList(list: List[Choice], amount: Int)
 
+@derive(jsonReader, jsonWriter)
+case class ChoiceXList(list: List[ChoiceX], amount: Int)
+
 class TethysSuite extends AnyFlatSpec with Matchers {
-  val choices = ChoiceList(List(First(1, "lol"), Second(c = true, Some(Foo(1, "kek"))), Third), 3)
+  val choices  = ChoiceList(List(First(1, "lol"), Second(c = true, Some(Foo(1, "kek"))), Third), 3)
+  val choicesX = ChoiceXList(List(FirstX(1, "lol"), SecondX(c = true, Some(Foo(1, "kek"))), ThirdX), 3)
   val choicesJson =
     """{"list":[{"type":"First","a":1,"b":"lol"},{"type":"Second","c":true,"f":{"d":1,"e":"kek"}},{"type":"Third"}],"amount":3}"""
+  val choicesXJson =
+    """{"list":[{"First":{"a":1,"b":"lol"}},{"Second":{"c":true,"f":{"d":1,"e":"kek"}}},{"Third":{}}],"amount":3}"""
 
-  "Writer derivation for ADT" should "work correctly" in {
+  "Writer derivation for ADT with discriminator" should "work correctly" in {
     choices.asJson shouldBe choicesJson
   }
 
-  "Reader derivation for ADT" should "work correctly" in {
+  "Reader derivation for ADT with discriminator" should "work correctly" in {
     choicesJson.jsonAs[ChoiceList] shouldBe Right(choices)
+  }
+
+  "Writer derivation for ADT without discriminator" should "work correctly" in {
+    choicesX.asJson shouldBe choicesXJson
+  }
+
+  "Reader derivation for ADT without discriminator" should "work correctly" in {
+    choicesXJson.jsonAs[ChoiceXList] shouldBe Right(choicesX)
   }
 
   "Reader derivation for case class" should "work correctly" in {
