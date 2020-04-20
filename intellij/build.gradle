@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.manatki'
-version '2019.3.0.1'
+version '2020.1.0.1'
 
 repositories {
     mavenCentral()
@@ -12,8 +12,8 @@ repositories {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version '2019.3'
-    plugins 'org.intellij.scala:2019.3.23', 'java'
+    version '2020.1'
+    plugins 'org.intellij.scala:2020.1.27', 'java'
 }
 
 dependencies {
