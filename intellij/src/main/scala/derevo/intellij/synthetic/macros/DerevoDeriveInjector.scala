@@ -52,12 +52,25 @@ object DerevoDeriveInjector {
     s"$pkg.tethys.tethysReader.type" -> "implicit val derevoDeriveTethysReader: _root_.tethys.JsonReader[%s] = ???",
     s"$pkg.tethys.tethysWriter.type" -> "implicit val derevoDeriveTethysWriter: _root_.tethys.JsonWriter[%s] = ???",
     // Circe
-    s"$pkg.circe.decoder.type" -> "implicit val derevoDeriveCirceDecoder: _root_.io.circe.Decoder[%s] = ???",
-    s"$pkg.circe.encoder.type" -> "implicit val derevoDeriveCirceEncoder: _root_.io.circe.Encoder[%s] = ???",
-    s"$pkg.circe.codec.type"   -> "implicit val derevoDeriveCirceCodec: _root_.io.circe.Codec[%s] = ???",
+    // decoders
+    s"$pkg.circe.decoder.type"      -> "implicit val derevoDeriveCirceDecoder: _root_.io.circe.Decoder[%s] = ???",
+    s"$pkg.circe.snakeDecoder.type" -> "implicit val derevoDeriveCirceDecoder: _root_.io.circe.Decoder[%s] = ???",
+    s"$pkg.circe.kebabDecoder.type" -> "implicit val derevoDeriveCirceDecoder: _root_.io.circe.Decoder[%s] = ???",
+    // encoders
+    s"$pkg.circe.encoder.type"      -> "implicit val derevoDeriveCirceEncoder: _root_.io.circe.Encoder[%s] = ???",
+    s"$pkg.circe.snakeEncoder.type" -> "implicit val derevoDeriveCirceEncoder: _root_.io.circe.Encoder[%s] = ???",
+    s"$pkg.circe.kebabEncoder.type" -> "implicit val derevoDeriveCirceEncoder: _root_.io.circe.Encoder[%s] = ???",
+    // codecs
+    s"$pkg.circe.codec.type"      -> "implicit val derevoDeriveCirceCodec: _root_.io.circe.Codec[%s] = ???",
+    s"$pkg.circe.snakeCodec.type" -> "implicit val derevoDeriveCirceCodec: _root_.io.circe.Codec[%s] = ???",
+    s"$pkg.circe.kebabCodec.type" -> "implicit val derevoDeriveCirceCodec: _root_.io.circe.Codec[%s] = ???",
     //Magnolia Circe
-    s"$pkg.circe.magnolia.decoder.type" -> "implicit val derevoDeriveMagnoliaCirceDecoder: _root_.io.circe.Decoder[%s] = ???",
-    s"$pkg.circe.magnolia.encoder.type" -> "implicit val derevoDeriveMagnoliaCirceEncoder: _root_.io.circe.Encoder[%s] = ???",
+    // decoders
+    s"$pkg.circe.magnolia.decoder.type"             -> "implicit val derevoDeriveMagnoliaCirceDecoder: _root_.io.circe.Decoder[%s] = ???",
+    s"$pkg.circe.magnolia.customizableDecoder.type" -> "implicit val derevoDeriveMagnoliaCirceDecoder: _root_.io.circe.Decoder[%s] = ???",
+    //encoders
+    s"$pkg.circe.magnolia.encoder.type"             -> "implicit val derevoDeriveMagnoliaCirceEncoder: _root_.io.circe.Encoder[%s] = ???",
+    s"$pkg.circe.magnolia.customizableEncoder.type" -> "implicit val derevoDeriveMagnoliaCirceEncoder: _root_.io.circe.Encoder[%s] = ???",
     // TypedSchema
     s"$pkg.tschema.swagger.type"      -> "implicit val derevoDeriveTypedSchemaSwagger: _root_.ru.tinkoff.tschema.swagger.SwaggerTypeable[%s] = ???",
     s"$pkg.tschema.openapiParam.type" -> "implicit val derevoDeriveTypedSchemaOpenApiParam: _root_.ru.tinkoff.tschema.param.AsOpenApiParam[%s] = ???",
