@@ -14,7 +14,7 @@
     <depends>org.intellij.scala</depends>
 
     <extensions defaultExtensionNs="org.intellij.scala">
-        <syntheticMemberInjector implementation="derevo.intellij.synthetic.macros.CatsF inalAlgInjector"/>
+        <syntheticMemberInjector implementation="derevo.intellij.synthetic.macros.CatsFinalAlgInjector"/>
         <syntheticMemberInjector implementation="derevo.intellij.synthetic.macros.DerevoDeriveInjector"/>
     </extensions>
 
