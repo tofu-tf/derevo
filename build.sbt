@@ -66,16 +66,17 @@ val compile211 = crossScalaVersions += "2.11.12"
 
 lazy val core = project settings common settings compile211
 
-lazy val cats          = project dependsOn core settings common
-lazy val circe         = project dependsOn core settings common
-lazy val circeMagnolia = project dependsOn core settings common
-lazy val ciris         = project dependsOn core settings common settings (scalacOptions -= "-Xfatal-warnings")
-lazy val tethys        = project dependsOn core settings common settings compile211
-lazy val tschema       = project dependsOn core settings common
-lazy val reactivemongo = project dependsOn core settings common settings compile211
-lazy val catsTagless   = project dependsOn core settings common settings compile211
-lazy val pureconfig    = project dependsOn core settings common
-lazy val scalacheck    = project dependsOn core settings common
+lazy val cats           = project dependsOn core settings common
+lazy val circe          = project dependsOn core settings common
+lazy val circeMagnolia  = project dependsOn core settings common
+lazy val ciris          = project dependsOn core settings common settings (scalacOptions -= "-Xfatal-warnings")
+lazy val tethys         = project dependsOn core settings common settings compile211
+lazy val tethysMagnolia = project dependsOn core settings common
+lazy val tschema        = project dependsOn core settings common
+lazy val reactivemongo  = project dependsOn core settings common settings compile211
+lazy val catsTagless    = project dependsOn core settings common settings compile211
+lazy val pureconfig     = project dependsOn core settings common
+lazy val scalacheck     = project dependsOn core settings common
 
 lazy val derevo = project in file(".") settings (common, skip in publish := true) aggregate (
   core, cats, circe, circeMagnolia, ciris, tethys, tschema, reactivemongo, catsTagless, pureconfig, scalacheck
