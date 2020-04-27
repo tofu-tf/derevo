@@ -182,9 +182,7 @@ class Derevo(val c: blackbox.Context) {
   }
 
   private def nameAndTypes(obj: Tree): (String, Type, Type, Int) = {
-    val name = obj match {
-      case Ident(name) => c.freshName(name.toString)
-    }
+    val name = c.freshName(obj.toString)
 
     val (from, to, drop) = c.typecheck(obj).tpe match {
       case IsDerivation(f, t, d)         => (f, t, d)
