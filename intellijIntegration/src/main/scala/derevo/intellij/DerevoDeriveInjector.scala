@@ -1,4 +1,4 @@
-package derevo.intellij.synthetic.macros
+package derevo.intellij
 
 import com.intellij.psi.PsiClass
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScAnnotation

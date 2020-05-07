@@ -1,4 +1,4 @@
-package derevo.intellij.synthetic.macros
+package derevo.intellij
 
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
