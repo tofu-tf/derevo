@@ -1,9 +1,9 @@
 # derevo
 Multiple instance derivations inside a single macro annotation
 
-| CI | Release | 
+| CI | Release |
 | --- | --- |
-| [![Build Status](https://travis-ci.org/manatki/derevo.svg?branch=master)](https://travis-ci.org/manatki/derevo) | [![Maven Central](https://img.shields.io/maven-central/v/org.manatki/derevo-core_2.12.svg)](https://search.maven.org/search?q=derevo) | 
+| [![Build Status](https://travis-ci.org/manatki/derevo.svg?branch=master)](https://travis-ci.org/manatki/derevo) | [![Maven Central](https://img.shields.io/maven-central/v/org.manatki/derevo-core_2.12.svg)](https://search.maven.org/search?q=derevo) |
 
 ## Breaking changes in 0.11
 `org.manatki.derevo` pkg was shortened to `derevo`.
@@ -22,16 +22,10 @@ scalacOptions += "-Ymacro-annotations"
 ```
 
 ## IntelliJ Integration
-Provides full support and visibility of implicits declared in `@derive` annotation
+Provides full support and visibility of implicits declared in `@derive` annotation.
 
-### Download from JetBrains Marketplace
-https://plugins.jetbrains.com/plugin/13697-derevo-for-intellij-idea
-
-### Build locally:
-1. `cd intellij`
-2. `gradle buildPlugin`
-3. `.zip` with plugin will be created in the `build/distributions` directory
-4. In IntelliJ open `Preferences | Plugins` and select "Install Plugin from Disk..."
+To activate, simply click 'Yes' on the extensions popup, after adding any of the `derevo-` integration libraries to your project.
+![](https://i.imgur.com/E6BKTeH.png)
 
 ## Supported integrations
 
@@ -117,7 +111,7 @@ assert(Bar("KKK", 22).asJson.printWith(Printer.noSpaces) == """{"stringName":"KK
 assert(parse("""{"stringName":"WWW","integerAge":20}""").flatMap(_.as[Bar]) == Right(Bar("WWW", 20)))
 ```
 
-### [Circe Magnolia](https://github.com/circe/circe-magnolia) 
+### [Circe Magnolia](https://github.com/circe/circe-magnolia)
 ```sbt
 libraryDependencies += "org.manatki" %% "derevo-circe-magnolia" % "latest version in badge"
 ```
