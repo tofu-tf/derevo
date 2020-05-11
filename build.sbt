@@ -64,7 +64,22 @@ val common = List(
 
 val compile211 = crossScalaVersions += "2.11.12"
 
-lazy val core = project settings common settings compile211
+lazy val core = project settings common settings compile211 settings (
+  Compile / resourceGenerators += Def.task {
+    val rootFolder = (Compile / resourceManaged).value / "META-INF"
+    rootFolder.mkdirs()
+    val integrationVersion = (intellijIntegration / version).value
+    val integrationName    = (intellijIntegration / name).value
+    val integrationOrg     = (intellijIntegration / organization).value
+    val intellijCompatFile = rootFolder / "intellij-compat.json"
+
+    IO.write(
+      intellijCompatFile,
+      s"""{"artifact": "$integrationOrg % ${integrationName}_2.12 % $integrationVersion"}""".stripMargin
+    )
+    Seq(intellijCompatFile)
+  }
+)
 
 lazy val cats           = project dependsOn core settings common
 lazy val circe          = project dependsOn core settings common
@@ -77,6 +92,21 @@ lazy val reactivemongo  = project dependsOn core settings common settings compil
 lazy val catsTagless    = project dependsOn core settings common settings compile211
 lazy val pureconfig     = project dependsOn core settings common
 lazy val scalacheck     = project dependsOn core settings common
+
+intellijPluginName in ThisBuild := "intellij-derevo"
+intellijBuild      in ThisBuild := "201.7223.91"
+
+lazy val intellijIntegration =
+  project
+    .enablePlugins(SbtIdeaPlugin)
+    .settings(common)
+    .settings(
+      name            := "derevo-intellij-integration",
+      version         := "0.1.0",
+      intellijPlugins += "org.intellij.scala".toPlugin,
+      scalaVersion    := "2.12.11",
+      packageMethod   := PackagingMethod.Standalone()
+    )
 
 lazy val derevo = project in file(".") settings (common, skip in publish := true) aggregate (
   core, cats, circe, circeMagnolia, ciris, tethys, tschema, reactivemongo, catsTagless, pureconfig, scalacheck
