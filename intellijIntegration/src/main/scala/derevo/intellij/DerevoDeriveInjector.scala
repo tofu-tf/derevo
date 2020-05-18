@@ -34,11 +34,12 @@ object DerevoDeriveInjector {
   private[this] val pkg              = "_root_.derevo"
   private[this] val mapping = Map[String, String](
     // Cats Core
-    s"$pkg.cats.show.type"      -> "implicit val derevoDeriveCatsShow: _root_.cats.Show[%s] = ???",
-    s"$pkg.cats.semigroup.type" -> "implicit val derevoDeriveCatsSemigroup: _root_.cats.Semigroup[%s] = ???",
-    s"$pkg.cats.monoid.type"    -> "implicit val derevoDeriveCatsMonoid: _root_.cats.Monoid[%s] = ???",
-    s"$pkg.cats.eq.type"        -> "implicit val derevoDeriveCatsEq: _root_.cats.Eq[%s] = ???",
-    s"$pkg.cats.order.type"     -> "implicit val derevoDeriveCatsOrder: _root_.cats.Order[%s] = ???",
+    s"$pkg.cats.show.type"         -> "implicit val derevoDeriveCatsShow: _root_.cats.Show[%s] = ???",
+    s"$pkg.cats.semigroup.type"    -> "implicit val derevoDeriveCatsSemigroup: _root_.cats.Semigroup[%s] = ???",
+    s"$pkg.cats.monoid.type"       -> "implicit val derevoDeriveCatsMonoid: _root_.cats.Monoid[%s] = ???",
+    s"$pkg.cats.eq.type"           -> "implicit val derevoDeriveCatsEq: _root_.cats.Eq[%s] = ???",
+    s"$pkg.cats.eq.universal.type" -> "implicit val derevoDeriveCatsEq: _root_.cats.Eq[%s] = ???",
+    s"$pkg.cats.order.type"        -> "implicit val derevoDeriveCatsOrder: _root_.cats.Order[%s] = ???",
     // Cats Tagless
     s"$pkg.tagless.functor.type"       -> "implicit val derevoDeriveCatsFunctor: _root_.cats.Functor[%s] = ???",
     s"$pkg.tagless.flatMap.type"       -> "implicit val derevoDeriveCatsFlatMap: _root_.cats.FlatMap[%s] = ???",
@@ -91,11 +92,12 @@ object DerevoDeriveInjector {
   private[this] val oldPkg              = "_root_.org.manatki.derevo"
   private[this] val oldMapping = Map[String, String](
     // Cats
-    s"$oldPkg.catsInstances.show.type"      -> "implicit val derevoDeriveCatsShow: _root_.cats.Show[%s] = ???",
-    s"$oldPkg.catsInstances.semigroup.type" -> "implicit val derevoDeriveCatsSemigroup: _root_.cats.Semigroup[%s] = ???",
-    s"$oldPkg.catsInstances.monoid.type"    -> "implicit val derevoDeriveCatsMonoid: _root_.cats.Monoid[%s] = ???",
-    s"$oldPkg.catsInstances.eq.type"        -> "implicit val derevoDeriveCatsEq: _root_.cats.Eq[%s] = ???",
-    s"$oldPkg.catsInstances.order.type"     -> "implicit val derevoDeriveCatsOrder: _root_.cats.Order[%s] = ???",
+    s"$oldPkg.catsInstances.show.type"         -> "implicit val derevoDeriveCatsShow: _root_.cats.Show[%s] = ???",
+    s"$oldPkg.catsInstances.semigroup.type"    -> "implicit val derevoDeriveCatsSemigroup: _root_.cats.Semigroup[%s] = ???",
+    s"$oldPkg.catsInstances.monoid.type"       -> "implicit val derevoDeriveCatsMonoid: _root_.cats.Monoid[%s] = ???",
+    s"$oldPkg.catsInstances.eq.type"           -> "implicit val derevoDeriveCatsEq: _root_.cats.Eq[%s] = ???",
+    s"$oldPkg.catsInstances.eq.universal.type" -> "implicit val derevoDeriveCatsEq: _root_.cats.Eq[%s] = ???",
+    s"$oldPkg.catsInstances.order.type"        -> "implicit val derevoDeriveCatsOrder: _root_.cats.Order[%s] = ???",
     // Cats Tagless
     s"$oldPkg.tagless.functor.type"       -> "implicit val derevoDeriveCatsFunctor: _root_.cats.Functor[%s] = ???",
     s"$oldPkg.tagless.flatMap.type"       -> "implicit val derevoDeriveCatsFlatMap: _root_.cats.FlatMap[%s] = ???",

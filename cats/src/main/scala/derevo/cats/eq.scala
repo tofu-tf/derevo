@@ -23,4 +23,8 @@ object eq extends Derivation[Eq] {
     }
 
   implicit def instance[T]: Eq[T] = macro Magnolia.gen[T]
+
+  object universal extends Derivation[Eq] {
+    implicit def instance[T]: Eq[T] = Eq.fromUniversalEquals[T]
+  }
 }

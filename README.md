@@ -48,8 +48,11 @@ import cats.syntax.monoid._
 
 @derive(eqv, show, order, monoid)
 case class Foo(bar: String, baz: Int)
+@derive(eqv.universal)
+case class Bar(x: Int)
 
 assert(Foo("111", 222) === Foo("111", 222))
+assert(Bar(1) === Bar(1))
 assert(show"${Foo("111", 222)}" === "Foo{bar=111,baz=222}")
 assert((Foo("111", 222) compare Foo("222", 333)) == -1)
 assert((Foo("1", 1) |+| Foo("2", 2)) == Foo("12", 3))
