@@ -5,7 +5,7 @@ val publishVersion = "0.11.3"
 
 val common = List(
   scalaVersion := "2.13.1",
-  crossScalaVersions := List("2.12.10", "2.13.1"),
+  crossScalaVersions := List("2.12.11", "2.13.2"),
   libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % Provided,
   libraryDependencies ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
