@@ -64,7 +64,7 @@ val common = List(
 
 lazy val core = project settings common settings (
   Compile / resourceGenerators += Def.task {
-    val rootFolder = (Compile / resourceManaged).value / "META-INF"
+    val rootFolder         = (Compile / resourceManaged).value / "META-INF"
     rootFolder.mkdirs()
     val integrationVersion = (intellijIntegration / version).value
     val integrationName    = (intellijIntegration / name).value
@@ -92,18 +92,18 @@ lazy val pureconfig     = project dependsOn core settings common
 lazy val scalacheck     = project dependsOn core settings common
 
 intellijPluginName in ThisBuild := "intellij-derevo"
-intellijBuild      in ThisBuild := "201.7223.91"
+intellijBuild in ThisBuild := "201.7223.91"
 
 lazy val intellijIntegration =
   project
     .enablePlugins(SbtIdeaPlugin)
     .settings(common)
     .settings(
-      name            := "derevo-intellij-integration",
-      version         := "0.1.0",
+      name := "derevo-intellij-integration",
+      version := "0.1.0",
       intellijPlugins += "org.intellij.scala".toPlugin,
-      scalaVersion    := "2.12.11",
-      packageMethod   := PackagingMethod.Standalone()
+      scalaVersion := "2.12.11",
+      packageMethod := PackagingMethod.Standalone()
     )
 
 lazy val derevo = project in file(".") settings (common, skip in publish := true) aggregate (

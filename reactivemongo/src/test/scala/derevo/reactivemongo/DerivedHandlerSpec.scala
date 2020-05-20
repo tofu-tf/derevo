@@ -15,7 +15,7 @@ class DerivedHandlerSpec extends RefSpec with Matchers {
   object `Derived writer` {
     def `should serialize`: Unit = {
       implicitly[BSONDocumentWriter[Peka]].write(Peka("azaza", 42)) shouldBe document(
-        "yoba" -> BSONString("azaza"),
+        "yoba"   -> BSONString("azaza"),
         "amount" -> BSONInteger(42)
       )
     }
@@ -24,7 +24,7 @@ class DerivedHandlerSpec extends RefSpec with Matchers {
       implicitly[BSONDocumentWriter[Pekarnya[Peka]]].write(Pekarnya("peka", Peka("azaza", 42))) shouldBe document(
         "yoba" -> BSONString("peka"),
         "peka" -> document(
-          "yoba" -> BSONString("azaza"),
+          "yoba"   -> BSONString("azaza"),
           "amount" -> BSONInteger(42)
         )
       )
@@ -35,7 +35,7 @@ class DerivedHandlerSpec extends RefSpec with Matchers {
     def `should deserialize`: Unit = {
       implicitly[BSONDocumentReader[Peka]].read(
         document(
-          "yoba" -> BSONString("azaza"),
+          "yoba"   -> BSONString("azaza"),
           "amount" -> BSONInteger(42)
         )
       ) shouldBe Peka("azaza", 42)
@@ -46,7 +46,7 @@ class DerivedHandlerSpec extends RefSpec with Matchers {
         document(
           "yoba" -> BSONString("peka"),
           "peka" -> document(
-            "yoba" -> BSONString("azaza"),
+            "yoba"   -> BSONString("azaza"),
             "amount" -> BSONInteger(42)
           )
         )

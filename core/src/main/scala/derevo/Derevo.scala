@@ -50,7 +50,7 @@ class Derevo(val c: blackbox.Context) {
     c.Expr(delegation(c.prefix.tree, Some((method, rest) => q"$method(..${unpackArgs(args.tree) ++ rest})")))
 
   private def delegation(tree: Tree, maybeCall: Option[(Tree, List[Tree]) => Tree]): Tree = {
-    val annots = tree.tpe.termSymbol.annotations
+    val annots            = tree.tpe.termSymbol.annotations
     val (delegatee, args) = annots
       .map(_.tree)
       .collectFirst {
@@ -79,7 +79,7 @@ class Derevo(val c: blackbox.Context) {
              }"""
         }
 
-      case Seq(cls: ClassDef) =>
+      case Seq(cls: ClassDef)  =>
         q"""
            $cls
            object ${cls.name.toTermName} {
@@ -88,8 +88,8 @@ class Derevo(val c: blackbox.Context) {
          """
 
       case Seq(
-          cls: ClassDef,
-          q"$mods object $companion extends {..$earlyDefs} with ..$parents{$self => ..$defs}"
+            cls: ClassDef,
+            q"$mods object $companion extends {..$earlyDefs} with ..$parents{$self => ..$defs}"
           ) =>
         q"""
            $cls
@@ -108,7 +108,7 @@ class Derevo(val c: blackbox.Context) {
           case q"$_.insertInstancesHere" => false
           case _                         => true
         }
-      case _ => true
+      case _                 => true
     }
 
     pre ++ instances ++ post.drop(1)
@@ -128,7 +128,7 @@ class Derevo(val c: blackbox.Context) {
     }
 
     val (name, fromTc, toTc, drop, call) = tree match {
-      case q"$obj(..$args)" =>
+      case q"$obj(..$args)"       =>
         val (name, from, to, drop) = nameAndTypes(obj)
         (name, from, to, drop, tree)
 
@@ -136,12 +136,12 @@ class Derevo(val c: blackbox.Context) {
         val (name, from, to, drop) = nameAndTypes(obj)
         (name, from, to, drop, tree)
 
-      case q"$obj" =>
+      case q"$obj"                =>
         val (name, from, to, drop) = nameAndTypes(obj)
         (name, from, to, drop, q"$obj.instance")
     }
 
-    val tn = TermName(name)
+    val tn         = TermName(name)
     val allTparams = impl match {
       case cls: ClassDef  => cls.tparams
       case obj: ModuleDef => Nil
@@ -154,7 +154,7 @@ class Derevo(val c: blackbox.Context) {
       implicit val $tn: $resT = $call
       """
     } else {
-      val tparams = allTparams.drop(drop)
+      val tparams   = allTparams.drop(drop)
       val implicits = tparams.flatMap { tparam =>
         val phantom =
           tparam.mods.annotations.exists { t => c.typecheck(t).tpe.typeSymbol == PhantomSymbol }
@@ -166,9 +166,9 @@ class Derevo(val c: blackbox.Context) {
           Some(q"val $name: $reqT")
         }
       }
-      val tps    = tparams.map(_.name)
-      val appTyp = tq"$typRef[..$tps]"
-      val resT   = mkAppliedType(toTc, appTyp)
+      val tps       = tparams.map(_.name)
+      val appTyp    = tq"$typRef[..$tps]"
+      val resT      = mkAppliedType(toTc, appTyp)
       q"""
       @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
       implicit def $tn[..$tparams](implicit ..$implicits): $resT = $call
@@ -197,7 +197,7 @@ class Derevo(val c: blackbox.Context) {
   }
 
   class IsInstanceDef(t: Type, drop: Int) {
-    val constrSymbol = t.typeConstructor.typeSymbol
+    val constrSymbol                                      = t.typeConstructor.typeSymbol
     def unapply(objType: Type): Option[(Type, Type, Int)] =
       objType.baseType(constrSymbol) match {
         case TypeRef(_, _, List(tc))       => Some((tc, tc, drop))
@@ -207,9 +207,13 @@ class Derevo(val c: blackbox.Context) {
   }
   def isInstanceDef[T: TypeTag](dropTParams: Int = 0) = new IsInstanceDef(typeOf[T], dropTParams)
 
-  private def debug(s: Any, pref: String = "") = c.info(c.enclosingPosition, pref + (s match {
-    case null => "null"
-    case _    => s.toString
-  }), false)
-  private def abort(s: String) = c.abort(c.enclosingPosition, s)
+  private def debug(s: Any, pref: String = "") = c.info(
+    c.enclosingPosition,
+    pref + (s match {
+      case null => "null"
+      case _    => s.toString
+    }),
+    false
+  )
+  private def abort(s: String)                 = c.abort(c.enclosingPosition, s)
 }

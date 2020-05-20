@@ -49,18 +49,18 @@ trait Tento[X] {
   def tento(x: X): X
 }
 
-
 class DerivationSuite extends AnyFlatSpec with Matchers {
   val listFoo: Foo[List]                       = name => name.toList
   val funFoo: Foo[Int => ?]                    = name => i => name(i)
   val optFoo: Foo[Option]                      = listFoo.mapK(functionK[List](_.headOption))
   val prodFoo: Foo[Tuple2K[List, Int => ?, ?]] = listFoo.productK[Int => ?](funFoo)
 
-  val intBar: Bar[Int => ?]       = (x, y) => i => s"$x [$i] $y"
-  val stringBar: Bar[String => ?] = (x, y) => s => s"$x {$s} $y"
+  val intBar: Bar[Int => ?]                        = (x, y) => i => s"$x [$i] $y"
+  val stringBar: Bar[String => ?]                  = (x, y) => s => s"$x {$s} $y"
   val intEStringBar: Bar[Either[Int, String] => ?] =
     ApplyK[Bar].map2K[Int => ?, String => ?, Either[Int, String] => ?](intBar, stringBar)(
-      functionK[Tuple2K[Int => ?, String => ?, ?]][Either[Int, String] => ?](fab => e => e.fold(fab.first, fab.second)))
+      functionK[Tuple2K[Int => ?, String => ?, ?]][Either[Int, String] => ?](fab => e => e.fold(fab.first, fab.second))
+    )
 
   "Simple FunctorK" should "apply FunctionK" in {
     optFoo.foo("hello") shouldBe Some('h')
@@ -100,7 +100,7 @@ class DerivationSuite extends AnyFlatSpec with Matchers {
   }
 
   "Simple functor" should "map values" in {
-    ((x => x * 3) : Quux[Int]).map(_.toString).quux(23) shouldBe "69"
+    ((x => x * 3): Quux[Int]).map(_.toString).quux(23) shouldBe "69"
   }
 
   "Simple contravarian" should "contramap values" in {

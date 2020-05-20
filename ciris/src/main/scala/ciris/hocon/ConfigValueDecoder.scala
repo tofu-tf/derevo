@@ -37,16 +37,15 @@ private[hocon] trait ConfigValueDecoderBaseInstances {
     _.getMemorySize
   )
 
-  implicit def optionConfigDecoder[A, B](
-      implicit decoder: ConfigValueDecoder[A]
+  implicit def optionConfigDecoder[A, B](implicit
+      decoder: ConfigValueDecoder[A]
   ): ConfigValueDecoder[Option[A]] = {
     ConfigDecoder.instance((key, value) => Right(decoder.decode(key, value).toOption))
   }
 }
 
 private[hocon] trait ConfigValueDecoderCollectionInstances {
-  implicit def seqConfigValueDecoder[C[_], A](
-      implicit
+  implicit def seqConfigValueDecoder[C[_], A](implicit
       dec: ConfigValueDecoder[A],
       cbf: FactoryCompat[A, C[A]]
   ): ConfigValueDecoder[C[A]] =
@@ -60,8 +59,8 @@ private[hocon] trait ConfigValueDecoderCollectionInstances {
       ).map(cbf.fromSpecific(_))
     }
 
-  implicit def mapConfigValueDecoder[A](
-      implicit dec: ConfigValueDecoder[A]
+  implicit def mapConfigValueDecoder[A](implicit
+      dec: ConfigValueDecoder[A]
   ): ConfigValueDecoder[Map[String, A]] =
     catchNonFatal { cfg => path =>
       collectErrors(

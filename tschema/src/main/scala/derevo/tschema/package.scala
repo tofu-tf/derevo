@@ -11,13 +11,13 @@ package object tschema {
 
   @deprecated("use @derive(tschema.swagger.AsOpenApiParam)", since = "0.11.1")
   @delegating("ru.tinkoff.tschema.swagger.AsOpenApiParam.generate")
-  object openapiParam extends Derivation[AsOpenApiParam]{
+  object openapiParam extends Derivation[AsOpenApiParam] {
     def instance[T]: AsOpenApiParam[T] = macro Derevo.delegate[AsOpenApiParam, T]
   }
 
   @deprecated("use @derive(tschema.param.HttpParam)", since = "0.11.1")
   @delegating("ru.tinkoff.tschema.param.HttpParam.generate")
-  object httpParam extends Derivation[HttpParam]{
+  object httpParam extends Derivation[HttpParam] {
     def instance[T]: HttpParam[T] = macro Derevo.delegate[HttpParam, T]
   }
 }
