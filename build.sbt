@@ -62,8 +62,6 @@ val common = List(
   licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
 )
 
-val compile211 = crossScalaVersions += "2.11.12"
-
 lazy val core = project settings common settings compile211 settings (
   Compile / resourceGenerators += Def.task {
     val rootFolder = (Compile / resourceManaged).value / "META-INF"
@@ -85,11 +83,11 @@ lazy val cats           = project dependsOn core settings common
 lazy val circe          = project dependsOn core settings common
 lazy val circeMagnolia  = project dependsOn core settings common
 lazy val ciris          = project dependsOn core settings common settings (scalacOptions -= "-Xfatal-warnings")
-lazy val tethys         = project dependsOn core settings common settings compile211
+lazy val tethys         = project dependsOn core settings common
 lazy val tethysMagnolia = project dependsOn core settings common
 lazy val tschema        = project dependsOn core settings common
-lazy val reactivemongo  = project dependsOn core settings common settings compile211
-lazy val catsTagless    = project dependsOn core settings common settings compile211
+lazy val reactivemongo  = project dependsOn core settings common
+lazy val catsTagless    = project dependsOn core settings common
 lazy val pureconfig     = project dependsOn core settings common
 lazy val scalacheck     = project dependsOn core settings common
 
