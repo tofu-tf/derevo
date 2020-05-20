@@ -3,7 +3,7 @@ Multiple instance derivations inside a single macro annotation
 
 | CI | Release |
 | --- | --- |
-| [![Build Status](https://travis-ci.org/manatki/derevo.svg?branch=master)](https://travis-ci.org/manatki/derevo) | [![Maven Central](https://img.shields.io/maven-central/v/org.manatki/derevo-core_2.12.svg)](https://search.maven.org/search?q=derevo) |
+| ![Scala CI](https://github.com/manatki/derevo/workflows/Scala%20CI/badge.svg) | [![Maven Central](https://img.shields.io/maven-central/v/org.manatki/derevo-core_2.12.svg)](https://search.maven.org/search?q=derevo) |
 
 ## Breaking changes in 0.11
 `org.manatki.derevo` pkg was shortened to `derevo`.
