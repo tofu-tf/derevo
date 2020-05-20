@@ -62,7 +62,7 @@ val common = List(
   licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
 )
 
-lazy val core = project settings common settings compile211 settings (
+lazy val core = project settings common settings (
   Compile / resourceGenerators += Def.task {
     val rootFolder = (Compile / resourceManaged).value / "META-INF"
     rootFolder.mkdirs()
@@ -109,3 +109,6 @@ lazy val intellijIntegration =
 lazy val derevo = project in file(".") settings (common, skip in publish := true) aggregate (
   core, cats, circe, circeMagnolia, ciris, tethys, tschema, reactivemongo, catsTagless, pureconfig, scalacheck
 )
+
+addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
+addCommandAlias("checkfmt", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck")
