@@ -26,7 +26,7 @@ object cirisDecoder extends Derivation[ConfigValueDecoder] {
         )
 
         errorOrParams.map(params => ctx.rawConstruct(params.reverse))
-      case other =>
+      case other                =>
         Left(
           ConfigError(
             s"Cannot derive for ${other.render()}"

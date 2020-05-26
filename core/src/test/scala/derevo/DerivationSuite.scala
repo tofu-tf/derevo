@@ -10,7 +10,7 @@ object Prefixed {
   val dummy = DummyTC
 }
 
-object DerivationSuite{
+object DerivationSuite {
   @derive(DummyTC)
   case class Foo[A](x: A, y: List[A], z: String)
 

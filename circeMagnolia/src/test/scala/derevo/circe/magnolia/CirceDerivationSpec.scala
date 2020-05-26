@@ -13,9 +13,9 @@ class CirceDerivationSpec extends AnyFlatSpec {
 
   "Circe derivation" should "derive simple codecs" in {
     @derive(encoder, decoder)
-    final case class Foo (string: String, int: Int)
+    final case class Foo(string: String, int: Int)
 
-    val foo = Foo("kek", -42)
+    val foo     = Foo("kek", -42)
     val fooJson = """{"string":"kek","int":-42}"""
 
     assert(foo.asJson.noSpaces == fooJson)
@@ -28,8 +28,7 @@ class CirceDerivationSpec extends AnyFlatSpec {
     @derive(customizableDecoder, customizableEncoder)
     final case class Bar(stringName: String, integerAge: Int)
 
-    val decodedBar = decode[Bar](
-      """
+    val decodedBar = decode[Bar]("""
         |{
         |   "string_name": "Cheburek",
         |   "integer_age": 146
@@ -55,7 +54,7 @@ class CirceDerivationSpec extends AnyFlatSpec {
         |  "type": "Bar"
         |}
         |""".stripMargin.filterNot(_.isWhitespace)
-    val bar = SealedTrait.Bar(123)
+    val bar     = SealedTrait.Bar(123)
 
     val bazJson =
       """
@@ -64,7 +63,7 @@ class CirceDerivationSpec extends AnyFlatSpec {
         |  "type": "Baz"
         |}
         |""".stripMargin.filterNot(_.isWhitespace)
-    val baz = SealedTrait.Baz("nani")
+    val baz     = SealedTrait.Baz("nani")
 
     val encode = Encoder[SealedTrait].apply _
     assert(encode(bar).noSpaces == barJson)
@@ -79,7 +78,7 @@ class CirceDerivationSpec extends AnyFlatSpec {
 sealed trait SealedTrait
 
 object SealedTrait {
-  implicit val configuration:Configuration = Configuration.default.withDiscriminator("type")
+  implicit val configuration: Configuration = Configuration.default.withDiscriminator("type")
 
   @derive(encoder, decoder)
   case class Bar(bar: Int) extends SealedTrait
