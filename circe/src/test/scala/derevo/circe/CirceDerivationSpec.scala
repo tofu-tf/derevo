@@ -50,7 +50,7 @@ class CirceDerivationSpec extends AnyFlatSpec with Matchers {
         |  "type": "Bar"
         |}
         |""".stripMargin.filterNot(_.isWhitespace)
-    val bar = SealedTrait.Bar(123)
+    val bar     = SealedTrait.Bar(123)
 
     val bazJson =
       """
@@ -59,7 +59,7 @@ class CirceDerivationSpec extends AnyFlatSpec with Matchers {
         |  "type": "Baz"
         |}
         |""".stripMargin.filterNot(_.isWhitespace)
-    val baz = SealedTrait.Baz("nani")
+    val baz     = SealedTrait.Baz("nani")
 
     val encode = Encoder[SealedTrait].apply _
     assert(encode(bar).noSpaces == barJson)

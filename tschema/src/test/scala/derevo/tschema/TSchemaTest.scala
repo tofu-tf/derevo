@@ -21,15 +21,14 @@ object TSchemaTest {
       case bm: HttpMultiParam[Bar] =>
         println(bm.names)
         println(bm.applyOpt(List(None, Some("2"))))
-      case _ =>
+      case _                       =>
     }
 
     implicitly[AsOpenApiParam[Bar]] match {
       case bm: AsMultiOpenApiParam[Bar] =>
         println(bm.fields)
-      case _ =>
+      case _                            =>
     }
   }
-
 
 }

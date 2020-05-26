@@ -10,11 +10,10 @@ object arbitrary extends Derivation[Arbitrary] {
   type Typeclass[T] = Arbitrary[T]
 
   def combine[T](ctx: CaseClass[Arbitrary, T]): Arbitrary[T] =
-    ctx.constructMonadic(
-      param =>
-        Arbitrary(
-          param.typeclass.arbitrary.map(x => x: Param[Arbitrary, T]#PType)
-        )
+    ctx.constructMonadic(param =>
+      Arbitrary(
+        param.typeclass.arbitrary.map(x => x: Param[Arbitrary, T]#PType)
+      )
     )
 
   def dispatch[T](ctx: SealedTrait[Arbitrary, T]): Arbitrary[T] = {

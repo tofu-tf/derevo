@@ -18,4 +18,3 @@ object TypeAliasesSuite {
 
 @derive(string1, string2)
 final case class StringAliases()
-

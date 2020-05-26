@@ -10,7 +10,7 @@ object monoid extends Derivation[Monoid] {
   def combine[T](ctx: CaseClass[Monoid, T]): Monoid[T] = new Monoid[T] {
     override def combine(x: T, y: T): T =
       ctx.construct(param => param.typeclass.combine(param.dereference(x), param.dereference(y)))
-    override def empty: T = ctx.construct(_.typeclass.empty)
+    override def empty: T               = ctx.construct(_.typeclass.empty)
   }
 
   def dispatch[T](ctx: SealedTrait[Monoid, T]): Monoid[T] = ???

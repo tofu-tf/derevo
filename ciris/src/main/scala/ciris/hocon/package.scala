@@ -14,8 +14,8 @@ package object hocon {
 
   object instances extends ConfigValueDecoderInstances
 
-  def hoconSource[Value](config: typesafe.Config, key: String)(
-      implicit decoder: ConfigValueDecoder[Value]
+  def hoconSource[Value](config: typesafe.Config, key: String)(implicit
+      decoder: ConfigValueDecoder[Value]
   ): ConfigValue[Value] = {
     val configKey = ConfigKey(key)
     ConfigValue.suspend(readEntry(config, key, configKey) match {
@@ -29,10 +29,13 @@ package object hocon {
       key: String,
       configKey: ConfigKey
   ): Either[ConfigError, typesafe.ConfigValue] =
-    Try(config.getValue(key)).fold({
-      case _: typesafe.ConfigException.Missing => Right(ConfigValueFactory.fromAnyRef(null))
-      case NonFatal(ex)                        => Left(ConfigError(ex.getMessage))
-    }, Right(_))
+    Try(config.getValue(key)).fold(
+      {
+        case _: typesafe.ConfigException.Missing => Right(ConfigValueFactory.fromAnyRef(null))
+        case NonFatal(ex)                        => Left(ConfigError(ex.getMessage))
+      },
+      Right(_)
+    )
 
   private[hocon] val DummyPath         = "config-decoder-path"
   private[hocon] val SeqElementKeyType = ConfigKey("Seq element")
@@ -46,7 +49,7 @@ package object hocon {
   private[hocon] def catchNonFatal[A](
       fn: typesafe.Config => String => Either[ConfigError, A]
   ): ConfigValueDecoder[A] =
-    ConfigDecoder.lift(
-      value => Try(fn(value.atKey(DummyPath))(DummyPath)).fold(err => Left(ConfigError(err.getMessage)), identity)
+    ConfigDecoder.lift(value =>
+      Try(fn(value.atKey(DummyPath))(DummyPath)).fold(err => Left(ConfigError(err.getMessage)), identity)
     )
 }

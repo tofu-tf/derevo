@@ -6,7 +6,7 @@ package derevo {
   }
 
   class delegating(to: String, args: Any*) extends StaticAnnotation
-  class phantom extends StaticAnnotation
+  class phantom                            extends StaticAnnotation
 
   sealed trait InstanceDef
   trait Derivation[TC[_]]                  extends InstanceDef
