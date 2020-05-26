@@ -20,5 +20,5 @@ object show extends Derivation[Show] {
       }
     }
 
-  implicit def instance[T]: Show[T] = macro Magnolia.gen[T]
+  def instance[T]: Show[T] = macro Magnolia.gen[T]
 }
