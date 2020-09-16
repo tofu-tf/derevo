@@ -1,5 +1,5 @@
 object Version {
-  val scalaTest = "3.2.1"
+  val scalaTest = "3.2.2"
 
   val catsTagless = "0.11"
 
