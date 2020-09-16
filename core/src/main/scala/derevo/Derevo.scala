@@ -79,7 +79,7 @@ class Derevo(val c: blackbox.Context) {
              }"""
         }
 
-      case Seq(cls: ClassDef)  =>
+      case Seq(cls: ClassDef) =>
         q"""
            $cls
            object ${cls.name.toTermName} {
@@ -128,7 +128,7 @@ class Derevo(val c: blackbox.Context) {
     }
 
     val (name, fromTc, toTc, drop, call) = tree match {
-      case q"$obj(..$args)"       =>
+      case q"$obj(..$args)" =>
         val (name, from, to, drop) = nameAndTypes(obj)
         (name, from, to, drop, tree)
 
@@ -136,7 +136,7 @@ class Derevo(val c: blackbox.Context) {
         val (name, from, to, drop) = nameAndTypes(obj)
         (name, from, to, drop, tree)
 
-      case q"$obj"                =>
+      case q"$obj" =>
         val (name, from, to, drop) = nameAndTypes(obj)
         (name, from, to, drop, q"$obj.instance")
     }
