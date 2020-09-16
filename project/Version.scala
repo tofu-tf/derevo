@@ -1,9 +1,9 @@
 object Version {
-  val scalaTest = "3.1.2"
+  val scalaTest = "3.2.1"
 
   val catsTagless = "0.11"
 
-  val cats = "2.1.1"
+  val cats = "2.2.0"
 
   val circe = "0.13.0"
 
@@ -11,13 +11,13 @@ object Version {
 
   val circeDerivation = "0.12.0-M7"
 
-  val pureConfig = "0.12.3"
+  val pureConfig = "0.13.0"
 
   val magnolia = "0.16.0"
 
   val typesafeConfig = "1.4.0"
 
-  val ciris = "1.0.4"
+  val ciris = "1.2.1"
 
   val reactivemongo = "0.20.12"
 
