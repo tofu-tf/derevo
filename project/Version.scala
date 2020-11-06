@@ -25,5 +25,5 @@ object Version {
 
   val typedSchema = "0.12.5.1"
 
-  val scalaCheck = "1.14.3"
+  val scalaCheck = "1.15.1"
 }
