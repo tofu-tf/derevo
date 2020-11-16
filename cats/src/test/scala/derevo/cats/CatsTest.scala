@@ -20,7 +20,6 @@ case class Lol(x: X)
 @derive(showNewline)
 case class Big(x: X, y: Y, z: Option[String])
 
-
 class X
 
 class Y
@@ -33,7 +32,6 @@ object Lol {
 
   val shown: String = Lol(new X).show
 }
-
 
 object Big {
   implicit private[this] val xShow: Show[X] = (_: X) => "X"

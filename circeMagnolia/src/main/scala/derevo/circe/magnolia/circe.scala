@@ -3,7 +3,7 @@ package derevo.circe.magnolia
 import derevo.{Derevo, Derivation, PolyDerivation, delegating}
 import io.circe.magnolia.configured.Configuration
 import io.circe.{Decoder, Encoder}
-import io.circe.magnolia.configured.encoder.semiauto.deriveConfiguredMagnoliaEncoder
+
 @delegating("io.circe.magnolia.derivation.decoder.semiauto.deriveMagnoliaDecoder")
 object decoder extends Derivation[Decoder] {
   def instance[A]: Decoder[A] = macro Derevo.delegate[Decoder, A]

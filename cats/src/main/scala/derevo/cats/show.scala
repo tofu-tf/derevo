@@ -23,7 +23,8 @@ object show extends ShowConfigured {
 
   override def fieldShow(fieldName: String, shownFieldValue: String): String = s"$fieldName=$shownFieldValue"
 
-  override def resultCombine(typeName: String, shownFieldValues: Seq[String]): String = shownFieldValues.mkString(s"$typeName{", ",", "}")
+  override def resultCombine(typeName: String, shownFieldValues: Seq[String]): String =
+    shownFieldValues.mkString(s"$typeName{", ",", "}")
 
 }
 
@@ -51,7 +52,8 @@ object showNewline extends ShowConfigured {
 
   override def fieldShow(fieldName: String, shownFieldValue: String): String = s"  $fieldName = $shownFieldValue"
 
-  override def resultCombine(typeName: String, shownFieldValues: Seq[String]): String = shownFieldValues.mkString(s"$typeName{\n", ",\n", "\n}")
+  override def resultCombine(typeName: String, shownFieldValues: Seq[String]): String =
+    shownFieldValues.mkString(s"$typeName{\n", ",\n", "\n}")
 }
 
 trait ShowConfigured extends Derivation[Show] {
@@ -63,18 +65,17 @@ trait ShowConfigured extends Derivation[Show] {
 
   def combine[T](ctx: CaseClass[Show, T]): Show[T] =
     (value: T) =>
-      resultCombine(ctx.typeName.short, ctx.parameters
-        .map {
-          p =>
-            fieldShow(p.label, s"${p.typeclass.show(p.dereference(value))}")
+      resultCombine(
+        ctx.typeName.short,
+        ctx.parameters.map { p =>
+          fieldShow(p.label, s"${p.typeclass.show(p.dereference(value))}")
         }
       )
 
   def dispatch[T](ctx: SealedTrait[Show, T]): Show[T] =
     (value: T) =>
-      ctx.dispatch(value) {
-        sub =>
-          sub.typeclass.show(sub.cast(value))
+      ctx.dispatch(value) { sub =>
+        sub.typeclass.show(sub.cast(value))
       }
 
   def instance[T]: Show[T] = macro Magnolia.gen[T]
