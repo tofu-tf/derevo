@@ -13,7 +13,7 @@ val common = List(
       case _                  => List()
     }
   },
-  libraryDependencies += compilerPlugin("org.typelevel" %% "kind-projector" % "0.11.0" cross CrossVersion.patch),
+  libraryDependencies += compilerPlugin("org.typelevel" %% "kind-projector" % "0.11.1" cross CrossVersion.patch),
   scalacOptions ++= Vector(
     "-deprecation",
     "-feature",
