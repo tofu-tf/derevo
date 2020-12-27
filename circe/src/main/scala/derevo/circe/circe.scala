@@ -8,8 +8,7 @@ import io.circe.{Codec, Decoder, Encoder}
 object decoder extends Derivation[Decoder] {
   def instance[A]: Decoder[A] = macro Derevo.delegate[Decoder, A]
 
-  /**
-    * @param arg1 naming function. For example io.circe.derivation.renaming.snakeCase
+  /** @param arg1 naming function. For example io.circe.derivation.renaming.snakeCase
     * @param arg2 useDefaults
     * @param arg3 type discriminator name
     */
@@ -21,8 +20,7 @@ object decoder extends Derivation[Decoder] {
 object encoder extends PolyDerivation[Encoder, Encoder.AsObject] {
   def instance[A]: Encoder.AsObject[A] = macro Derevo.delegate[Encoder.AsObject, A]
 
-  /**
-    * @param arg1 naming function. For example io.circe.derivation.renaming.snakeCase
+  /** @param arg1 naming function. For example io.circe.derivation.renaming.snakeCase
     * @param arg2 type discriminator name
     */
   def apply[A](arg1: String => String, arg2: Option[String]): Encoder.AsObject[A] =
@@ -33,8 +31,7 @@ object encoder extends PolyDerivation[Encoder, Encoder.AsObject] {
 object codec extends PolyDerivation[Codec, Codec.AsObject] {
   def instance[A]: Codec.AsObject[A] = macro Derevo.delegate[Codec.AsObject, A]
 
-  /**
-    * @param arg1 naming function. For example io.circe.derivation.renaming.snakeCase
+  /** @param arg1 naming function. For example io.circe.derivation.renaming.snakeCase
     * @param arg2 type discriminator name
     */
   def apply[A](arg1: String => String, arg2: Boolean, arg3: Option[String]): Codec.AsObject[A] =
