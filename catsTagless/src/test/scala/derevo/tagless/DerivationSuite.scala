@@ -59,7 +59,7 @@ class DerivationSuite extends AnyFlatSpec with Matchers {
   val stringBar: Bar[String => *]                  = (x, y) => s => s"$x {$s} $y"
   val intEStringBar: Bar[Either[Int, String] => *] =
     ApplyK[Bar].map2K[Int => *, String => *, Either[Int, String] => *](intBar, stringBar)(
-      functionK[Tuple2K[Int => *, String => *, ?]][Either[Int, String] => *](fab => e => e.fold(fab.first, fab.second))
+      functionK[Tuple2K[Int => *, String => *, *]][Either[Int, String] => *](fab => e => e.fold(fab.first, fab.second))
     )
 
   "Simple FunctorK" should "apply FunctionK" in {
