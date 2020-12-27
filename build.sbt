@@ -1,11 +1,11 @@
 name := "derevo"
 import com.typesafe.sbt.SbtGit.git
 
-val publishVersion = "0.11.5"
+val publishVersion = "0.11.6"
 
 val common = List(
-  scalaVersion := "2.13.1",
-  crossScalaVersions := List("2.12.11", "2.13.2"),
+  scalaVersion := "2.13.4",
+  crossScalaVersions := List("2.12.12", "2.13.4"),
   libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % Provided,
   libraryDependencies ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
@@ -73,7 +73,7 @@ lazy val core = project settings common settings (
 
     IO.write(
       intellijCompatFile,
-      s"""{"artifact": "$integrationOrg % ${integrationName}_2.12 % $integrationVersion"}""".stripMargin
+      s"""{"artifact": "$integrationOrg % ${integrationName}_2.13 % $integrationVersion"}""".stripMargin
     )
     Seq(intellijCompatFile)
   }
@@ -92,7 +92,7 @@ lazy val pureconfig     = project dependsOn core settings common
 lazy val scalacheck     = project dependsOn core settings common
 
 intellijPluginName in ThisBuild := "intellij-derevo"
-intellijBuild in ThisBuild := "201.7223.91"
+intellijBuild in ThisBuild := "203.5981.41"
 
 lazy val intellijIntegration =
   project
@@ -100,9 +100,9 @@ lazy val intellijIntegration =
     .settings(common)
     .settings(
       name := "derevo-intellij-integration",
-      version := "0.1.0",
+      version := "0.2.0",
       intellijPlugins += "org.intellij.scala".toPlugin,
-      scalaVersion := "2.12.11",
+      scalaVersion := "2.13.4",
       packageMethod := PackagingMethod.Standalone()
     )
 
