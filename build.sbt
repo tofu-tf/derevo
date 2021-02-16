@@ -37,8 +37,8 @@ val common = List(
   homepage := Some(url("https://manatki.org/docs/derevo")),
   scmInfo := Some(
     ScmInfo(
-      url("https://github.com/manatki/derevo"),
-      "git@github.com:manatki/derevo.git"
+      url("https://github.com/tofu-tf/derevo"),
+      "git@github.com:tofu-tf/derevo.git"
     )
   ),
   publishTo := {
@@ -58,7 +58,7 @@ val common = List(
     .filter(_.exists())
     .map(Credentials.apply),
   pgpSecretRing := Path.userHome / ".gnupg" / "secring.gpg",
-  organization := "org.manatki",
+  organization := "tf.tofu",
   version := {
     val branch = git.gitCurrentBranch.value
     if (branch == "master") publishVersion
