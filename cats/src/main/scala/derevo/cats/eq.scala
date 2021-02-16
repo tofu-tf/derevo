@@ -3,8 +3,9 @@ package derevo.cats
 import cats.Eq
 import magnolia.{CaseClass, Magnolia, SealedTrait}
 import derevo.Derivation
+import derevo.NewTypeDerivation
 
-object eq extends Derivation[Eq] {
+object eq extends Derivation[Eq] with NewTypeDerivation[Eq] {
   type Typeclass[T] = Eq[T]
 
   def combine[T](ctx: CaseClass[Eq, T]): Eq[T] = new Eq[T] {

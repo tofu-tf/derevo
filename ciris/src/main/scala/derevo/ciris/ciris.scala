@@ -9,8 +9,9 @@ import magnolia.{CaseClass, Magnolia, SealedTrait}
 import derevo.Derivation
 
 import scala.language.experimental.macros
+import derevo.NewTypeDerivation
 
-object cirisDecoder extends Derivation[ConfigValueDecoder] {
+object cirisDecoder extends Derivation[ConfigValueDecoder] with NewTypeDerivation[ConfigValueDecoder] {
   type Typeclass[T]  = ConfigValueDecoder[T]
   type ErrorOrParams = Either[ConfigError, List[Any]]
 
