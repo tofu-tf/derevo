@@ -1,11 +1,11 @@
 name := "derevo"
 import com.typesafe.sbt.SbtGit.git
 
-val publishVersion = "0.11.6"
+val publishVersion = "0.12.0"
 
 val common = List(
   scalaVersion := "2.13.4",
-  crossScalaVersions := List("2.12.12", "2.13.4"),
+  crossScalaVersions := List("2.12.13", "2.13.4"),
   libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % Provided,
   libraryDependencies ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
@@ -21,9 +21,14 @@ val common = List(
     "-language:higherKinds",
     "-Xfatal-warnings",
   ),
+  Test / scalacOptions ++= Vector(
+    "-language:implicitConversions",
+  ),
+  libraryDependencies += "io.estatico"          %% "newtype"       % "0.4.4"            % Test,
+  libraryDependencies += "org.scalameta"        %% "munit"         % Version.munit      % "test",
+  libraryDependencies += "org.scalatest"        %% "scalatest"     % Version.scalaTest  % "test",
   scalacOptions ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, y)) if y == 11 => Seq("-Xexperimental")
       case Some((2, y)) if y == 13 => Seq("-Ymacro-annotations")
       case _                       => Seq.empty[String]
     }
@@ -76,7 +81,7 @@ lazy val core = project settings common settings (
       s"""{"artifact": "$integrationOrg % ${integrationName}_2.13 % $integrationVersion"}""".stripMargin
     )
     Seq(intellijCompatFile)
-  }
+  },
 )
 
 lazy val cats           = project dependsOn core settings common

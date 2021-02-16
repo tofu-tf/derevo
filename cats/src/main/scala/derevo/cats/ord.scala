@@ -3,8 +3,9 @@ package derevo.cats
 import cats.Order
 import magnolia.{CaseClass, Magnolia, SealedTrait}
 import derevo.Derivation
+import derevo.NewTypeDerivation
 
-object order extends Derivation[Order] {
+object order extends Derivation[Order] with NewTypeDerivation[Order] {
   type Typeclass[T] = Order[T]
 
   def combine[T](ctx: CaseClass[Order, T]): Order[T] = new Order[T] {
