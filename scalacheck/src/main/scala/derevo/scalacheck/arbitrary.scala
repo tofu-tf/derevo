@@ -5,8 +5,9 @@ import magnolia.{CaseClass, Magnolia, Param, SealedTrait}
 import mercator.Monadic
 import org.scalacheck.{Arbitrary, Gen}
 import arbitraryInstances._
+import derevo.NewTypeDerivation
 
-object arbitrary extends Derivation[Arbitrary] {
+object arbitrary extends Derivation[Arbitrary] with NewTypeDerivation[Arbitrary] {
   type Typeclass[T] = Arbitrary[T]
 
   def combine[T](ctx: CaseClass[Arbitrary, T]): Arbitrary[T] =

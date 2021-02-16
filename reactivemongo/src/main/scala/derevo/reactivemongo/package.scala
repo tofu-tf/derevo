@@ -8,12 +8,14 @@ package object reactivemongo {
   type BsonValueWriter[A] = BSONWriter[A, _ <: BSONValue]
 
   @delegating("reactivemongo.bson.Macros.writer")
-  object bsonDocumentWriter extends PolyDerivation[BsonValueWriter, BSONDocumentWriter] {
+  object bsonDocumentWriter
+      extends PolyDerivation[BsonValueWriter, BSONDocumentWriter] with NewTypeDerivation[BSONDocumentWriter] {
     def instance[A]: BSONDocumentWriter[A] = macro Derevo.delegate[BSONDocumentWriter, A]
   }
 
   @delegating("reactivemongo.bson.Macros.reader")
-  object bsonDocumentReader extends PolyDerivation[BsonValueReader, BSONDocumentReader] {
+  object bsonDocumentReader
+      extends PolyDerivation[BsonValueReader, BSONDocumentReader] with NewTypeDerivation[BSONDocumentReader] {
     def instance[A]: BSONDocumentReader[A] = macro Derevo.delegate[BSONDocumentReader, A]
   }
 }

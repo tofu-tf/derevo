@@ -4,7 +4,7 @@ package cats
 import _root_.cats.Show
 import magnolia.{CaseClass, Magnolia, SealedTrait}
 
-object show extends Derivation[Show] {
+object show extends Derivation[Show] with NewTypeDerivation[Show] {
   type Typeclass[T] = Show[T]
 
   def combine[T](ctx: CaseClass[Show, T]): Show[T] = new Show[T] {

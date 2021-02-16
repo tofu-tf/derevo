@@ -4,6 +4,7 @@ import cats.Eq
 import derevo.cats.{eq => eqv}
 import derevo.derive
 import org.scalatest.freespec.AnyFreeSpec
+import io.estatico.newtype.macros.newtype
 
 class EqSpec extends AnyFreeSpec {
 
@@ -19,6 +20,13 @@ class EqSpec extends AnyFreeSpec {
         assert(Eq[Qux].neqv(Qux(1), Qux(-1)))
       }
 
+      "through newtype casting" - {
+        import derevo.cats.EqSpec.Jankurpo
+
+        assert(Eq[Jankurpo].eqv(Jankurpo("a"), Jankurpo("a")))
+        assert(Eq[Jankurpo].neqv(Jankurpo("a"), Jankurpo("b")))
+      }
+
       "through Eq.fromUniversalEquals" in {
         @derive(eqv.universal)
         case class Qux(a: Int)
@@ -28,4 +36,10 @@ class EqSpec extends AnyFreeSpec {
       }
     }
   }
+}
+
+object EqSpec {
+  @derive(eqv)
+  @newtype
+  case class Jankurpo(a: String)
 }

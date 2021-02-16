@@ -13,6 +13,7 @@ import tethys.{JsonReader, JsonWriter}
 
 import scala.collection.mutable
 import scala.language.experimental.macros
+import derevo.NewTypeDerivation
 
 case class CodecConfig(
     discriminator: Option[String] = None,
@@ -46,7 +47,7 @@ object CodecConfig {
   val upperSnakecase: String => String = snakecase andThen (_.toUpperCase)
 }
 
-object jsonWriter extends Derivation[JsonWriter] {
+object jsonWriter extends Derivation[JsonWriter] with NewTypeDerivation[JsonWriter]{
   type Typeclass[A] = JsonWriter[A]
 
   abstract class RecordJsonWriter[A] extends JsonWriter[A] {
@@ -92,7 +93,7 @@ object jsonWriter extends Derivation[JsonWriter] {
   def instance[A]: JsonWriter[A] = macro Magnolia.gen[A]
 }
 
-object jsonReader extends Derivation[JsonReader] {
+object jsonReader extends Derivation[JsonReader] with NewTypeDerivation[JsonReader] {
   type Typeclass[A] = JsonReader[A]
 
   abstract class RecordJsonReader[A] extends JsonReader[A] {

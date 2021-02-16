@@ -18,6 +18,8 @@ class Derevo(val c: blackbox.Context) {
   val IsDerivationK2       = isInstanceDef[DerivationK2[Dummy3]](1)
   val IIH                  = weakTypeOf[InjectInstancesHere].typeSymbol
 
+  val EstaticoFQN = "io.estatico.newtype.macros.newtype"
+
   def delegate[TC[_], I]: c.Expr[TC[I]] =
     c.Expr(delegation(c.prefix.tree, None))
 
@@ -68,6 +70,16 @@ class Derevo(val c: blackbox.Context) {
     maybeCall.fold(default)(call => call(method, args))
   }
 
+  def isConstructionOf(name: String)(t: Tree): Boolean = t match {
+    case q"new $cls(...$_)" =>
+      val tts = c.typecheck(t, silent = true).symbol
+      tts.isMethod && {
+        val o = tts.asMethod.owner
+        o.isClass && o.asClass.fullName == name
+      }
+    case _                  => false
+  }
+
   def deriveMacro(annottees: Tree*): Tree = {
     annottees match {
       case Seq(obj: ModuleDef) =>
@@ -114,14 +126,20 @@ class Derevo(val c: blackbox.Context) {
     pre ++ instances ++ post.drop(1)
   }
 
-  private def instances(cls: ImplDef): List[Tree] =
+  private def instances(cls: ImplDef): List[Tree] = {
+    val newType = cls match {
+      case c: ClassDef if c.mods.annotations.exists(isConstructionOf(EstaticoFQN)) =>
+        c.impl.body.collectFirst { case q"$mods val $n :$t" if mods.hasFlag(Flag.CASEACCESSOR) => t }
+      case _                                                                       => None
+    }
     c.prefix.tree match {
       case q"new derive(..${instances})" =>
         instances
-          .map(buildInstance(_, cls))
+          .map(buildInstance(_, cls, newType))
     }
+  }
 
-  private def buildInstance(tree: Tree, impl: ImplDef): Tree = {
+  private def buildInstance(tree: Tree, impl: ImplDef, newType: Option[Tree]): Tree = {
     val typRef = impl match {
       case cls: ClassDef  => tq"${impl.name.toTypeName}"
       case obj: ModuleDef => tq"${obj.name}.type"
@@ -138,7 +156,8 @@ class Derevo(val c: blackbox.Context) {
 
       case q"$obj" =>
         val (name, from, to, drop) = nameAndTypes(obj)
-        (name, from, to, drop, q"$obj.instance")
+        val call                   = newType.fold(q"$obj.instance")(t => q"$obj.newtype[$t].instance")
+        (name, from, to, drop, call)
     }
 
     val tn         = TermName(name)
