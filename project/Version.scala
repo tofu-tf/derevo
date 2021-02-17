@@ -29,5 +29,5 @@ object Version {
 
   val estatico = "0.4.4"
 
-  val munit = "0.7.21"
+  val munit = "0.7.22"
 }
