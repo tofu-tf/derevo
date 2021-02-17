@@ -6,7 +6,7 @@ val publishVersion = "0.12.0"
 val common = List(
   scalaVersion := "2.13.4",
   crossScalaVersions := List("2.12.13", "2.13.4"),
-  libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % Provided,
+  libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value  % Provided,
   libraryDependencies ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, 11 | 12)) => List(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.patch))
@@ -24,9 +24,10 @@ val common = List(
   Test / scalacOptions ++= Vector(
     "-language:implicitConversions",
   ),
-  libraryDependencies += "io.estatico"          %% "newtype"       % "0.4.4"            % Test,
-  libraryDependencies += "org.scalameta"        %% "munit"         % Version.munit      % "test",
-  libraryDependencies += "org.scalatest"        %% "scalatest"     % Version.scalaTest  % "test",
+  libraryDependencies += "io.estatico"          %% "newtype"       % Version.estatico    % Test,
+  libraryDependencies += "org.rudogma"          %% "supertagged"   % Version.supertagged % Test,
+  libraryDependencies += "org.scalameta"        %% "munit"         % Version.munit       % "test",
+  libraryDependencies += "org.scalatest"        %% "scalatest"     % Version.scalaTest   % "test",
   scalacOptions ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, y)) if y == 13 => Seq("-Ymacro-annotations")
