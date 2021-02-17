@@ -8,14 +8,30 @@ package derevo {
   class delegating(to: String, args: Any*) extends StaticAnnotation
   class phantom                            extends StaticAnnotation
 
+  //* numeration according to https://docs.tofu.tf/docs/internal/kind-enumeration
   sealed trait InstanceDef
-  trait Derivation[TC[_]]                  extends InstanceDef
-  trait DerivationK1[TC[_[_]]]             extends InstanceDef
-  trait DerivationK2[TC[_[_[_]]]]          extends InstanceDef
-  trait PolyDerivation[FromTC[_], ToTC[_]] extends InstanceDef
+  trait Derivation[TC[_]]                        extends InstanceDef
+  trait DerivationKN1[TC[f[_]]]                  extends InstanceDef
+  trait DerivationKN2[TC[bf[_, _]]]              extends InstanceDef
+  trait DerivationKN3[TC[alg[f[_]]]]             extends InstanceDef
+  trait DerivationKN4[TC[tr[f[_], _]]]           extends InstanceDef
+  trait DerivationKN5[TC[tf[_, _, _]]]           extends InstanceDef
+  trait DerivationKN11[TC[alg[bf[_, _]]]]        extends InstanceDef
+  trait DerivationKN17[TC[alg[btr[_, _], _, _]]] extends InstanceDef
+  trait PolyDerivation[FromTC[_], ToTC[_]]       extends InstanceDef
+
 }
 
 package object derevo {
   type InjectInstancesHere >: Null
   def insertInstancesHere(): InjectInstancesHere = null
+
+  type DerivationK1[TC[f[_]]]               = DerivationKN1[TC]
+  type DerivationBi1[TC[f[_, _]]]           = DerivationKN2[TC]
+  type DerivationTri1[TC[f[_, _, _]]]       = DerivationKN5[TC]
+  type DerivationK2[TC[alg[f[_]]]]          = DerivationKN3[TC]
+  type DerivationHK[TC[alg[f[_]]]]          = DerivationKN3[TC]
+  type DerivationBi2[TC[alf[bf[_, _]]]]     = DerivationKN11[TC]
+  type DerivationTr[TC[T[f[_], a]]]         = DerivationKN4[TC]
+  type DerivationBiTr[TC[T[f[_, _], a, b]]] = DerivationKN17[TC]
 }
