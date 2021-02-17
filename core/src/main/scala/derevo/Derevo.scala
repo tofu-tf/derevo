@@ -2,21 +2,28 @@ package derevo
 
 import scala.language.higherKinds
 import scala.reflect.macros.blackbox
-
-private trait Dummy1[X]
-private trait Dummy2[X[_]]
-private trait Dummy3[X[_[_]]]
+import scala.annotation.nowarn
 
 class Derevo(val c: blackbox.Context) {
   import c.universe._
   val DelegatingSymbol = typeOf[delegating].typeSymbol
   val PhantomSymbol    = typeOf[phantom].typeSymbol
 
-  val IsDerivation         = isInstanceDef[Derivation[Dummy1]]()
-  val IsSpecificDerivation = isInstanceDef[PolyDerivation[Dummy1, Dummy1]]()
-  val IsDerivationK1       = isInstanceDef[DerivationK1[Dummy2]](1)
-  val IsDerivationK2       = isInstanceDef[DerivationK2[Dummy3]](1)
-  val IIH                  = weakTypeOf[InjectInstancesHere].typeSymbol
+  val instanceDefs         = Vector(
+  )
+  val IsSpecificDerivation = isInstanceDef[PolyDerivation[Any, Any]]()
+  val IsDerivation         = isInstanceDef[Derivation[Any]]()
+
+  val HKDerivation = new DerivationList(
+    isInstanceDef[DerivationKN1[Any]](1),
+    isInstanceDef[DerivationKN2[Any]](2),
+    isInstanceDef[DerivationKN3[Any]](1),
+    isInstanceDef[DerivationKN4[Any]](2),
+    isInstanceDef[DerivationKN5[Any]](3),
+    isInstanceDef[DerivationKN11[Any]](1),
+    isInstanceDef[DerivationKN17[Any]](3)
+  )
+  val IIH          = weakTypeOf[InjectInstancesHere].typeSymbol
 
   val EstaticoFQN = "io.estatico.newtype.macros.newtype"
 
@@ -134,8 +141,7 @@ class Derevo(val c: blackbox.Context) {
     }
     c.prefix.tree match {
       case q"new derive(..${instances})" =>
-        instances
-          .map(buildInstance(_, cls, newType))
+        instances.map(buildInstance(_, cls, newType))
     }
   }
 
@@ -145,49 +151,54 @@ class Derevo(val c: blackbox.Context) {
       case obj: ModuleDef => tq"${obj.name}.type"
     }
 
-    val (name, fromTc, toTc, drop, call) = tree match {
-      case q"$obj(..$args)" =>
-        val (name, from, to, drop) = nameAndTypes(obj)
-        (name, from, to, drop, tree)
+    val (mode, call) = tree match {
+      case q"$obj(..$args)" => (nameAndTypes(obj), tree)
 
-      case q"$obj.$method($args)" =>
-        val (name, from, to, drop) = nameAndTypes(obj)
-        (name, from, to, drop, tree)
+      case q"$obj.$method($args)" => (nameAndTypes(obj), tree)
 
       case q"$obj" =>
-        val (name, from, to, drop) = nameAndTypes(obj)
-        val call                   = newType.fold(q"$obj.instance")(t => q"$obj.newtype[$t].instance")
-        (name, from, to, drop, call)
+        val call = newType.fold(q"$obj.instance")(t => q"$obj.newtype[$t].instance")
+        (nameAndTypes(obj), call)
     }
 
-    val tn         = TermName(name)
+    val tn         = TermName(mode.name)
     val allTparams = impl match {
       case cls: ClassDef  => cls.tparams
       case obj: ModuleDef => Nil
     }
 
     if (allTparams.isEmpty) {
-      val resT = mkAppliedType(toTc, tq"$typRef")
+      val resT = mkAppliedType(mode.to, tq"$typRef")
       q"""
       @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
       implicit val $tn: $resT = $call
       """
     } else {
-      val tparams   = allTparams.drop(drop)
-      val implicits = tparams.flatMap { tparam =>
-        val phantom =
-          tparam.mods.annotations.exists { t => c.typecheck(t).tpe.typeSymbol == PhantomSymbol }
-        if (phantom) None
-        else {
-          val name = TermName(c.freshName("ev"))
-          val typ  = tparam.name
-          val reqT = mkAppliedType(fromTc, tq"$typ")
-          Some(q"val $name: $reqT")
-        }
-      }
+      val tparams = allTparams.dropRight(mode.drop)
+      val pparams = allTparams.takeRight(mode.drop)
+
+      val implicits =
+        if (mode.cascade)
+          tparams.flatMap { tparam =>
+            val phantom = tparam.mods.annotations.exists { t => c.typecheck(t).tpe.typeSymbol == PhantomSymbol }
+            if (phantom) None
+            else {
+              val name = TermName(c.freshName("ev"))
+              val typ  = tparam.name
+              val reqT = mkAppliedType(mode.from, tq"$typ")
+              Some(q"val $name: $reqT")
+            }
+          }
+        else Nil
+
       val tps       = tparams.map(_.name)
-      val appTyp    = tq"$typRef[..$tps]"
-      val resT      = mkAppliedType(toTc, appTyp)
+      def appTyp    = tq"$typRef[..$tps]"
+      def allTnames = allTparams.map(_.name)
+      def lamTyp    = tq"({ type Lam[..$pparams] = $typRef[..$allTnames] })#Lam"
+      val outTyp    = if (pparams.isEmpty) appTyp else lamTyp
+
+      val resT = mkAppliedType(mode.to, outTyp)
+
       q"""
       @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
       implicit def $tn[..$tparams](implicit ..$implicits): $resT = $call
@@ -200,20 +211,30 @@ class Derevo(val c: blackbox.Context) {
     case _                     => tq"$tc[$arg]"
   }
 
-  private def nameAndTypes(obj: Tree): (String, Type, Type, Int) = {
+  @nowarn
+  final class NameAndTypes(
+      val name: String,
+      val from: Type,
+      val to: Type,
+      val drop: Int,
+      val cascade: Boolean
+  )
+
+  private def nameAndTypes(obj: Tree): NameAndTypes = {
     val mangledName = obj.toString.replaceAll("[^\\w]", "_")
     val name        = c.freshName(mangledName)
 
-    val (from, to, drop) = c.typecheck(obj).tpe match {
-      case IsDerivation(f, t, d)         => (f, t, d)
-      case IsSpecificDerivation(f, t, d) => (f, t, d)
-      case IsDerivationK1(f, t, d)       => (f, t, d)
-      case IsDerivationK2(f, t, d)       => (f, t, d)
+    c.typecheck(obj).tpe match {
+      case IsSpecificDerivation(f, t, d) => new NameAndTypes(name, f, t, d, true)
+      case IsDerivation(f, t, d)         => new NameAndTypes(name, f, t, d, true)
+      case HKDerivation(f, t, d)         => new NameAndTypes(name, f, t, d, false)
       case _                             => abort(s"$obj seems not extending InstanceDef traits")
     }
+  }
 
-    (name, from, to, drop)
-
+  class DerivationList(ds: IsInstanceDef*) {
+    def unapply(objType: Type): Option[(Type, Type, Int)] =
+      ds.iterator.flatMap(_.unapply(objType)).collectFirst { case x => x }
   }
 
   class IsInstanceDef(t: Type, drop: Int) {
@@ -229,7 +250,7 @@ class Derevo(val c: blackbox.Context) {
 
   private def debug(s: Any, pref: String = "") = c.info(
     c.enclosingPosition,
-    pref + (s match {
+    pref + " " + (s match {
       case null => "null"
       case _    => s.toString
     }),
