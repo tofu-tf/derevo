@@ -25,7 +25,9 @@ class Derevo(val c: blackbox.Context) {
   )
   val IIH          = weakTypeOf[InjectInstancesHere].typeSymbol
 
-  val EstaticoFQN = "io.estatico.newtype.macros.newtype"
+  val EstaticoFQN     = "io.estatico.newtype.macros.newtype"
+  val SupertaggedFQN  = "supertagged.TaggedType"
+  val Supertagged0FQN = "supertagged.TaggedType0"
 
   def delegate[TC[_], I]: c.Expr[TC[I]] =
     c.Expr(delegation(c.prefix.tree, None))
@@ -133,10 +135,24 @@ class Derevo(val c: blackbox.Context) {
     pre ++ instances ++ post.drop(1)
   }
 
+  object ClassOf {
+    def unapply(t: Tree): Option[String] = {
+      val tc = c.typecheck(t, mode = c.TYPEmode, silent = true)
+      Option(tc.symbol).map(_.fullName)
+    }
+
+  }
+
   private def instances(cls: ImplDef): List[Tree] = {
     val newType = cls match {
       case c: ClassDef if c.mods.annotations.exists(isConstructionOf(EstaticoFQN)) =>
-        c.impl.body.collectFirst { case q"$mods val $n :$t" if mods.hasFlag(Flag.CASEACCESSOR) => t }
+        c.impl.body.collectFirst {
+          case q"$mods val $n :$t" if mods.hasFlag(Flag.CASEACCESSOR) => NewtypeCls(t)
+        }
+      case m: ModuleDef                                                            =>
+        m.impl.parents.collectFirst { case tq"${ClassOf(SupertaggedFQN | Supertagged0FQN)}[$t]" =>
+          NewtypeMod(t, tq"${m.name}.Type")
+        }
       case _                                                                       => None
     }
     c.prefix.tree match {
@@ -145,10 +161,14 @@ class Derevo(val c: blackbox.Context) {
     }
   }
 
-  private def buildInstance(tree: Tree, impl: ImplDef, newType: Option[Tree]): Tree = {
+  private def buildInstance(tree: Tree, impl: ImplDef, newType: Option[Newtype]): Tree = {
     val typRef = impl match {
       case cls: ClassDef  => tq"${impl.name.toTypeName}"
-      case obj: ModuleDef => tq"${obj.name}.type"
+      case obj: ModuleDef =>
+        newType match {
+          case Some(NewtypeMod(_, res)) => res
+          case _                        => tq"${obj.name}.type"
+        }
     }
 
     val (mode, call) = tree match {
@@ -157,7 +177,7 @@ class Derevo(val c: blackbox.Context) {
       case q"$obj.$method($args)" => (nameAndTypes(obj), tree)
 
       case q"$obj" =>
-        val call = newType.fold(q"$obj.instance")(t => q"$obj.newtype[$t].instance")
+        val call = newType.fold(q"$obj.instance")(t => q"$obj.newtype[${t.underlying}].instance")
         (nameAndTypes(obj), call)
     }
 
@@ -211,8 +231,16 @@ class Derevo(val c: blackbox.Context) {
     case _                     => tq"$tc[$arg]"
   }
 
+  private sealed trait Newtype {
+    def underlying: Tree
+  }
   @nowarn
-  final class NameAndTypes(
+  private final case class NewtypeCls(underlying: Tree)            extends Newtype
+  @nowarn
+  private final case class NewtypeMod(underlying: Tree, res: Tree) extends Newtype
+
+  @nowarn
+  private final class NameAndTypes(
       val name: String,
       val from: Type,
       val to: Type,
