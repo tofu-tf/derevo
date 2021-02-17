@@ -62,7 +62,7 @@ Just add the
 annotation to your delegator object
 then call 
 `macro Derevo.delegate`, `macro Derevo.deletateParams`, `macro Derevo.deletateParams2` or `macro Derevo.deletateParams3` in the corresponding methods
-Example could be found (here)[https://github.com/tofu-tf/derevo/blob/supertagged/circe/src/main/scala/derevo/circe/circe.scala]
+Example could be found [here](https://github.com/tofu-tf/derevo/blob/supertagged/circe/src/main/scala/derevo/circe/circe.scala)
 
 | CI | Release |
 | --- | --- |
