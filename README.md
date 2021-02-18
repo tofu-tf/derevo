@@ -45,6 +45,16 @@ Also, you can define additional methods `def apply(...)` or `def foo(...)` in yo
 
 To support `newtype` derivation, extend your object with (`NewtypeDerivation`)[https://github.com/tofu-tf/derevo/blob/master/core/src/main/scala/derevo/NewTypeRepr.scala#L8]. Alternatively, your object should have method `newtype[R]` with a single type parameter, that will receive underlying type, and should return another object which has method `instance` that should work as described earlier.
 
+Sometimes, your required constraint could differ of provided typeclass, example is `circe.Encoder`, where it should require
+`Encoder` for each of the field, but provides `Encoder.AsObject` for derived case classes.
+In this case you should extend `SpecificDerivation` instead, like
+`object foo extends SpecificDerivation[FromTc, ToTc, NT]`, where
+
+ - `FromTc[A]` - typeclass that will be required for non-phantom type parameters
+ - `ToTc[A]` - normal typeclass provided by the instance
+ - `NT[A]` - type class, that will be forwarded by the newtype derivation
+
+
 ## Expression table
 
 | Derivation line                                           | Translation                                                | 
