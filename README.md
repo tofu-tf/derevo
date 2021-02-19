@@ -1,5 +1,12 @@
 # derevo
+
+[![Build & Release](https://github.com/tofu-tf/derevo/workflows/Scala%20CI/badge.svg)](https://github.com/tofu-tf/derevo/actions?query=workflow%3A%22Scala+CI%22)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/tf.tofu/derevo-core_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/tf.tofu/derevo-core_2.13)
+[![Scala Steward badge](https://img.shields.io/badge/Scala_Steward-helping-blue.svg?style=flat&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAMAAAARSr4IAAAAVFBMVEUAAACHjojlOy5NWlrKzcYRKjGFjIbp293YycuLa3pYY2LSqql4f3pCUFTgSjNodYRmcXUsPD/NTTbjRS+2jomhgnzNc223cGvZS0HaSD0XLjbaSjElhIr+AAAAAXRSTlMAQObYZgAAAHlJREFUCNdNyosOwyAIhWHAQS1Vt7a77/3fcxxdmv0xwmckutAR1nkm4ggbyEcg/wWmlGLDAA3oL50xi6fk5ffZ3E2E3QfZDCcCN2YtbEWZt+Drc6u6rlqv7Uk0LdKqqr5rk2UCRXOk0vmQKGfc94nOJyQjouF9H/wCc9gECEYfONoAAAAASUVORK5CYII=)](https://scala-steward.org)
+
+
 Multiple instance derivations inside a single macro annotation.
+
 
 ## Basic Usage
 If a library has support for `derevo`, you can simply write
@@ -9,8 +16,8 @@ case class Foo(...)
 ```
 where `SomeCaseClass`, `AnotherCaseClass`, `fooDerivation`, `barDerivation` are some objects, extending one of the `InstanceDef` traits ([see module source](https://github.com/tofu-tf/derevo/blob/supertagged/core/src/main/scala/derevo/package.scala#L13:L21)).
 
-For every element of `@derive` macro, there will be generated `implicit val` or `implicit def` (when `Foo` has type parameters) providing the corresponding typeclass.
-For simple type derivation, if `Foo` has type parameters, the instance will require an instance of the same or specified another typeclass for proper derivation.
+For every element of the `@derive` macro, there will be generated `implicit val` or `implicit def` (when `Foo` has type parameters) providing the corresponding typeclass.
+For simple type derivation, if `Foo` has type parameters, the instance will require an instance of the same or specified other typeclass for proper derivation.
 Example:
 ```scala
 @derive(encoder)
@@ -20,15 +27,16 @@ case class Foo[@phantom A, B](...)
 implicit def encoder$macro$1[A, B: Encoder]: Encoder.AsObject[Foo[A, B]] = ...
 ```
 
-`Foo` can be also a newtype in form of [estatico](https://github.com/estatico/scala-newtype) or [supertagged](https://github.com/rudogma/scala-supertagged) libraries.
+`Foo` can also be a newtype in form of [estatico](https://github.com/estatico/scala-newtype) or [supertagged](https://github.com/rudogma/scala-supertagged) libraries.
 
-If you have problems with initialization order you can optionally put the 
-`insertInstancesHere()` to the body of your companion object to specify the place where `implicit val`s should be inserted.
+If you have problems with the initialization order you can optionally put the 
+`insertInstancesHere()` call to the body of your companion object to specify the place where `implicit val`s should be inserted.
+
+
 ## Making your own derivation.
+First, extend the object (the companion object for your type is the best option) from one of the [`InstanceDef` traits](https://github.com/tofu-tf/derevo/blob/supertagged/core/src/main/scala/derevo/package.scala#L13:L21).
 
-First, extend the object (companion object for your type would be the best) from one of the [`InstanceDef` traits](https://github.com/tofu-tf/derevo/blob/supertagged/core/src/main/scala/derevo/package.scala#L13:L21)).
-
-Then implement method `instance` for your object so it could derive corresponding instance.
+Then implement the `instance` method for your object so it could derive the corresponding instance.
 Example:
 ```scala
 trait TypeClass[A] {
@@ -40,10 +48,19 @@ object TypeClass extends Derivaton[TypeClass] {
 }
 ```
 
-Also, you can define additional methods `def apply(...)` or `def foo(...)` in your derivation object. This would allow instance creation as
-`@derive(TypeClass(...))` or `@derive(TypeClass.foo(...))`
+Also, you can define additional methods `def apply(...)` or `def foo(...)` in your derivation object. This will allow instance creation as
+`@derive(TypeClass(...))` or `@derive(TypeClass.foo(...))`.
 
-To support `newtype` derivation, extend your object with (`NewtypeDerivation`)[https://github.com/tofu-tf/derevo/blob/master/core/src/main/scala/derevo/NewTypeRepr.scala#L8]. Alternatively, your object should have method `newtype[R]` with a single type parameter, that will receive underlying type, and should return another object which has method `instance` that should work as described earlier.
+To support `newtype` derivation, extend your object with (`NewtypeDerivation`)[https://github.com/tofu-tf/derevo/blob/master/core/src/main/scala/derevo/NewTypeRepr.scala#L8]. Alternatively, your object may have the `newtype[R]` method with a single type parameter that receives the underlying type and returns another object that has the `instance` method that works as described earlier.
+
+Sometimes, the required constraint may differ from the provided typeclass, e.g. `circe.Encoder` which requires
+`Encoder` for each field but provides `Encoder.AsObject` for the target case class.
+In this case you should extend `SpecificDerivation` instead, like `object foo extends SpecificDerivation[FromTc, ToTc, NT]`, where
+
+ - `FromTc[A]` - typeclass that will be required for non-phantom type parameters
+ - `ToTc[A]` - normal typeclass provided by the instance
+ - `NT[A]` - type class that will be forwarded by the newtype derivation
+
 
 ## Expression table
 
@@ -52,28 +69,19 @@ To support `newtype` derivation, extend your object with (`NewtypeDerivation`)[h
 | `@derive(...foo, ...)`                                    | `implicit val foo$macro: Foo[A] = foo.instance`            |
 | `@derive(...foo(bar))`                                    | `implicit val foo$macro : Foo[A] = foo(bar)`               | 
 | `@derive(...foo.quux(bar))`                               | `implicit val foo$macro : Foo[A] = foo.quux(bar)`          | 
-| `@derive(...foo, ...)` when `A` is a newtype over`B`      | `implicit val foo$macro: Foo[A] = foo.newtype[B].instance` |
-
+| `@derive(...foo, ...)` when `A` is a newtype over `B`     | `implicit val foo$macro: Foo[A] = foo.newtype[B].instance` |
 
 
 ## Delegating to other macros
-`Derevo` supports macro delegation when corresponding macro function is provided by another library.
+`Derevo` supports macro delegation when the corresponding macro function is provided by another library.
 
 This works by adding the `@delegating` annotation to your delegator object:
 ```scala
 @delegating("full.qualified.method.path")
 ``` 
 Then call `macro Derevo.delegate`, `macro Derevo.delegateParams`, `macro Derevo.delegateParams2` or `macro Derevo.delegateParams3` in the corresponding methods.
-Example could be found [here](https://github.com/tofu-tf/derevo/blob/supertagged/circe/src/main/scala/derevo/circe/circe.scala).
+An example can be found [here](https://github.com/tofu-tf/derevo/blob/supertagged/circe/src/main/scala/derevo/circe/circe.scala).
 
-| CI | Release |
-| --- | --- |
-| ![Scala CI](https://github.com/manatki/derevo/workflows/Scala%20CI/badge.svg) | [![Maven Central](https://img.shields.io/maven-central/v/org.manatki/derevo-core_2.12.svg)](https://search.maven.org/search?q=derevo) |
-
-## Breaking changes in 0.11
-`org.manatki.derevo` pkg was shortened to `derevo`.
-
-Use [scalafix](https://scalacenter.github.io/scalafix/docs/users/installation) and [this rule](https://gist.github.com/REDNBLACK/9bc56ad71e4b01a63001339fa61b4cfd) for migration
 
 ## Installation
 For Scala 2.12 and older:
@@ -87,7 +95,7 @@ scalacOptions += "-Ymacro-annotations"
 ```
 
 ## IntelliJ Integration
-Provides full support and visibility of implicits declared in `@derive` annotation.
+Provides full support and visibility of implicits declared in the `@derive` annotation.
 
 To activate, simply click 'Yes' on the extensions popup, after adding any of the `derevo-` integration libraries to your project.
 ![](https://i.imgur.com/E6BKTeH.png)

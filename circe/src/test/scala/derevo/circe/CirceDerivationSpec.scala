@@ -7,6 +7,8 @@ import io.circe.parser._
 import io.circe.derivation.renaming
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
+import io.estatico.newtype.macros.newtype
+import CirceDerivationSpec.{Moe, Nya}
 
 class CirceDerivationSpec extends AnyFlatSpec with Matchers {
   "Circe derivation" should "derive simple codecs" in {
@@ -87,6 +89,15 @@ class CirceDerivationSpec extends AnyFlatSpec with Matchers {
   it should "reject decode with inserted params" in {
     decode[ShelloBaz](shelloKebab).left.getOrElse(null) mustBe a[DecodingFailure]
   }
+
+  it should "encode object newtype" in {
+    val bar: SealedTrait = SealedTrait.Bar(143)
+    assert(Moe(bar).asJson === (bar).asJson)
+  }
+
+  it should "encode string newtype" in {
+    assert(Nya("uwu").asJson === "uwu".asJson)
+  }
 }
 
 @derive(encoder(identity, Some("type")), decoder(identity, false, Some("type")))
@@ -98,5 +109,14 @@ object SealedTrait {
 
   @derive(encoder, decoder)
   case class Baz(baz: String) extends SealedTrait
+}
 
+object CirceDerivationSpec {
+  @derive(encoder, decoder)
+  @newtype
+  case class Moe(tutu: SealedTrait)
+
+  @derive(encoder, decoder)
+  @newtype
+  case class Nya(string: String)
 }

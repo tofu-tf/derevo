@@ -4,6 +4,7 @@ import derevo.{Derevo, Derivation, PolyDerivation, delegating}
 import io.circe.derivation.renaming
 import io.circe.{Codec, Decoder, Encoder}
 import derevo.NewTypeDerivation
+import derevo.SpecificDerivation
 
 @delegating("io.circe.derivation.deriveDecoder")
 object decoder extends Derivation[Decoder] with NewTypeDerivation[Decoder] {
@@ -18,7 +19,7 @@ object decoder extends Derivation[Decoder] with NewTypeDerivation[Decoder] {
 }
 
 @delegating("io.circe.derivation.deriveEncoder")
-object encoder extends PolyDerivation[Encoder, Encoder.AsObject] with NewTypeDerivation[Encoder] {
+object encoder extends SpecificDerivation[Encoder, Encoder.AsObject, Encoder] with NewTypeDerivation[Encoder] {
   def instance[A]: Encoder.AsObject[A] = macro Derevo.delegate[Encoder.AsObject, A]
 
   /** @param arg1 naming function. For example io.circe.derivation.renaming.snakeCase
@@ -29,7 +30,7 @@ object encoder extends PolyDerivation[Encoder, Encoder.AsObject] with NewTypeDer
 }
 
 @delegating("io.circe.derivation.deriveCodec")
-object codec extends PolyDerivation[Codec, Codec.AsObject] with NewTypeDerivation[Codec] {
+object codec extends SpecificDerivation[Codec, Codec.AsObject, Codec] with NewTypeDerivation[Codec] {
   def instance[A]: Codec.AsObject[A] = macro Derevo.delegate[Codec.AsObject, A]
 
   /** @param arg1 naming function. For example io.circe.derivation.renaming.snakeCase
@@ -45,12 +46,12 @@ object snakeDecoder extends Derivation[Decoder] {
 }
 
 @delegating("io.circe.derivation.deriveEncoder", renaming.snakeCase, None)
-object snakeEncoder extends PolyDerivation[Encoder, Encoder.AsObject] {
+object snakeEncoder extends SpecificDerivation[Encoder, Encoder.AsObject, Encoder] {
   def instance[A]: Encoder.AsObject[A] = macro Derevo.delegate[Encoder.AsObject, A]
 }
 
 @delegating("io.circe.derivation.deriveCodec", renaming.snakeCase, false, None)
-object snakeCodec extends PolyDerivation[Codec, Codec.AsObject] {
+object snakeCodec extends SpecificDerivation[Codec, Codec.AsObject, Encoder] {
   def instance[A]: Codec.AsObject[A] = macro Derevo.delegate[Codec.AsObject, A]
 }
 
@@ -60,11 +61,11 @@ object kebabDecoder extends Derivation[Decoder] {
 }
 
 @delegating("io.circe.derivation.deriveEncoder", renaming.kebabCase, None)
-object kebabEncoder extends PolyDerivation[Encoder, Encoder.AsObject] {
+object kebabEncoder extends SpecificDerivation[Encoder, Encoder.AsObject, Encoder] {
   def instance[A]: Encoder.AsObject[A] = macro Derevo.delegate[Encoder.AsObject, A]
 }
 
 @delegating("io.circe.derivation.deriveCodec", renaming.kebabCase, false, None)
-object kebabCodec extends PolyDerivation[Codec, Codec.AsObject] {
+object kebabCodec extends SpecificDerivation[Codec, Codec.AsObject, Encoder] {
   def instance[A]: Codec.AsObject[A] = macro Derevo.delegate[Codec.AsObject, A]
 }

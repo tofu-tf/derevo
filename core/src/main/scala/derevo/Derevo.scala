@@ -11,7 +11,7 @@ class Derevo(val c: blackbox.Context) {
 
   val instanceDefs         = Vector(
   )
-  val IsSpecificDerivation = isInstanceDef[PolyDerivation[Any, Any]]()
+  val IsSpecificDerivation = isInstanceDef[SpecificDerivation[Any, Any, Any]]()
   val IsDerivation         = isInstanceDef[Derivation[Any]]()
 
   val HKDerivation = new DerivationList(
@@ -188,7 +188,8 @@ class Derevo(val c: blackbox.Context) {
     }
 
     if (allTparams.isEmpty) {
-      val resT = mkAppliedType(mode.to, tq"$typRef")
+      val resTc = if (newType.isDefined) mode.newtype else mode.to
+      val resT  = mkAppliedType(resTc, tq"$typRef")
       q"""
       @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
       implicit val $tn: $resT = $call
@@ -244,6 +245,7 @@ class Derevo(val c: blackbox.Context) {
       val name: String,
       val from: Type,
       val to: Type,
+      val newtype: Type,
       val drop: Int,
       val cascade: Boolean
   )
@@ -253,25 +255,25 @@ class Derevo(val c: blackbox.Context) {
     val name        = c.freshName(mangledName)
 
     c.typecheck(obj).tpe match {
-      case IsSpecificDerivation(f, t, d) => new NameAndTypes(name, f, t, d, true)
-      case IsDerivation(f, t, d)         => new NameAndTypes(name, f, t, d, true)
-      case HKDerivation(f, t, d)         => new NameAndTypes(name, f, t, d, false)
-      case _                             => abort(s"$obj seems not extending InstanceDef traits")
+      case IsSpecificDerivation(f, t, nt, d) => new NameAndTypes(name, f, t, nt, d, true)
+      case IsDerivation(f, t, nt, d)         => new NameAndTypes(name, f, t, nt, d, true)
+      case HKDerivation(f, t, nt, d)         => new NameAndTypes(name, f, t, nt, d, false)
+      case _                                 => abort(s"$obj seems not extending InstanceDef traits")
     }
   }
 
   class DerivationList(ds: IsInstanceDef*) {
-    def unapply(objType: Type): Option[(Type, Type, Int)] =
+    def unapply(objType: Type): Option[(Type, Type, Type, Int)] =
       ds.iterator.flatMap(_.unapply(objType)).collectFirst { case x => x }
   }
 
   class IsInstanceDef(t: Type, drop: Int) {
-    val constrSymbol                                      = t.typeConstructor.typeSymbol
-    def unapply(objType: Type): Option[(Type, Type, Int)] =
+    val constrSymbol                                            = t.typeConstructor.typeSymbol
+    def unapply(objType: Type): Option[(Type, Type, Type, Int)] =
       objType.baseType(constrSymbol) match {
-        case TypeRef(_, _, List(tc))       => Some((tc, tc, drop))
-        case TypeRef(_, _, List(from, to)) => Some((from, to, drop))
-        case _                             => None
+        case TypeRef(_, _, List(tc))           => Some((tc, tc, tc, drop))
+        case TypeRef(_, _, List(from, to, nt)) => Some((from, to, nt, drop))
+        case _                                 => None
       }
   }
   def isInstanceDef[T: TypeTag](dropTParams: Int = 0) = new IsInstanceDef(typeOf[T], dropTParams)
