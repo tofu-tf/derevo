@@ -104,7 +104,7 @@ To activate, simply click 'Yes' on the extensions popup, after adding any of the
 
 ### [Cats](https://github.com/typelevel/cats)
 ```sbt
-libraryDependencies += "org.manatki" %% "derevo-cats" % "latest version in badge"
+libraryDependencies += "tf.tofu" %% "derevo-cats" % "latest version in badge"
 ```
 
 ```scala
@@ -134,7 +134,7 @@ assert(Monoid[Foo].empty == Foo("", 0))
 
 ### [Cats Tagless](https://github.com/typelevel/cats-tagless)
 ```sbt
-libraryDependencies += "org.manatki" %% "derevo-cats-tagless" % "latest version in badge"
+libraryDependencies += "tf.tofu" %% "derevo-cats-tagless" % "latest version in badge"
 ```
 
 ```scala
@@ -146,7 +146,7 @@ import derevo.tagless.{functor, flatMap, invariant, contravariant, functorK, inv
 
 ### [Tethys](https://github.com/tethys-json/tethys)
 ```sbt
-libraryDependencies += "org.manatki" %% "derevo-tethys" % "latest version in badge"
+libraryDependencies += "tf.tofu" %% "derevo-tethys" % "latest version in badge"
 ```
 
 ```scala
@@ -169,7 +169,7 @@ assert("""{"stringName":"Elya","integerAge":32}""".jsonAs[Bar] == Right(Bar("Ely
 
 ### [Circe](https://github.com/circe/circe)
 ```sbt
-libraryDependencies += "org.manatki" %% "derevo-circe" % "latest version in badge"
+libraryDependencies += "tf.tofu" %% "derevo-circe" % "latest version in badge"
 ```
 
 ```scala
@@ -189,7 +189,7 @@ assert(parse("""{"stringName":"WWW","integerAge":20}""").flatMap(_.as[Bar]) == R
 
 ### [Circe Magnolia](https://github.com/circe/circe-magnolia)
 ```sbt
-libraryDependencies += "org.manatki" %% "derevo-circe-magnolia" % "latest version in badge"
+libraryDependencies += "tf.tofu" %% "derevo-circe-magnolia" % "latest version in badge"
 ```
 
 ```scala
@@ -232,7 +232,7 @@ object SealedTrait {
 
 ### [Ciris](https://github.com/vlovgr/ciris) + `HOCON`
 ```sbt
-libraryDependencies += "org.manatki" %% "derevo-ciris" % "latest version in badge"
+libraryDependencies += "tf.tofu" %% "derevo-ciris" % "latest version in badge"
 ```
 
 ```scala
@@ -272,7 +272,7 @@ assert(source.load[IO].unsafeRunSync() == DataConfig("AAA", List("pub", "home", 
 
 ### [PureConfig](https://github.com/pureconfig/pureconfig)
 ```sbt
-libraryDependencies += "org.manatki" %% "derevo-pureconfig" % "latest version in badge"
+libraryDependencies += "tf.tofu" %% "derevo-pureconfig" % "latest version in badge"
 ```
 
 ```scala
@@ -307,7 +307,7 @@ assert(parsed.map(_.toConfig.atPath("data").getConfig("data")) == Right(raw))
 
 ### [TypedSchema](https://github.com/TinkoffCreditSystems/typed-schema)
 ```sbt
-libraryDependencies += "org.manatki" %% "derevo-tschema" % "latest version in badge"
+libraryDependencies += "tf.tofu" %% "derevo-tschema" % "latest version in badge"
 ```
 
 ```scala
@@ -319,7 +319,7 @@ import derevo.tschema.{swagger, openapiParam, httpParam}
 
 ### [RMongo](https://github.com/tc/RMongo)
 ```sbt
-libraryDependencies += "org.manatki" %% "derevo-rmongo" % "latest version in badge"
+libraryDependencies += "tf.tofu" %% "derevo-rmongo" % "latest version in badge"
 ```
 
 ```scala
@@ -331,7 +331,7 @@ import derevo.reactivemongo.{bsonDocumentReader, bsonDocumentWriter}
 
 ### [Scalacheck](https://github.com/typelevel/scalacheck)
 ```sbt
-libraryDependencies += "org.manatki" %% "derevo-scalacheck" % "latest version in badge" % Test
+libraryDependencies += "tf.tofu" %% "derevo-scalacheck" % "latest version in badge" % Test
 ```
 
 ```scala
