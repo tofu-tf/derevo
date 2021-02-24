@@ -1,7 +1,7 @@
 package derevo.cats
 
 import cats.Eq
-import derevo.cats.{eq => eqv}
+import derevo.cats._
 import derevo.derive
 import org.scalatest.freespec.AnyFreeSpec
 import io.estatico.newtype.macros.newtype
