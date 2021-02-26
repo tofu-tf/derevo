@@ -29,7 +29,7 @@ implicit def encoder$macro$1[A, B: Encoder]: Encoder.AsObject[Foo[A, B]] = ...
 
 `Foo` can also be a newtype in form of [estatico](https://github.com/estatico/scala-newtype) or [supertagged](https://github.com/rudogma/scala-supertagged) libraries.
 
-If you have problems with the initialization order you can optionally put the 
+If you have problems with the initialization order you can optionally put the
 `insertInstancesHere()` call to the body of your companion object to specify the place where `implicit val`s should be inserted.
 
 
@@ -64,11 +64,11 @@ In this case you should extend `SpecificDerivation` instead, like `object foo ex
 
 ## Expression table
 
-| Derivation line                                           | Translation                                                | 
+| Derivation line                                           | Translation                                                |
 |-----------------------------------------------------------|------------------------------------------------------------|
 | `@derive(...foo, ...)`                                    | `implicit val foo$macro: Foo[A] = foo.instance`            |
-| `@derive(...foo(bar))`                                    | `implicit val foo$macro : Foo[A] = foo(bar)`               | 
-| `@derive(...foo.quux(bar))`                               | `implicit val foo$macro : Foo[A] = foo.quux(bar)`          | 
+| `@derive(...foo(bar))`                                    | `implicit val foo$macro : Foo[A] = foo(bar)`               |
+| `@derive(...foo.quux(bar))`                               | `implicit val foo$macro : Foo[A] = foo.quux(bar)`          |
 | `@derive(...foo, ...)` when `A` is a newtype over `B`     | `implicit val foo$macro: Foo[A] = foo.newtype[B].instance` |
 
 
@@ -78,7 +78,7 @@ In this case you should extend `SpecificDerivation` instead, like `object foo ex
 This works by adding the `@delegating` annotation to your delegator object:
 ```scala
 @delegating("full.qualified.method.path")
-``` 
+```
 Then call `macro Derevo.delegate`, `macro Derevo.delegateParams`, `macro Derevo.delegateParams2` or `macro Derevo.delegateParams3` in the corresponding methods.
 An example can be found [here](https://github.com/tofu-tf/derevo/blob/supertagged/circe/src/main/scala/derevo/circe/circe.scala).
 
@@ -109,7 +109,7 @@ libraryDependencies += "tf.tofu" %% "derevo-cats" % "latest version in badge"
 
 ```scala
 import derevo.derive
-import derevo.cats.{eq => eqv, show, order, monoid}
+import derevo.cats.{eqv, show, order, monoid}
 
 import cats.Monoid
 import cats.instances.string._
