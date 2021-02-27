@@ -16,8 +16,8 @@ class DerevoDeriveInjector extends SyntheticMembersInjector {
       obj.fakeCompanionClassOrCompanionClass match {
         case clazz: ScTypeDefinition =>
           findMacroAnnotation(clazz) match {
-            case Some((old, annotation)) =>
-              annotationParams(annotation).flatMap(injectImplicit(clazz, _, old))
+            case Some(annotation) =>
+              annotationParams(annotation).flatMap(injectImplicit(clazz, _))
             case _ => Nil
           }
         case _ => Nil
@@ -30,6 +30,8 @@ class DerevoDeriveInjector extends SyntheticMembersInjector {
 }
 
 object DerevoDeriveInjector {
+  import java.nio.file.{Files, Paths}
+
   private[this] val deriveAnnotation = "derevo.derive"
   private[this] val pkg              = "_root_.derevo"
   private[this] val mapping = Map[String, String](
@@ -86,62 +88,38 @@ object DerevoDeriveInjector {
     s"$pkg.reactivemongo.bsonDocumentWriter.type" -> "implicit val derevoDeriveReactiveMongoWriter: _root_.reactivemongo.bson.BSONDocumentWriter[%s] = ???",
     // ScalaCheck
     s"$pkg.scalacheck.arbitrary.type" -> "implicit val derevoDeriveScalaCheckArbitrary: _root_.org.scalacheck.Arbitrary[%s] = ???",
-  )
+  ) ++ loadCustomDerive
 
-  private[this] val oldDeriveAnnotation = "org.manatki.derevo.derive"
-  private[this] val oldPkg              = "_root_.org.manatki.derevo"
-  private[this] val oldMapping = Map[String, String](
-    // Cats
-    s"$oldPkg.catsInstances.show.type"         -> "implicit val derevoDeriveCatsShow: _root_.cats.Show[%s] = ???",
-    s"$oldPkg.catsInstances.semigroup.type"    -> "implicit val derevoDeriveCatsSemigroup: _root_.cats.Semigroup[%s] = ???",
-    s"$oldPkg.catsInstances.monoid.type"       -> "implicit val derevoDeriveCatsMonoid: _root_.cats.Monoid[%s] = ???",
-    s"$oldPkg.catsInstances.eq.type"           -> "implicit val derevoDeriveCatsEq: _root_.cats.Eq[%s] = ???",
-    s"$oldPkg.catsInstances.eq.universal.type" -> "implicit val derevoDeriveCatsEq: _root_.cats.Eq[%s] = ???",
-    s"$oldPkg.catsInstances.order.type"        -> "implicit val derevoDeriveCatsOrder: _root_.cats.Order[%s] = ???",
-    // Cats Tagless
-    s"$oldPkg.tagless.functor.type"       -> "implicit val derevoDeriveCatsFunctor: _root_.cats.Functor[%s] = ???",
-    s"$oldPkg.tagless.flatMap.type"       -> "implicit val derevoDeriveCatsFlatMap: _root_.cats.FlatMap[%s] = ???",
-    s"$oldPkg.tagless.invariant.type"     -> "implicit val derevoDeriveCatsInvariant: _root_.cats.Invariant[%s] = ???",
-    s"$oldPkg.tagless.contravariant.type" -> "implicit val derevoDeriveCatsContravariant: _root_.cats.Contravariant[%s] = ???",
-    s"$oldPkg.tagless.applyK.type"        -> "implicit val derevoDeriveCatsTaglessApplyK: _root_.cats.tagless.ApplyK[%s] = ???",
-    s"$oldPkg.tagless.functorK.type"      -> "implicit val derevoDeriveCatsTaglessFunctorK: _root_.cats.tagless.FunctorK[%s] = ???",
-    s"$oldPkg.tagless.invariantK.type"    -> "implicit val derevoDeriveCatsTaglessInvariantK: _root_.cats.tagless.InvariantK[%s] = ???",
-    s"$oldPkg.tagless.semigroupalK.type"  -> "implicit val derevoDeriveCatsTaglessSemigroupalK: _root_.cats.tagless.SemigroupalK[%s] = ???",
-    // Tethys
-    s"$oldPkg.tethysInstances.tethysReader.type" -> "implicit val derevoDeriveTethysReader: _root_.tethys.JsonReader[%s] = ???",
-    s"$oldPkg.tethysInstances.tethysWriter.type" -> "implicit val derevoDeriveTethysWriter: _root_.tethys.JsonWriter[%s] = ???",
-    // Circe
-    s"$oldPkg.circeDerivation.decoder.type" -> "implicit val derevoDeriveCirceDecoder: _root_.io.circe.Decoder[%s] = ???",
-    s"$oldPkg.circeDerivation.encoder.type" -> "implicit val derevoDeriveCirceEncoder: _root_.io.circe.Encoder[%s] = ???",
-    s"$oldPkg.circeDerivation.codec.type"   -> "implicit val derevoDeriveCirceCodec: _root_.io.circe.Codec[%s] = ???",
-    // TypedSchema
-    s"$oldPkg.tschemaInstances.swagger.type"      -> "implicit val derevoDeriveTypedSchemaSwagger: _root_.ru.tinkoff.tschema.swagger.SwaggerTypeable[%s] = ???",
-    s"$oldPkg.tschemaInstances.openapiParam.type" -> "implicit val derevoDeriveTypedSchemaOpenApiParam: _root_.ru.tinkoff.tschema.param.AsOpenApiParam[%s] = ???",
-    s"$oldPkg.tschemaInstances.httpParam.type"    -> "implicit val derevoDeriveTypedSchemaHttpParam: _root_.ru.tinkoff.tschema.param.HttpParam[%s] = ???",
-    // PureConfig
-    s"$oldPkg.pureconfigDerivation.pureconfigReader.type" -> "implicit val derevoDerivePureConfigReader: _root_.pureconfig.ConfigReader[%s] = ???",
-    s"$oldPkg.pureconfigDerivation.pureconfigWriter.type" -> "implicit val derevoDerivePureConfigWriter: _root_.pureconfig.ConfigWriter[%s] = ???",
-    // Ciris
-    s"$oldPkg.cirisDerivation.cirisDecoder.type" -> "implicit val derevoDeriveCirisDecoder: _root_.ciris.hocon.ConfigValueDecoder[%s] = ???",
-    // ReactiveMongo
-    s"$oldPkg.reactivemongoDerivation.bsonDocumentReader.type" -> "implicit val derevoDeriveReactiveMongoReader: _root_.reactivemongo.bson.BSONDocumentReader[%s] = ???",
-    s"$oldPkg.reactivemongoDerivation.bsonDocumentWriter.type" -> "implicit val derevoDeriveReactiveMongoWriter: _root_.reactivemongo.bson.BSONDocumentWriter[%s] = ???",
-    // ScalaCheck
-    s"$pkg.scalacheckDerivation.arbitrary.type" -> "implicit val derevoDeriveScalaCheckArbitrary: _root_.org.scalacheck.Arbitrary[%s] = ???",
-  )
+  def injectImplicit(clazz: PsiClass, param: String): Option[String] =
+    mapping.get(param).map(_.format(clazz.getQualifiedName))
 
-  def injectImplicit(clazz: PsiClass, param: String, old: Boolean): Option[String] =
-    (if (old) oldMapping else mapping).get(param).map(_.format(clazz.getQualifiedName))
-
-  def findMacroAnnotation(source: ScTypeDefinition): Option[(Boolean, ScAnnotation)] =
+  def findMacroAnnotation(source: ScTypeDefinition): Option[ScAnnotation] =
     source.findAnnotationNoAliases(deriveAnnotation) match {
-      case null =>
-        source.findAnnotationNoAliases(oldDeriveAnnotation) match {
-          case null            => None
-          case a: ScAnnotation => Some(true -> a)
-          case _               => None
-        }
-      case a: ScAnnotation => Some(false -> a)
+      case null            => None
+      case a: ScAnnotation => Some(a)
       case _               => None
     }
+
+  def loadCustomDerive: Map[String, String] =
+    sys.props
+      .get("user.home")
+      .map(Paths.get(_).resolve(".config").resolve("derevo").resolve("mapping.properties"))
+      .filter(Files.isReadable)
+      .map { file =>
+        import scala.util.{Try, Using}
+        import scala.jdk.CollectionConverters._
+
+        val props = new java.util.Properties()
+
+        Try(Using.resource(Files.newInputStream(file))(props.load))
+
+        props
+          .asScala
+          .zipWithIndex
+          .map { case ((tpeName, instName), idx) =>
+            tpeName -> s"implicit val derevoDeriveSynthetic$idx: $instName[%s] = ???"
+          }
+          .toMap
+      }
+      .getOrElse(Map.empty)
 }
