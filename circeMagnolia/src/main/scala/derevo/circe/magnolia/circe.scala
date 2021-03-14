@@ -16,11 +16,11 @@ object encoder extends Derivation[Encoder] with NewTypeDerivation[Encoder] {
 }
 
 @delegating("io.circe.magnolia.configured.decoder.semiauto.deriveConfiguredMagnoliaDecoder")
-object customizableDecoder extends Derivation[Decoder] {
+object customizableDecoder extends Derivation[Decoder] with NewTypeDerivation[Decoder] {
   def instance[A]: Decoder[A] = macro Derevo.delegate[Decoder, A]
 }
 
 @delegating("io.circe.magnolia.configured.encoder.semiauto.deriveConfiguredMagnoliaEncoder")
-object customizableEncoder extends Derivation[Encoder] {
+object customizableEncoder extends Derivation[Encoder] with NewTypeDerivation[Encoder] {
   def instance[A]: Encoder[A] = macro Derevo.delegate[Encoder, A]
 }
