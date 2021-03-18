@@ -2,12 +2,17 @@ package derevo
 
 import scala.language.higherKinds
 import scala.reflect.macros.blackbox
-import scala.annotation.nowarn
+import Derevo._
 
 class Derevo(val c: blackbox.Context) {
   import c.universe._
-  val DelegatingSymbol = typeOf[delegating].typeSymbol
-  val PhantomSymbol    = typeOf[phantom].typeSymbol
+
+  type Newtype      = NewtypeP[Tree]
+  type NameAndTypes = NameAndTypesP[c.Type]
+
+  val DelegatingSymbol   = typeOf[delegating].typeSymbol
+  val PhantomSymbol      = typeOf[phantom].typeSymbol
+  val PassTypeArgsSymbol = typeOf[PassTypeArgs].typeSymbol
 
   val instanceDefs         = Vector(
   )
@@ -220,9 +225,11 @@ class Derevo(val c: blackbox.Context) {
 
       val resT = mkAppliedType(mode.to, outTyp)
 
+      val callWithT = if (mode.passArgs) q"$call[$outTyp]" else call
+
       q"""
       @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
-      implicit def $tn[..$tparams](implicit ..$implicits): $resT = $call
+      implicit def $tn[..$tparams](implicit ..$implicits): $resT = $callWithT
       """
     }
   }
@@ -232,34 +239,25 @@ class Derevo(val c: blackbox.Context) {
     case _                     => tq"$tc[$arg]"
   }
 
-  private sealed trait Newtype {
-    def underlying: Tree
-  }
-  @nowarn
-  private final case class NewtypeCls(underlying: Tree)            extends Newtype
-  @nowarn
-  private final case class NewtypeMod(underlying: Tree, res: Tree) extends Newtype
-
-  @nowarn
-  private final class NameAndTypes(
-      val name: String,
-      val from: Type,
-      val to: Type,
-      val newtype: Type,
-      val drop: Int,
-      val cascade: Boolean
-  )
-
   private def nameAndTypes(obj: Tree): NameAndTypes = {
     val mangledName = obj.toString.replaceAll("[^\\w]", "_")
     val name        = c.freshName(mangledName)
 
-    c.typecheck(obj).tpe match {
+    val objTyp = c.typecheck(obj).tpe
+
+    val nt = objTyp match {
       case IsSpecificDerivation(f, t, nt, d) => new NameAndTypes(name, f, t, nt, d, true)
       case IsDerivation(f, t, nt, d)         => new NameAndTypes(name, f, t, nt, d, true)
       case HKDerivation(f, t, nt, d)         => new NameAndTypes(name, f, t, nt, d, false)
       case _                                 => abort(s"$obj seems not extending InstanceDef traits")
     }
+
+    val passArgs = objTyp.baseType(PassTypeArgsSymbol) match {
+      case TypeRef(_, _, _) => true
+      case _                => false
+    }
+
+    nt.copy(passArgs = passArgs)
   }
 
   class DerivationList(ds: IsInstanceDef*) {
@@ -287,4 +285,22 @@ class Derevo(val c: blackbox.Context) {
     false
   )
   private def abort(s: String)                 = c.abort(c.enclosingPosition, s)
+}
+
+object Derevo {
+  private[Derevo] sealed trait NewtypeP[tree] {
+    def underlying: tree
+  }
+  private[Derevo] final case class NewtypeCls[tree](underlying: tree)            extends NewtypeP[tree]
+  private[Derevo] final case class NewtypeMod[tree](underlying: tree, res: tree) extends NewtypeP[tree]
+
+  private[Derevo] final case class NameAndTypesP[typ](
+      name: String,
+      from: typ,
+      to: typ,
+      newtype: typ,
+      drop: Int,
+      cascade: Boolean,
+      passArgs: Boolean = false,
+  )
 }

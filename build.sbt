@@ -80,10 +80,28 @@ lazy val reactivemongo  = project dependsOn core settings common
 lazy val catsTagless    = project dependsOn core settings common
 lazy val pureconfig     = project dependsOn core settings common
 lazy val scalacheck     = project dependsOn core settings common
+lazy val tests          =
+  project
+    .dependsOn(core, circe, ciris, tethys, reactivemongo, catsTagless, pureconfig)
+    .settings(common, skip in publish := true)
 
-lazy val derevo = project in file(".") settings (common, skip in publish := true) aggregate (
-  core, cats, circe, circeMagnolia, ciris, tethys, tschema, reactivemongo, catsTagless, pureconfig, scalacheck
-)
+lazy val derevo = project
+  .in(file("."))
+  .settings(common, skip in publish := true)
+  .aggregate(
+    core,
+    cats,
+    circe,
+    circeMagnolia,
+    ciris,
+    tethys,
+    tschema,
+    reactivemongo,
+    catsTagless,
+    pureconfig,
+    scalacheck,
+    tests,
+  )
 
 addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
 addCommandAlias("checkfmt", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck")
