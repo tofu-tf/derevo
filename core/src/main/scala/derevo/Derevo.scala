@@ -2,10 +2,14 @@ package derevo
 
 import scala.language.higherKinds
 import scala.reflect.macros.blackbox
-import scala.annotation.nowarn
+import Derevo._
 
 class Derevo(val c: blackbox.Context) {
   import c.universe._
+
+  type Newtype      = NewtypeP[Tree]
+  type NameAndTypes = NameAndTypesP[c.Type]
+
   val DelegatingSymbol   = typeOf[delegating].typeSymbol
   val PhantomSymbol      = typeOf[phantom].typeSymbol
   val PassTypeArgsSymbol = typeOf[PassTypeArgs].typeSymbol
@@ -221,7 +225,7 @@ class Derevo(val c: blackbox.Context) {
 
       val resT = mkAppliedType(mode.to, outTyp)
 
-      val callWithT = if(mode.passArgs) q"$call[$outTyp]" else call
+      val callWithT = if (mode.passArgs) q"$call[$outTyp]" else call
 
       q"""
       @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
@@ -234,25 +238,6 @@ class Derevo(val c: blackbox.Context) {
     case TypeRef(pre, sym, ps) => tq"$sym[..$ps, $arg]"
     case _                     => tq"$tc[$arg]"
   }
-
-  private sealed trait Newtype {
-    def underlying: Tree
-  }
-  @nowarn
-  private final case class NewtypeCls(underlying: Tree)            extends Newtype
-  @nowarn
-  private final case class NewtypeMod(underlying: Tree, res: Tree) extends Newtype
-
-  @nowarn
-  private final case class NameAndTypes(
-      name: String,
-      from: Type,
-      to: Type,
-      newtype: Type,
-      drop: Int,
-      cascade: Boolean,
-      passArgs: Boolean = false,
-  )
 
   private def nameAndTypes(obj: Tree): NameAndTypes = {
     val mangledName = obj.toString.replaceAll("[^\\w]", "_")
@@ -300,4 +285,22 @@ class Derevo(val c: blackbox.Context) {
     false
   )
   private def abort(s: String)                 = c.abort(c.enclosingPosition, s)
+}
+
+object Derevo {
+  private[Derevo] sealed trait NewtypeP[tree] {
+    def underlying: tree
+  }
+  private[Derevo] final case class NewtypeCls[tree](underlying: tree)            extends NewtypeP[tree]
+  private[Derevo] final case class NewtypeMod[tree](underlying: tree, res: tree) extends NewtypeP[tree]
+
+  private[Derevo] final case class NameAndTypesP[typ](
+      name: String,
+      from: typ,
+      to: typ,
+      newtype: typ,
+      drop: Int,
+      cascade: Boolean,
+      passArgs: Boolean = false,
+  )
 }
