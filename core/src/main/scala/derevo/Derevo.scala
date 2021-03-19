@@ -28,6 +28,8 @@ class Derevo(val c: blackbox.Context) {
     isInstanceDef[DerivationKN11[Any]](1),
     isInstanceDef[DerivationKN17[Any]](3)
   )
+
+  val ParamRequire = isInstanceDef[ParamRequire[Any]](0)
   val IIH          = weakTypeOf[InjectInstancesHere].typeSymbol
 
   val EstaticoFQN     = "io.estatico.newtype.macros.newtype"
@@ -192,16 +194,28 @@ class Derevo(val c: blackbox.Context) {
       case obj: ModuleDef => Nil
     }
 
-    if (allTparams.isEmpty) {
+    val tparams = allTparams.dropRight(mode.drop)
+    val pparams = allTparams.takeRight(mode.drop)
+
+    val tps       = tparams.map(_.name)
+    def appTyp    = tq"$typRef[..$tps]"
+    def allTnames = allTparams.map(_.name)
+    def lamTyp    = tq"({ type Lam[..$pparams] = $typRef[..$allTnames] })#Lam"
+    val outTyp    = if (pparams.isEmpty) appTyp else lamTyp
+
+    val resT = mkAppliedType(mode.to, outTyp)
+
+    val callWithT = if (mode.passArgs) q"$call[$outTyp]" else call
+
+    if (allTparams.isEmpty || allTparams.length <= mode.drop) {
       val resTc = if (newType.isDefined) mode.newtype else mode.to
       val resT  = mkAppliedType(resTc, tq"$typRef")
+
       q"""
       @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
-      implicit val $tn: $resT = $call
+      implicit val $tn: $resT = $callWithT
       """
     } else {
-      val tparams = allTparams.dropRight(mode.drop)
-      val pparams = allTparams.takeRight(mode.drop)
 
       val implicits =
         if (mode.cascade)
@@ -216,16 +230,6 @@ class Derevo(val c: blackbox.Context) {
             }
           }
         else Nil
-
-      val tps       = tparams.map(_.name)
-      def appTyp    = tq"$typRef[..$tps]"
-      def allTnames = allTparams.map(_.name)
-      def lamTyp    = tq"({ type Lam[..$pparams] = $typRef[..$allTnames] })#Lam"
-      val outTyp    = if (pparams.isEmpty) appTyp else lamTyp
-
-      val resT = mkAppliedType(mode.to, outTyp)
-
-      val callWithT = if (mode.passArgs) q"$call[$outTyp]" else call
 
       q"""
       @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
@@ -246,10 +250,15 @@ class Derevo(val c: blackbox.Context) {
     val objTyp = c.typecheck(obj).tpe
 
     val nt = objTyp match {
-      case IsSpecificDerivation(f, t, nt, d) => new NameAndTypes(name, f, t, nt, d, true)
-      case IsDerivation(f, t, nt, d)         => new NameAndTypes(name, f, t, nt, d, true)
-      case HKDerivation(f, t, nt, d)         => new NameAndTypes(name, f, t, nt, d, false)
-      case _                                 => abort(s"$obj seems not extending InstanceDef traits")
+      case IsSpecificDerivation(f, t, nt, d) => new NameAndTypes(name, f, t, nt, d, cascade = true)
+      case IsDerivation(f, t, nt, d)         => new NameAndTypes(name, f, t, nt, d, cascade = true)
+      case HKDerivation(f, t, nt, d)         =>
+        objTyp match {
+          case ParamRequire(fr, _, _, _) => new NameAndTypes(name, fr, t, nt, d, cascade = true)
+          case _                         => new NameAndTypes(name, f, t, nt, d, cascade = false)
+        }
+
+      case _ => abort(s"$obj seems not extending InstanceDef traits")
     }
 
     val passArgs = objTyp.baseType(PassTypeArgsSymbol) match {
@@ -260,12 +269,16 @@ class Derevo(val c: blackbox.Context) {
     nt.copy(passArgs = passArgs)
   }
 
-  class DerivationList(ds: IsInstanceDef*) {
+  trait DerivationMatcher {
+    def unapply(objType: Type): Option[(Type, Type, Type, Int)]
+  }
+
+  class DerivationList(ds: IsInstanceDef*) extends DerivationMatcher {
     def unapply(objType: Type): Option[(Type, Type, Type, Int)] =
       ds.iterator.flatMap(_.unapply(objType)).collectFirst { case x => x }
   }
 
-  class IsInstanceDef(t: Type, drop: Int) {
+  class IsInstanceDef(t: Type, drop: Int) extends DerivationMatcher {
     val constrSymbol                                            = t.typeConstructor.typeSymbol
     def unapply(objType: Type): Option[(Type, Type, Type, Int)] =
       objType.baseType(constrSymbol) match {
@@ -274,17 +287,22 @@ class Derevo(val c: blackbox.Context) {
         case _                                 => None
       }
   }
-  def isInstanceDef[T: TypeTag](dropTParams: Int = 0) = new IsInstanceDef(typeOf[T], dropTParams)
 
-  private def debug(s: Any, pref: String = "") = c.info(
-    c.enclosingPosition,
-    pref + " " + (s match {
-      case null => "null"
-      case _    => s.toString
-    }),
-    false
-  )
-  private def abort(s: String)                 = c.abort(c.enclosingPosition, s)
+  def isInstanceDef[T: TypeTag](dropTParams: Int = 0) = new IsInstanceDef(typeOf[T], dropTParams)
+  def hkInstanceDef[T: TypeTag](dropTParams: Int = 0) = new IsInstanceDef(typeOf[T], dropTParams)
+
+  private def debug[S](s: S, pref: String = ""): S = {
+    c.info(
+      c.enclosingPosition,
+      pref + " " + (s match {
+        case null => "null"
+        case _    => s.toString
+      }),
+      false
+    )
+    s
+  }
+  private def abort(s: String) = c.abort(c.enclosingPosition, s)
 }
 
 object Derevo {

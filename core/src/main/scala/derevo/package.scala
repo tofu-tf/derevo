@@ -5,10 +5,14 @@ package derevo {
     def macroTransform(annottees: Any*): Any = macro Derevo.deriveMacro
   }
 
+  /**
+    */
   trait PassTypeArgs
 
   class delegating(to: String, args: Any*) extends StaticAnnotation
   class phantom                            extends StaticAnnotation
+
+  trait ParamRequire[TC[_]]
 
   //* numeration according to https://docs.tofu.tf/docs/internal/kind-enumeration
   sealed trait InstanceDef
