@@ -29,7 +29,7 @@ object Version {
 
   val estatico = "0.4.4"
 
-  val munit = "0.7.22"
+  val munit = "0.7.23"
 
   val supertagged = "2.0-RC2"
 }
