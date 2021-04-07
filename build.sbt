@@ -4,13 +4,13 @@ import com.typesafe.sbt.SbtGit.git
 val publishVersion = "0.12.2"
 
 val common = List(
-  scalaVersion := "2.13.4",
-  crossScalaVersions := List("2.12.13", "2.13.4"),
+  scalaVersion := "2.13.5",
+  crossScalaVersions := List("2.12.13", "2.13.5"),
   libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value  % Provided,
   libraryDependencies ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, 11 | 12)) => List(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.patch))
-      case _                  => List()
+      case Some((2, 12)) => List(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.patch))
+      case _             => List()
     }
   },
   libraryDependencies += compilerPlugin("org.typelevel" %% "kind-projector" % "0.11.3" cross CrossVersion.patch),
@@ -83,11 +83,11 @@ lazy val scalacheck     = project dependsOn core settings common
 lazy val tests          =
   project
     .dependsOn(core, circe, ciris, tethys, reactivemongo, catsTagless, pureconfig)
-    .settings(common, skip in publish := true)
+    .settings(common, publish / skip := true)
 
 lazy val derevo = project
   .in(file("."))
-  .settings(common, skip in publish := true)
+  .settings(common, publish / skip := true)
   .aggregate(
     core,
     cats,
