@@ -94,12 +94,6 @@ For Scala 2.13:
 scalacOptions += "-Ymacro-annotations"
 ```
 
-## IntelliJ Integration
-Provides full support and visibility of implicits declared in the `@derive` annotation.
-
-To activate, simply click 'Yes' on the extensions popup, after adding any of the `derevo-` integration libraries to your project.
-![](https://i.imgur.com/E6BKTeH.png)
-
 ## Supported integrations
 
 ### [Cats](https://github.com/typelevel/cats)
@@ -274,6 +268,12 @@ assert(source.load[IO].unsafeRunSync() == DataConfig("AAA", List("pub", "home", 
 ```sbt
 libraryDependencies += "tf.tofu" %% "derevo-pureconfig" % "latest version in badge"
 ```
+or
+```sbt
+libraryDependencies += "tf.tofu" %% "derevo-pureconfig-legacy" % "latest version in badge"
+                                    // depends on pureconfig 0.14.1, doesn't force you to switch to CE3
+```
+
 
 ```scala
 import derevo.derive
@@ -303,18 +303,6 @@ val parsed = ConfigSource.fromConfig(raw).load[DataConfig]
 
 assert(parsed == Right(DataConfig("AAA", List("home", "work", "pub"), Map("until" -> 1, "from" -> 2, "to" -> 3))))
 assert(parsed.map(_.toConfig.atPath("data").getConfig("data")) == Right(raw))
-```
-
-### [TypedSchema](https://github.com/TinkoffCreditSystems/typed-schema)
-```sbt
-libraryDependencies += "tf.tofu" %% "derevo-tschema" % "latest version in badge"
-```
-
-```scala
-import derevo.derive
-import derevo.tschema.{swagger, openapiParam, httpParam}
-
-// TODO
 ```
 
 ### [RMongo](https://github.com/tc/RMongo)
