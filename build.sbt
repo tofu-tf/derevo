@@ -75,7 +75,6 @@ lazy val circeMagnolia  = project dependsOn core settings common
 lazy val ciris          = project dependsOn core settings common settings (scalacOptions -= "-Xfatal-warnings")
 lazy val tethys         = project dependsOn core settings common
 lazy val tethysMagnolia = project dependsOn core settings common
-lazy val tschema        = project dependsOn core settings common
 lazy val reactivemongo  = project dependsOn core settings common
 lazy val catsTagless    = project dependsOn core settings common
 lazy val pureconfig     = project dependsOn core settings common
@@ -95,7 +94,6 @@ lazy val derevo = project
     circeMagnolia,
     ciris,
     tethys,
-    tschema,
     reactivemongo,
     catsTagless,
     pureconfig,
