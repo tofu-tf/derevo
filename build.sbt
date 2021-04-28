@@ -35,6 +35,7 @@ val common = List(
     }
   },
   publishMavenStyle := true,
+  versionScheme := Some("semver-spec"),
   homepage := Some(url("https://manatki.org/docs/derevo")),
   scmInfo := Some(
     ScmInfo(
