@@ -34,4 +34,6 @@ object Version {
   val munit = "0.7.25"
 
   val supertagged = "2.0-RC2"
+
+  val doobie = "0.13.1"
 }

@@ -80,6 +80,7 @@ lazy val reactivemongo       = project dependsOn core settings common
 lazy val catsTagless         = project dependsOn core settings common
 lazy val pureconfig          = project dependsOn core settings common
 lazy val `pureconfig-legacy` = project dependsOn core settings common
+lazy val doobie              = project dependsOn core settings common
 lazy val scalacheck          = project dependsOn core settings common
 lazy val tests               =
   project
@@ -100,6 +101,7 @@ lazy val derevo = project
     catsTagless,
     pureconfig,
     `pureconfig-legacy`,
+    doobie,
     scalacheck,
     tests,
   )
