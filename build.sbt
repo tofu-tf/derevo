@@ -101,6 +101,7 @@ lazy val derevo = project
     catsTagless,
     pureconfig,
     `pureconfig-legacy`,
+    tapir,
     scalacheck,
     tests,
   )
