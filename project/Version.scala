@@ -27,7 +27,7 @@ object Version {
 
   val typedSchema = "0.14.3"
 
-  val scalaCheck = "1.15.3"
+  val scalaCheck = "1.15.4"
 
   val estatico = "0.4.4"
 
