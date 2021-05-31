@@ -4,8 +4,8 @@ import com.typesafe.sbt.SbtGit.git
 val publishVersion = "0.12.5"
 
 val common = List(
-  scalaVersion := "2.13.5",
-  crossScalaVersions := List("2.12.14", "2.13.5"),
+  scalaVersion := "2.13.6",
+  crossScalaVersions := List("2.12.14", "2.13.6"),
   libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value  % Provided,
   libraryDependencies ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
@@ -13,7 +13,7 @@ val common = List(
       case _             => List()
     }
   },
-  libraryDependencies += compilerPlugin("org.typelevel" %% "kind-projector" % "0.11.3" cross CrossVersion.patch),
+  libraryDependencies += compilerPlugin("org.typelevel" %% "kind-projector" % "0.13.0" cross CrossVersion.patch),
   scalacOptions ++= Vector(
     "-deprecation",
     "-feature",

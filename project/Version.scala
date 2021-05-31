@@ -1,11 +1,11 @@
 object Version {
-  val scalaTest = "3.2.8"
+  val scalaTest = "3.2.9"
 
   val catsTagless = "0.14.0"
 
-  val cats = "2.6.0"
+  val cats = "2.6.1"
 
-  val circe = "0.13.0"
+  val circe = "0.14.1"
 
   val circeMagnolia = "0.7.0"
 
@@ -23,15 +23,15 @@ object Version {
 
   val reactivemongo = "0.20.13"
 
-  val tethys = "0.23.0"
+  val tethys = "0.24.0"
 
   val typedSchema = "0.14.3"
 
-  val scalaCheck = "1.15.3"
+  val scalaCheck = "1.15.4"
 
   val estatico = "0.4.4"
 
-  val munit = "0.7.25"
+  val munit = "0.7.26"
 
   val supertagged = "2.0-RC2"
 }
