@@ -10,9 +10,10 @@ class Derevo(val c: blackbox.Context) {
   type Newtype      = NewtypeP[Tree]
   type NameAndTypes = NameAndTypesP[c.Type]
 
-  val DelegatingSymbol   = typeOf[delegating].typeSymbol
-  val PhantomSymbol      = typeOf[phantom].typeSymbol
-  val PassTypeArgsSymbol = typeOf[PassTypeArgs].typeSymbol
+  val DelegatingSymbol      = typeOf[delegating].typeSymbol
+  val PhantomSymbol         = typeOf[phantom].typeSymbol
+  val PassTypeArgsSymbol    = typeOf[PassTypeArgs].typeSymbol
+  val KeepRefinementsSymbol = typeOf[KeepRefinements].typeSymbol
 
   val instanceDefs         = Vector(
   )
@@ -207,14 +208,36 @@ class Derevo(val c: blackbox.Context) {
 
     val callWithT = if (mode.passArgs) q"$call[$outTyp]" else call
 
-    if (allTparams.isEmpty || allTparams.length <= mode.drop) {
-      val resTc = if (newType.isDefined) mode.newtype else mode.to
-      val resT  = mkAppliedType(resTc, tq"$typRef")
+    def substNothing = {
+      def fixTpes(tpes: Seq[Tree]) = tpes.map {
+        case t if t.tpe == c.typeOf[Nothing] => tq"$outTyp"
+        case other => other
+      }
 
-      q"""
-      @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
-      implicit val $tn: $resT = $callWithT
-      """
+      c.typecheck(tree, silent = true) match {
+        case q"$method[..$tpes](..$args)" =>
+          q"$method[..${fixTpes(tpes)}](..$args)"
+        case q"$method[..$tpes]" =>
+          q"$method[..${fixTpes(tpes)}]"
+        case _ => tree
+      }
+    }
+
+    if (allTparams.isEmpty || allTparams.length <= mode.drop) {
+      if (mode.keepRefinements) {
+        q"""
+        @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
+        implicit val $tn = $substNothing
+        """
+      } else {
+        val resTc = if (newType.isDefined) mode.newtype else mode.to
+        val resT  = mkAppliedType(resTc, tq"$typRef")
+
+        q"""
+        @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
+        implicit val $tn: $resT = $callWithT
+        """
+      }
     } else {
 
       val implicits =
@@ -231,10 +254,17 @@ class Derevo(val c: blackbox.Context) {
           }
         else Nil
 
-      q"""
-      @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
-      implicit def $tn[..$tparams](implicit ..$implicits): $resT = $callWithT
-      """
+      if (mode.keepRefinements) {
+        q"""
+        @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
+        implicit def $tn[..$tparams](implicit ..$implicits) = $substNothing
+        """
+      } else {
+        q"""
+        @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
+        implicit def $tn[..$tparams](implicit ..$implicits): $resT = $callWithT
+        """
+      }
     }
   }
 
@@ -266,7 +296,12 @@ class Derevo(val c: blackbox.Context) {
       case _                => false
     }
 
-    nt.copy(passArgs = passArgs)
+    val keepRefinements = objTyp.baseType(KeepRefinementsSymbol) match {
+      case TypeRef(_, _, _) => true
+      case _                => false
+    }
+
+    nt.copy(passArgs = passArgs, keepRefinements = keepRefinements)
   }
 
   trait DerivationMatcher {
@@ -319,6 +354,7 @@ object Derevo {
       newtype: typ,
       drop: Int,
       cascade: Boolean,
+      keepRefinements: Boolean = false,
       passArgs: Boolean = false,
   )
 }
