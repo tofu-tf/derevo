@@ -208,17 +208,14 @@ class Derevo(val c: blackbox.Context) {
 
     val callWithT = if (mode.passArgs) q"$call[$outTyp]" else call
 
-    def substNothing = {
-      def fixTpes(tpes: Seq[Tree]) = tpes.map {
-        case t if t.tpe == c.typeOf[Nothing] => tq"$outTyp"
-        case other => other
-      }
+    def fixFirstTypeParam = {
+      val nothingT = c.typeOf[Nothing]
 
       c.typecheck(tree, silent = true) match {
-        case q"$method[..$tpes](..$args)" =>
-          q"$method[..${fixTpes(tpes)}](..$args)"
-        case q"$method[..$tpes]" =>
-          q"$method[..${fixTpes(tpes)}]"
+        case q"$method[$nothing, ..$remainingTpes](..$args)" if nothing.tpe == nothingT =>
+          q"$method[$outTyp, ..$remainingTpes](..$args)"
+        case q"$method[$nothing, ..$remainingTpes]" if nothing.tpe == nothingT =>
+          q"$method[$outTyp, ..$remainingTpes]"
         case _ => tree
       }
     }
@@ -227,7 +224,7 @@ class Derevo(val c: blackbox.Context) {
       if (mode.keepRefinements) {
         q"""
         @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
-        implicit val $tn = $substNothing
+        implicit val $tn = $fixFirstTypeParam
         """
       } else {
         val resTc = if (newType.isDefined) mode.newtype else mode.to
@@ -257,7 +254,7 @@ class Derevo(val c: blackbox.Context) {
       if (mode.keepRefinements) {
         q"""
         @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
-        implicit def $tn[..$tparams](implicit ..$implicits) = $substNothing
+        implicit def $tn[..$tparams](implicit ..$implicits) = $fixFirstTypeParam
         """
       } else {
         q"""
