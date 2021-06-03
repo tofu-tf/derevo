@@ -179,9 +179,9 @@ class Derevo(val c: blackbox.Context) {
     }
 
     val (mode, call) = tree match {
-      case q"$obj(..$args)" => (nameAndTypes(obj), tree)
+      case q"$obj.$method(..$args)" => (nameAndTypes(obj), tree)
 
-      case q"$obj.$method($args)" => (nameAndTypes(obj), tree)
+      case q"$obj(..$args)" => (nameAndTypes(obj), tree)
 
       case q"$obj" =>
         val call = newType.fold(q"$obj.instance")(t => q"$obj.newtype[${t.underlying}].instance")
