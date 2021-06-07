@@ -10,9 +10,10 @@ class Derevo(val c: blackbox.Context) {
   type Newtype      = NewtypeP[Tree]
   type NameAndTypes = NameAndTypesP[c.Type]
 
-  val DelegatingSymbol   = typeOf[delegating].typeSymbol
-  val PhantomSymbol      = typeOf[phantom].typeSymbol
-  val PassTypeArgsSymbol = typeOf[PassTypeArgs].typeSymbol
+  val DelegatingSymbol      = typeOf[delegating].typeSymbol
+  val PhantomSymbol         = typeOf[phantom].typeSymbol
+  val PassTypeArgsSymbol    = typeOf[PassTypeArgs].typeSymbol
+  val KeepRefinementsSymbol = typeOf[KeepRefinements].typeSymbol
 
   val instanceDefs         = Vector(
   )
@@ -179,9 +180,9 @@ class Derevo(val c: blackbox.Context) {
     }
 
     val (mode, call) = tree match {
-      case q"$obj(..$args)" => (nameAndTypes(obj), tree)
+      case q"$obj.$method(..$args)" => (nameAndTypes(obj), tree)
 
-      case q"$obj.$method($args)" => (nameAndTypes(obj), tree)
+      case q"$obj(..$args)" => (nameAndTypes(obj), tree)
 
       case q"$obj" =>
         val call = newType.fold(q"$obj.instance")(t => q"$obj.newtype[${t.underlying}].instance")
@@ -207,14 +208,33 @@ class Derevo(val c: blackbox.Context) {
 
     val callWithT = if (mode.passArgs) q"$call[$outTyp]" else call
 
-    if (allTparams.isEmpty || allTparams.length <= mode.drop) {
-      val resTc = if (newType.isDefined) mode.newtype else mode.to
-      val resT  = mkAppliedType(resTc, tq"$typRef")
+    def fixFirstTypeParam = {
+      val nothingT = c.typeOf[Nothing]
 
-      q"""
-      @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
-      implicit val $tn: $resT = $callWithT
-      """
+      c.typecheck(call, silent = true) match {
+        case q"$method[$nothing, ..$remainingTpes](..$args)" if nothing.tpe == nothingT =>
+          q"$method[$outTyp, ..$remainingTpes](..$args)"
+        case q"$method[$nothing, ..$remainingTpes]" if nothing.tpe == nothingT          =>
+          q"$method[$outTyp, ..$remainingTpes]"
+        case _                                                                          => tree
+      }
+    }
+
+    if (allTparams.isEmpty || allTparams.length <= mode.drop) {
+      if (mode.keepRefinements) {
+        q"""
+        @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
+        implicit val $tn = $fixFirstTypeParam
+        """
+      } else {
+        val resTc = if (newType.isDefined) mode.newtype else mode.to
+        val resT  = mkAppliedType(resTc, tq"$typRef")
+
+        q"""
+        @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
+        implicit val $tn: $resT = $callWithT
+        """
+      }
     } else {
 
       val implicits =
@@ -231,10 +251,17 @@ class Derevo(val c: blackbox.Context) {
           }
         else Nil
 
-      q"""
-      @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
-      implicit def $tn[..$tparams](implicit ..$implicits): $resT = $callWithT
-      """
+      if (mode.keepRefinements) {
+        q"""
+        @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
+        implicit def $tn[..$tparams](implicit ..$implicits) = $fixFirstTypeParam
+        """
+      } else {
+        q"""
+        @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
+        implicit def $tn[..$tparams](implicit ..$implicits): $resT = $callWithT
+        """
+      }
     }
   }
 
@@ -266,7 +293,12 @@ class Derevo(val c: blackbox.Context) {
       case _                => false
     }
 
-    nt.copy(passArgs = passArgs)
+    val keepRefinements = objTyp.baseType(KeepRefinementsSymbol) match {
+      case TypeRef(_, _, _) => true
+      case _                => false
+    }
+
+    nt.copy(passArgs = passArgs, keepRefinements = keepRefinements)
   }
 
   trait DerivationMatcher {
@@ -319,6 +351,7 @@ object Derevo {
       newtype: typ,
       drop: Int,
       cascade: Boolean,
+      keepRefinements: Boolean = false,
       passArgs: Boolean = false,
   )
 }
