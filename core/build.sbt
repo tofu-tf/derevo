@@ -1,1 +1,0 @@
-moduleName := "derevo-core"
