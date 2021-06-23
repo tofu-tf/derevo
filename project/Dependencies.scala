@@ -62,7 +62,6 @@ object Dependencies {
   lazy val scalatest     = "org.scalatest"   %% "scalatest"      % Version.scalatest
   lazy val estatico      = "io.estatico"     %% "newtype"        % Version.estatico
   lazy val supertagged   = "org.rudogma"     %% "supertagged"    % Version.supertagged
-  // lazy val munit         = "org.scalameta"   %% "munit"          % Version.munit
 
   lazy val macroParadise = "org.scalamacros" % "paradise"       % Version.macroParadise cross CrossVersion.patch
   lazy val kindProjector = "org.typelevel"  %% "kind-projector" % Version.kindProjector cross CrossVersion.patch
