@@ -69,19 +69,18 @@ val common = List(
   licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
 )
 
-lazy val core                = project settings common
-lazy val cats                = project dependsOn core settings common
-lazy val circe               = project dependsOn core settings common
-lazy val circeMagnolia       = project dependsOn core settings common
-lazy val ciris               = project dependsOn core settings common settings (scalacOptions -= "-Xfatal-warnings")
-lazy val tethys              = project dependsOn core settings common
-lazy val tethysMagnolia      = project dependsOn core settings common
-lazy val reactivemongo       = project dependsOn core settings common
-lazy val catsTagless         = project dependsOn core settings common
-lazy val pureconfig          = project dependsOn core settings common
-lazy val `pureconfig-legacy` = project dependsOn core settings common
-lazy val scalacheck          = project dependsOn core settings common
-lazy val tests               =
+lazy val core           = project settings common
+lazy val cats           = project dependsOn core settings common
+lazy val circe          = project dependsOn core settings common
+lazy val circeMagnolia  = project dependsOn core settings common
+lazy val ciris          = project dependsOn core settings common settings (scalacOptions -= "-Xfatal-warnings")
+lazy val tethys         = project dependsOn core settings common
+lazy val tethysMagnolia = project dependsOn core settings common
+lazy val reactivemongo  = project dependsOn core settings common
+lazy val catsTagless    = project dependsOn core settings common
+lazy val pureconfig     = project dependsOn core settings common
+lazy val scalacheck     = project dependsOn core settings common
+lazy val tests          =
   project
     .dependsOn(core, circe, ciris, tethys, reactivemongo, catsTagless, pureconfig)
     .settings(common, publish / skip := true)
@@ -99,7 +98,6 @@ lazy val derevo = project
     reactivemongo,
     catsTagless,
     pureconfig,
-    `pureconfig-legacy`,
     scalacheck,
     tests,
   )
