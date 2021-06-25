@@ -266,8 +266,19 @@ class Derevo(val c: blackbox.Context) {
   }
 
   private def mkAppliedType(tc: Type, arg: Tree): Tree = tc match {
-    case TypeRef(pre, sym, ps) => tq"$sym[..$ps, $arg]"
-    case _                     => tq"$tc[$arg]"
+    case TypeRef(_, sym, ps)                    =>
+      tq"$sym[..$ps, $arg]"
+    case PolyType(List(p), TypeRef(_, sym, ps)) =>
+      val fixedPs = ps.map {
+        case pp if pp.typeSymbol == p => arg
+        case other                    => tq"$other"
+      }
+      tq"$sym[..$fixedPs]"
+    case PolyType(_, _)                         =>
+      c.error(c.enclosingPosition, "Attempt to derive on polytype with more than 1 argument")
+      tq"$tc"
+    case _                                      =>
+      tq"$tc[$arg]"
   }
 
   private def nameAndTypes(obj: Tree): NameAndTypes = {
