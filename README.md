@@ -268,6 +268,12 @@ assert(source.load[IO].unsafeRunSync() == DataConfig("AAA", List("pub", "home", 
 ```sbt
 libraryDependencies += "tf.tofu" %% "derevo-pureconfig" % "latest version in badge"
 ```
+or
+```sbt
+libraryDependencies += "tf.tofu" %% "derevo-pureconfig-legacy" % "latest version in badge"
+                                    // depends on pureconfig 0.14.1, doesn't force you to switch to CE3
+```
+
 
 ```scala
 import derevo.derive
