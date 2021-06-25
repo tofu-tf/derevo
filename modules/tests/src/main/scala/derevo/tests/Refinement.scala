@@ -13,7 +13,7 @@ object refinedTraitWithInstanceMethod extends Derivation[Trait] with KeepRefinem
   def instance[T]: Trait[T] { type Refinement = String } = new Trait[T] { type Refinement = String }
 }
 
-object Test {
+object RefinementTest {
   @derive(refinedTrait("123")) case class Foo()
   @derive(refinedTrait.singleTparam(123)) case class Bar()
   @derive(refinedTraitWithInstanceMethod) case class Baz()
