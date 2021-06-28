@@ -4,8 +4,10 @@ ThisBuild / crossScalaVersions := Seq(
   Dependencies.Version.scala212
 )
 ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
-ThisBuild / githubWorkflowPublishTargetBranches ++=
-  Seq(RefPredicate.StartsWith(Ref.Tag("v")))
+ThisBuild / githubWorkflowPublishTargetBranches := Seq(
+  RefPredicate.Equals(Ref.Branch("master")),
+  RefPredicate.StartsWith(Ref.Tag("v"))
+)
 
 ThisBuild / githubWorkflowJavaVersions := Seq("adopt@1.8", "adopt@1.11")
 
