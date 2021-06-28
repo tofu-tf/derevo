@@ -1,108 +1,160 @@
-name := "derevo"
-import com.typesafe.sbt.SbtGit.git
-
-val publishVersion = "0.12.5"
-
-val common = List(
-  scalaVersion := "2.13.5",
-  crossScalaVersions := List("2.12.13", "2.13.5"),
-  libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value  % Provided,
+lazy val commonSettings = Seq(
   libraryDependencies ++= {
+    (CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 12)) => Seq(compilerPlugin(Dependencies.kindProjector), compilerPlugin(Dependencies.macroParadise))
+      case Some((2, 13)) => Seq(compilerPlugin(Dependencies.kindProjector))
+      case _             => Seq.empty
+    }) ++
+      Seq(Dependencies.scalaReflect(scalaOrganization.value, scalaVersion.value) % Provided)
+  },
+  scalacOptions := {
+    val opts     = scalacOptions.value
+    val excluded = Set("-Xfatal-warnings")
+    val wconf    = "-Wconf:" +
+      Set("unused-params", "unused-privates", "unused-pat-vars", "other-match-analysis")
+        .foldRight("any:wv")((s, acc) => s"cat=$s:s,$acc")
+    val mannot   = "-Ymacro-annotations"
     CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, 12)) => List(compilerPlugin("org.scalamacros" % "paradise" % "2.1.1" cross CrossVersion.patch))
-      case _             => List()
+      case Some((2, 12)) => opts.filterNot(excluded) ++ Seq(wconf)
+      case Some((2, 13)) => opts.filterNot(excluded) ++ Seq(wconf, mannot)
+      case _             => opts
     }
   },
-  libraryDependencies += compilerPlugin("org.typelevel" %% "kind-projector" % "0.11.3" cross CrossVersion.patch),
-  scalacOptions ++= Vector(
-    "-deprecation",
-    "-feature",
-    "-language:experimental.macros",
-    "-language:higherKinds",
-    "-Xfatal-warnings",
-  ),
-  Test / scalacOptions ++= Vector(
-    "-language:implicitConversions",
-  ),
-  libraryDependencies += "io.estatico"          %% "newtype"       % Version.estatico    % Test,
-  libraryDependencies += "org.rudogma"          %% "supertagged"   % Version.supertagged % Test,
-  libraryDependencies += "org.scalameta"        %% "munit"         % Version.munit       % "test",
-  libraryDependencies += "org.scalatest"        %% "scalatest"     % Version.scalaTest   % "test",
-  scalacOptions ++= {
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, y)) if y == 13 => Seq("-Ymacro-annotations")
-      case _                       => Seq.empty[String]
-    }
-  },
-  publishMavenStyle := true,
-  versionScheme := Some("semver-spec"),
-  homepage := Some(url("https://manatki.org/docs/derevo")),
-  scmInfo := Some(
-    ScmInfo(
-      url("https://github.com/tofu-tf/derevo"),
-      "git@github.com:tofu-tf/derevo.git"
-    )
-  ),
-  publishTo := {
-    if (isSnapshot.value) {
-      Some(Opts.resolver.sonatypeSnapshots)
-    } else sonatypePublishToBundle.value
-  },
-  developers := List(
-    Developer(
-      "odomontois",
-      "Oleg Nizhnik",
-      "odomontois@gmail.com",
-      url("https://github.com/odomontois")
-    )
-  ),
-  credentials ++= ((Path.userHome / ".sbt" / "odo.credentials") :: Nil)
-    .filter(_.exists())
-    .map(Credentials.apply),
-  pgpSecretRing := Path.userHome / ".gnupg" / "secring.gpg",
-  organization := "tf.tofu",
-  version := {
-    val branch = git.gitCurrentBranch.value
-    if (branch == "master") publishVersion
-    else s"$publishVersion-$branch-SNAPSHOT"
-  },
-  licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
+  Test / fork := true,
+  libraryDependencies ++= Seq(Dependencies.scalatest, Dependencies.estatico, Dependencies.supertagged).map(_ % Test),
+  resolvers += Resolver.sonatypeRepo("releases"),
 )
 
-lazy val core                = project settings common
-lazy val cats                = project dependsOn core settings common
-lazy val circe               = project dependsOn core settings common
-lazy val circeMagnolia       = project dependsOn core settings common
-lazy val ciris               = project dependsOn core settings common settings (scalacOptions -= "-Xfatal-warnings")
-lazy val tethys              = project dependsOn core settings common
-lazy val tethysMagnolia      = project dependsOn core settings common
-lazy val reactivemongo       = project dependsOn core settings common
-lazy val catsTagless         = project dependsOn core settings common
-lazy val pureconfig          = project dependsOn core settings common
-lazy val `pureconfig-legacy` = project dependsOn core settings common
-lazy val scalacheck          = project dependsOn core settings common
-lazy val tests               =
-  project
-    .dependsOn(core, circe, ciris, tethys, reactivemongo, catsTagless, pureconfig)
-    .settings(common, publish / skip := true)
+lazy val noPublishSettings =
+  commonSettings ++ Seq(publish := {}, publishArtifact := false, publishTo := None, publish / skip := true)
+
+lazy val publishSettings = commonSettings ++ Seq(
+  pomIncludeRepository := { _ =>
+    false
+  },
+  Test / publishArtifact := false
+)
 
 lazy val derevo = project
   .in(file("."))
-  .settings(common, publish / skip := true)
+  .settings(noPublishSettings)
   .aggregate(
-    core,
     cats,
+    catsTagless,
     circe,
     circeMagnolia,
     ciris,
-    tethys,
-    reactivemongo,
-    catsTagless,
+    core,
     pureconfig,
-    `pureconfig-legacy`,
+    reactivemongo,
     scalacheck,
+    tethys,
+    tethysMagnolia,
     tests,
   )
 
-addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
-addCommandAlias("checkfmt", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck")
+lazy val core =
+  (project in file("modules/core"))
+    .settings(publishSettings)
+    .settings(
+      name := "derevo-core"
+    )
+
+lazy val cats =
+  (project in file("modules/cats"))
+    .settings(publishSettings)
+    .settings(
+      name := "derevo-cats",
+      libraryDependencies ++= Seq(Dependencies.magnolia, Dependencies.catsCore),
+    )
+    .dependsOn(core)
+
+lazy val catsTagless =
+  (project in file("modules/catsTagless"))
+    .settings(publishSettings)
+    .settings(
+      name := "derevo-cats-tagless",
+      libraryDependencies ++= Seq(Dependencies.catsTaglessCore, Dependencies.catsTaglessMacros),
+    )
+    .dependsOn(core)
+
+lazy val circe =
+  (project in file("modules/circe"))
+    .settings(publishSettings)
+    .settings(
+      name := "derevo-circe",
+      libraryDependencies ++= Seq(Dependencies.circeCore, Dependencies.circeDerivation),
+      libraryDependencies ++= Seq(Dependencies.circeParser).map(_ % Test)
+    )
+    .dependsOn(core)
+
+lazy val circeMagnolia =
+  (project in file("modules/circeMagnolia"))
+    .settings(publishSettings)
+    .settings(
+      name := "derevo-circe-magnolia",
+      libraryDependencies ++= Seq(Dependencies.circeMagnolia),
+      libraryDependencies ++= Seq(Dependencies.circeParser).map(_ % Test)
+    )
+    .dependsOn(core)
+
+lazy val ciris =
+  (project in file("modules/ciris"))
+    .settings(publishSettings)
+    .settings(
+      name := "derevo-ciris",
+      libraryDependencies ++= Seq(Dependencies.ciris, Dependencies.typesafeConfig, Dependencies.magnolia),
+    )
+    .dependsOn(core)
+
+lazy val pureconfig =
+  (project in file("modules/pureconfig"))
+    .settings(publishSettings)
+    .settings(
+      name := "derevo-pureconfig",
+      libraryDependencies ++= Seq(Dependencies.pureconfig, Dependencies.pureconfigMagnolia),
+    )
+    .dependsOn(core)
+
+lazy val reactivemongo =
+  (project in file("modules/reactivemongo"))
+    .settings(publishSettings)
+    .settings(
+      name := "derevo-reactivemongo",
+      libraryDependencies ++= Seq(Dependencies.reactivemongoBsonMacros),
+    )
+    .dependsOn(core)
+
+lazy val tethys =
+  (project in file("modules/tethys"))
+    .settings(publishSettings)
+    .settings(
+      name := "derevo-tethys",
+      libraryDependencies ++= Seq(Dependencies.tethysCore, Dependencies.tethysDerivation),
+      libraryDependencies ++= Seq(Dependencies.tethysJackson).map(_ % Test)
+    )
+    .dependsOn(core)
+
+lazy val tethysMagnolia =
+  (project in file("modules/tethysMagnolia"))
+    .settings(publishSettings)
+    .settings(
+      name := "derevo-tethys-magnolia",
+      libraryDependencies ++= Seq(Dependencies.tethysCore, Dependencies.magnolia),
+      libraryDependencies ++= Seq(Dependencies.tethysJackson).map(_ % Test)
+    )
+    .dependsOn(core)
+
+lazy val scalacheck =
+  (project in file("modules/scalacheck"))
+    .settings(publishSettings)
+    .settings(
+      name := "derevo-scalacheck",
+      libraryDependencies ++= Seq(Dependencies.scalacheck, Dependencies.magnolia),
+    )
+    .dependsOn(core)
+
+lazy val tests =
+  (project in file("modules/tests"))
+    .settings(noPublishSettings)
+    .dependsOn(core, circe, ciris, tethys, reactivemongo, catsTagless, pureconfig)
