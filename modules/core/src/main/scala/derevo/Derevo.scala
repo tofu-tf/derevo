@@ -280,11 +280,38 @@ class Derevo(val c: blackbox.Context) {
       tq"$tc[$arg]"
   }
 
+  def resolveObjWithImports(tree: Tree, target: Tree, foundImports: List[Tree]): Option[Tree] = {
+    val indexOfClassDefWithAnnot = tree.children.indexWhere {
+      case ClassDef(m, _, _, _) => m.annotations.exists(_.pos == c.prefix.tree.pos)
+      case _                    => false
+    }
+
+    def importsBeforeIx(ix: Int) = tree.children.take(ix).collect { case Import(a, b) =>
+      Import(a, b)
+    }
+
+    if (indexOfClassDefWithAnnot == -1) {
+      tree.children.zipWithIndex.foldLeft(None: Option[Tree]) { case (v, (c, i)) =>
+        v.orElse(resolveObjWithImports(c, target, foundImports ++ importsBeforeIx(i)))
+      }
+    } else {
+      val allImports = foundImports ++ importsBeforeIx(indexOfClassDefWithAnnot)
+
+      val imp = allImports.foldLeft(q"") { case (q, i) =>
+        val it = c.typecheck(i, silent = true)
+        if (it.isEmpty) q else q"$q; $it"
+      }
+
+      Some(q"{ ..$imp; $target }")
+    }
+  }
+
   private def nameAndTypes(obj: Tree): NameAndTypes = {
     val mangledName = obj.toString.replaceAll("[^\\w]", "_")
     val name        = c.freshName(mangledName)
 
-    val objTyp = c.typecheck(obj).tpe
+    val objWithImports = resolveObjWithImports(c.enclosingUnit.body, obj, Nil).getOrElse(obj)
+    val objTyp         = c.typecheck(objWithImports).tpe
 
     val nt = objTyp match {
       case IsSpecificDerivation(f, t, nt, d) => new NameAndTypes(name, f, t, nt, d, cascade = true)
