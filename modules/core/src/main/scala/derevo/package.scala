@@ -5,8 +5,7 @@ package derevo {
     def macroTransform(annottees: Any*): Any = macro Derevo.deriveMacro
   }
 
-  /**
-    */
+  /** */
   trait PassTypeArgs
   trait KeepRefinements
 

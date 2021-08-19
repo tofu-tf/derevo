@@ -1,5 +1,5 @@
-ThisBuild / scalaVersion := Dependencies.Version.scala213
-ThisBuild / crossScalaVersions := Seq(
+ThisBuild / scalaVersion                        := Dependencies.Version.scala213
+ThisBuild / crossScalaVersions                  := Seq(
   Dependencies.Version.scala213,
   Dependencies.Version.scala212
 )
@@ -9,7 +9,7 @@ ThisBuild / githubWorkflowPublishTargetBranches := Seq(
   RefPredicate.StartsWith(Ref.Tag("v"))
 )
 
-ThisBuild / githubWorkflowJavaVersions := Seq("adopt@1.8", "adopt@1.11")
+ThisBuild / githubWorkflowJavaVersions          := Seq("adopt@1.8", "adopt@1.11")
 
 ThisBuild / githubWorkflowBuildPreamble += WorkflowStep.Sbt(
   List("scalafmtCheckAll", "scalafmtSbtCheck"),
@@ -29,10 +29,10 @@ ThisBuild / githubWorkflowPublish := Seq(
   )
 )
 
-ThisBuild / versionScheme := Some("early-semver")
+ThisBuild / versionScheme         := Some("early-semver")
 
 ThisBuild / licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
-ThisBuild / developers := List(
+ThisBuild / developers       := List(
   Developer(
     "Odomontois",
     "Oleg Nizhnik",
@@ -40,9 +40,9 @@ ThisBuild / developers := List(
     url("https://github.com/Odomontois")
   )
 )
-ThisBuild / homepage := Some(url("https://manatki.org/docs/derevo"))
-ThisBuild / scmInfo := Some(
+ThisBuild / homepage         := Some(url("https://manatki.org/docs/derevo"))
+ThisBuild / scmInfo          := Some(
   ScmInfo(url("https://github.com/tofu-tf/derevo"), "scm:git:git@github.com:tofu-tf/derevo.git")
 )
-ThisBuild / organization := "tf.tofu"
+ThisBuild / organization     := "tf.tofu"
 ThisBuild / organizationName := "Tofu"
