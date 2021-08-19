@@ -163,8 +163,11 @@ class Derevo(val c: blackbox.Context) {
       case _                                                                       => None
     }
     c.prefix.tree match {
-      case q"new derive(..${instances})" =>
+      case q"new $_(..${instances})" =>
         instances.map(buildInstance(_, cls, newType))
+      case _                         =>
+        c.error(c.prefix.tree.pos, s"FIXME: Could not match annotation tree `${c.prefix.tree}'")
+        Nil
     }
   }
 
