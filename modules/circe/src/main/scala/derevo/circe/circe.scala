@@ -10,9 +10,12 @@ import derevo.SpecificDerivation
 object decoder extends Derivation[Decoder] with NewTypeDerivation[Decoder] {
   def instance[A]: Decoder[A] = macro Derevo.delegate[Decoder, A]
 
-  /** @param arg1 naming function. For example io.circe.derivation.renaming.snakeCase
-    * @param arg2 useDefaults
-    * @param arg3 type discriminator name
+  /** @param arg1
+    *   naming function. For example io.circe.derivation.renaming.snakeCase
+    * @param arg2
+    *   useDefaults
+    * @param arg3
+    *   type discriminator name
     */
   def apply[A](arg1: String => String, arg2: Boolean, arg3: Option[String]): Decoder[A] =
     macro Derevo.delegateParams3[Decoder, A, String => String, Boolean, Option[String]]
@@ -22,8 +25,10 @@ object decoder extends Derivation[Decoder] with NewTypeDerivation[Decoder] {
 object encoder extends SpecificDerivation[Encoder, Encoder.AsObject, Encoder] with NewTypeDerivation[Encoder] {
   def instance[A]: Encoder.AsObject[A] = macro Derevo.delegate[Encoder.AsObject, A]
 
-  /** @param arg1 naming function. For example io.circe.derivation.renaming.snakeCase
-    * @param arg2 type discriminator name
+  /** @param arg1
+    *   naming function. For example io.circe.derivation.renaming.snakeCase
+    * @param arg2
+    *   type discriminator name
     */
   def apply[A](arg1: String => String, arg2: Option[String]): Encoder.AsObject[A] =
     macro Derevo.delegateParams2[Encoder.AsObject, A, String => String, Option[String]]
@@ -33,8 +38,10 @@ object encoder extends SpecificDerivation[Encoder, Encoder.AsObject, Encoder] wi
 object codec extends SpecificDerivation[Codec, Codec.AsObject, Codec] with NewTypeDerivation[Codec] {
   def instance[A]: Codec.AsObject[A] = macro Derevo.delegate[Codec.AsObject, A]
 
-  /** @param arg1 naming function. For example io.circe.derivation.renaming.snakeCase
-    * @param arg2 type discriminator name
+  /** @param arg1
+    *   naming function. For example io.circe.derivation.renaming.snakeCase
+    * @param arg2
+    *   type discriminator name
     */
   def apply[A](arg1: String => String, arg2: Boolean, arg3: Option[String]): Codec.AsObject[A] =
     macro Derevo.delegateParams3[Codec.AsObject, A, String => String, Boolean, Option[String]]

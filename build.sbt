@@ -20,7 +20,7 @@ lazy val commonSettings = Seq(
       case _             => opts
     }
   },
-  Test / fork := true,
+  Test / fork   := true,
   libraryDependencies ++= Seq(Dependencies.scalatest, Dependencies.estatico, Dependencies.supertagged).map(_ % Test),
   resolvers += Resolver.sonatypeRepo("releases"),
 )
@@ -28,8 +28,8 @@ lazy val commonSettings = Seq(
 lazy val noPublishSettings =
   commonSettings ++ Seq(publish := {}, publishArtifact := false, publishTo := None, publish / skip := true)
 
-lazy val publishSettings = commonSettings ++ Seq(
-  pomIncludeRepository := { _ =>
+lazy val publishSettings   = commonSettings ++ Seq(
+  pomIncludeRepository   := { _ =>
     false
   },
   Test / publishArtifact := false
