@@ -36,7 +36,7 @@ object Dependencies {
 
     val supertagged = "2.0-RC2"
 
-    val kindProjector = "0.13.0"
+    val kindProjector = "0.13.1"
 
     val macroParadise = "2.1.1"
   }
