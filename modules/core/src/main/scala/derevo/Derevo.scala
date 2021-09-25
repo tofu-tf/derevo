@@ -58,13 +58,13 @@ class Derevo(val c: blackbox.Context) {
   ): c.Expr[TC[I]] =
     c.Expr(delegation(c.prefix.tree, Some((method, args) => q"$method($arg1, $arg2, $arg3, ..$args)")))
 
-  private def unpackArgs(args: Tree): Seq[Tree] =
+  private def unpackArgs(args: Tree): Seq[Tree]                                                    =
     args match {
       case q"(..$params)" => params
       case _              => abort("argument of delegateParams must be tuple")
     }
 
-  def delegateParams[TC[_], I, Args](args: c.Expr[Args]): c.Expr[TC[I]] =
+  def delegateParams[TC[_], I, Args](args: c.Expr[Args]): c.Expr[TC[I]]                   =
     c.Expr(delegation(c.prefix.tree, Some((method, rest) => q"$method(..${unpackArgs(args.tree) ++ rest})")))
 
   private def delegation(tree: Tree, maybeCall: Option[(Tree, List[Tree]) => Tree]): Tree = {
@@ -96,7 +96,7 @@ class Derevo(val c: blackbox.Context) {
     case _                  => false
   }
 
-  def deriveMacro(annottees: Tree*): Tree = {
+  def deriveMacro(annottees: Tree*): Tree                                        = {
     annottees match {
       case Seq(obj: ModuleDef) =>
         obj match {
@@ -150,7 +150,7 @@ class Derevo(val c: blackbox.Context) {
 
   }
 
-  private def instances(cls: ImplDef): List[Tree] = {
+  private def instances(cls: ImplDef): List[Tree]                                      = {
     val newType = cls match {
       case c: ClassDef if c.mods.annotations.exists(isConstructionOf(EstaticoFQN)) =>
         c.impl.body.collectFirst {
@@ -264,7 +264,7 @@ class Derevo(val c: blackbox.Context) {
     }
   }
 
-  private def mkAppliedType(tc: Type, arg: Tree): Tree = tc match {
+  private def mkAppliedType(tc: Type, arg: Tree): Tree                                 = tc match {
     case TypeRef(_, sym, ps)                    =>
       tq"$sym[..$ps, $arg]"
     case PolyType(List(p), TypeRef(_, sym, ps)) =>
@@ -280,7 +280,7 @@ class Derevo(val c: blackbox.Context) {
       tq"$tc[$arg]"
   }
 
-  private def nameAndTypes(obj: Tree): NameAndTypes = {
+  private def nameAndTypes(obj: Tree): NameAndTypes                                    = {
     val mangledName = obj.toString.replaceAll("[^\\w]", "_")
     val name        = c.freshName(mangledName)
 
@@ -344,7 +344,7 @@ class Derevo(val c: blackbox.Context) {
     )
     s
   }
-  private def abort(s: String) = c.abort(c.enclosingPosition, s)
+  private def abort(s: String)                     = c.abort(c.enclosingPosition, s)
 }
 
 object Derevo {

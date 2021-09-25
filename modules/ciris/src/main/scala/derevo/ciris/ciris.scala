@@ -12,7 +12,7 @@ object cirisDecoder extends Derivation[ConfigValueDecoder] with NewTypeDerivatio
   type Typeclass[T]  = ConfigValueDecoder[T]
   type ErrorOrParams = Either[ConfigError, List[Any]]
 
-  def combine[T](ctx: CaseClass[Typeclass, T]): Typeclass[T] = ConfigDecoder
+  def combine[T](ctx: CaseClass[Typeclass, T]): Typeclass[T]        = ConfigDecoder
     .lift[typesafe.ConfigValue, T] {
       case config: ConfigObject =>
         val cfg = (key: String) => readEntry(config.toConfig, key, originKeyType(config.origin))

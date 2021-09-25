@@ -13,7 +13,7 @@ trait ConfigValueDecoderInstances
     extends ConfigValueDecoderBaseInstances with ConfigValueDecoderCollectionInstances
     with ConfigValueDecoderJavaInstances
 
-private[hocon] trait ConfigValueDecoderBaseInstances {
+private[hocon] trait ConfigValueDecoderBaseInstances       {
   implicit val boolConfigDecoder: ConfigValueDecoder[Boolean]  = nonFatal(_.getBoolean)
   implicit val stringConfigDecoder: ConfigValueDecoder[String] = nonFatal(_.getString)
   implicit val intConfigDecoder: ConfigValueDecoder[Int]       = nonFatal(_.getInt)
@@ -21,19 +21,19 @@ private[hocon] trait ConfigValueDecoderBaseInstances {
   implicit val floatConfigDecoder: ConfigValueDecoder[Float]   = nonFatal(cfg => cfg.getDouble(_).toFloat)
   implicit val doubleConfigDecoder: ConfigValueDecoder[Double] = nonFatal(_.getDouble)
 
-  implicit val symbolConfigValueDecoder: ConfigValueDecoder[Symbol] =
+  implicit val symbolConfigValueDecoder: ConfigValueDecoder[Symbol]                 =
     nonFatal(cfg => path => Symbol(cfg.getString(path)))
 
   implicit val finiteDurationConfigValueDecoder: ConfigValueDecoder[FiniteDuration] =
     nonFatal(cfg => path => Duration.fromNanos(cfg.getDuration(path, NANOSECONDS)))
 
-  implicit val durationConfigValueDecoder: ConfigValueDecoder[Duration] =
+  implicit val durationConfigValueDecoder: ConfigValueDecoder[Duration]             =
     nonFatal { cfg => path =>
       try Duration.fromNanos(cfg.getDuration(path, NANOSECONDS))
       catch { case _: ConfigException.BadValue => Duration(cfg.getString(path)) }
     }
 
-  implicit val memorySizeConfigValueDecoder: ConfigValueDecoder[ConfigMemorySize] = nonFatal(
+  implicit val memorySizeConfigValueDecoder: ConfigValueDecoder[ConfigMemorySize]   = nonFatal(
     _.getMemorySize
   )
 
@@ -85,16 +85,16 @@ private[hocon] trait ConfigValueDecoderCollectionInstances {
   }
 }
 
-private[hocon] trait ConfigValueDecoderJavaInstances {
+private[hocon] trait ConfigValueDecoderJavaInstances       {
   implicit val inetAddressConfigDecoder: ConfigValueDecoder[InetAddress] =
     nonFatal(cfg => path => InetAddress.getByName(cfg.getString(path)))
 
-  implicit val uriConfigDecoder: ConfigValueDecoder[URI] =
+  implicit val uriConfigDecoder: ConfigValueDecoder[URI]                 =
     nonFatal(cfg => path => new URI(cfg.getString(path)))
 
-  implicit val urlConfigDecoder: ConfigValueDecoder[URL] =
+  implicit val urlConfigDecoder: ConfigValueDecoder[URL]                 =
     nonFatal(cfg => path => new URL(cfg.getString(path)))
 
-  implicit val pathConfigDecoder: ConfigValueDecoder[Path] =
+  implicit val pathConfigDecoder: ConfigValueDecoder[Path]               =
     nonFatal(cfg => path => Paths.get(cfg.getString(path)))
 }

@@ -31,13 +31,13 @@ object arbitrary extends Derivation[Arbitrary] with NewTypeDerivation[Arbitrary]
 
 object arbitraryInstances {
   implicit val monadicInstance: Monadic[Arbitrary] = new Monadic[Arbitrary] {
-    override def point[A](value: A): Arbitrary[A] =
+    override def point[A](value: A): Arbitrary[A]                                       =
       Arbitrary(Gen.const(value))
 
     override def flatMap[A, B](from: Arbitrary[A])(fn: A => Arbitrary[B]): Arbitrary[B] =
       Arbitrary(from.arbitrary.flatMap(x => fn(x).arbitrary))
 
-    override def map[A, B](from: Arbitrary[A])(fn: A => B): Arbitrary[B] =
+    override def map[A, B](from: Arbitrary[A])(fn: A => B): Arbitrary[B]                =
       Arbitrary(from.arbitrary.map(fn))
   }
 }

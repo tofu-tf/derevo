@@ -1,4 +1,4 @@
-lazy val commonSettings = Seq(
+lazy val commonSettings    = Seq(
   libraryDependencies ++= {
     (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, 12)) => Seq(compilerPlugin(Dependencies.kindProjector), compilerPlugin(Dependencies.macroParadise))
@@ -35,7 +35,7 @@ lazy val publishSettings   = commonSettings ++ Seq(
   Test / publishArtifact := false
 )
 
-lazy val derevo = project
+lazy val derevo            = project
   .in(file("."))
   .settings(noPublishSettings)
   .aggregate(
@@ -53,14 +53,14 @@ lazy val derevo = project
     tests,
   )
 
-lazy val core =
+lazy val core              =
   (project in file("modules/core"))
     .settings(publishSettings)
     .settings(
       name := "derevo-core"
     )
 
-lazy val cats =
+lazy val cats              =
   (project in file("modules/cats"))
     .settings(publishSettings)
     .settings(
@@ -69,7 +69,7 @@ lazy val cats =
     )
     .dependsOn(core)
 
-lazy val catsTagless =
+lazy val catsTagless       =
   (project in file("modules/catsTagless"))
     .settings(publishSettings)
     .settings(
@@ -78,7 +78,7 @@ lazy val catsTagless =
     )
     .dependsOn(core)
 
-lazy val circe =
+lazy val circe             =
   (project in file("modules/circe"))
     .settings(publishSettings)
     .settings(
@@ -88,7 +88,7 @@ lazy val circe =
     )
     .dependsOn(core)
 
-lazy val circeMagnolia =
+lazy val circeMagnolia     =
   (project in file("modules/circeMagnolia"))
     .settings(publishSettings)
     .settings(
@@ -98,7 +98,7 @@ lazy val circeMagnolia =
     )
     .dependsOn(core)
 
-lazy val ciris =
+lazy val ciris             =
   (project in file("modules/ciris"))
     .settings(publishSettings)
     .settings(
@@ -107,7 +107,7 @@ lazy val ciris =
     )
     .dependsOn(core)
 
-lazy val pureconfig =
+lazy val pureconfig        =
   (project in file("modules/pureconfig"))
     .settings(publishSettings)
     .settings(
@@ -116,7 +116,7 @@ lazy val pureconfig =
     )
     .dependsOn(core)
 
-lazy val reactivemongo =
+lazy val reactivemongo     =
   (project in file("modules/reactivemongo"))
     .settings(publishSettings)
     .settings(
@@ -125,7 +125,7 @@ lazy val reactivemongo =
     )
     .dependsOn(core)
 
-lazy val tethys =
+lazy val tethys            =
   (project in file("modules/tethys"))
     .settings(publishSettings)
     .settings(
@@ -135,7 +135,7 @@ lazy val tethys =
     )
     .dependsOn(core)
 
-lazy val tethysMagnolia =
+lazy val tethysMagnolia    =
   (project in file("modules/tethysMagnolia"))
     .settings(publishSettings)
     .settings(
@@ -145,7 +145,7 @@ lazy val tethysMagnolia =
     )
     .dependsOn(core)
 
-lazy val scalacheck =
+lazy val scalacheck        =
   (project in file("modules/scalacheck"))
     .settings(publishSettings)
     .settings(
@@ -154,7 +154,7 @@ lazy val scalacheck =
     )
     .dependsOn(core)
 
-lazy val tests =
+lazy val tests             =
   (project in file("modules/tests"))
     .settings(noPublishSettings)
     .dependsOn(core, circe, ciris, tethys, reactivemongo, catsTagless, pureconfig)

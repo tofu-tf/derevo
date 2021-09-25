@@ -41,7 +41,7 @@ object Dependencies {
     val macroParadise = "2.1.1"
   }
 
-  lazy val magnolia                = "com.propensive"        %% "magnolia"                  % Version.magnolia
+  lazy val magnolia = "com.propensive" %% "magnolia" % Version.magnolia
   lazy val catsCore                = "org.typelevel"         %% "cats-core"                 % Version.cats
   lazy val catsTaglessCore         = "org.typelevel"         %% "cats-tagless-core"         % Version.catsTagless
   lazy val catsTaglessMacros       = "org.typelevel"         %% "cats-tagless-macros"       % Version.catsTagless
