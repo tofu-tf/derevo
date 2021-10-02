@@ -344,7 +344,7 @@ class Derevo(val c: blackbox.Context) {
     )
     s
   }
-  private def abort(s: String) = c.abort(c.enclosingPosition, s)
+  private def abort(s: String)                     = c.abort(c.enclosingPosition, s)
 }
 
 object Derevo {
