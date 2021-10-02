@@ -28,7 +28,7 @@ lazy val commonSettings = Seq(
 lazy val noPublishSettings =
   commonSettings ++ Seq(publish := {}, publishArtifact := false, publishTo := None, publish / skip := true)
 
-lazy val publishSettings   = commonSettings ++ Seq(
+lazy val publishSettings = commonSettings ++ Seq(
   pomIncludeRepository   := { _ =>
     false
   },
