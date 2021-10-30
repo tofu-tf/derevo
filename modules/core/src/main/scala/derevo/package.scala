@@ -14,7 +14,7 @@ package derevo {
 
   trait ParamRequire[TC[_]]
 
-  //* numeration according to https://docs.tofu.tf/docs/internal/kind-enumeration
+  // * numeration according to https://docs.tofu.tf/docs/internal/kind-enumeration
   sealed trait InstanceDef
   trait Derivation[TC[_]]                             extends InstanceDef
   trait DerivationKN1[TC[f[_]]]                       extends InstanceDef
