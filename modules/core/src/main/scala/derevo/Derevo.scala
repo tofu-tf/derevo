@@ -213,7 +213,7 @@ class Derevo(val c: blackbox.Context) {
     def fixFirstTypeParam = {
       val nothingT = c.typeOf[Nothing]
 
-      c.typecheck(call, silent = true) match {
+      c.typecheck(call, silent = true, withMacrosDisabled = true) match {
         case q"$method[$nothing, ..$remainingTpes](..$args)" if nothing.tpe == nothingT =>
           q"$method[$outTyp, ..$remainingTpes](..$args)"
         case q"$method[$nothing, ..$remainingTpes]" if nothing.tpe == nothingT          =>
