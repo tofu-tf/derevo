@@ -56,6 +56,7 @@ private[hocon] trait ConfigValueDecoderCollectionInstances {
           .asScala
           .map(dec.decode(Some(SeqElementKeyType), _))
           .toList
+          .reverse
       ).map(cbf.fromSpecific(_))
     }
 
@@ -70,6 +71,7 @@ private[hocon] trait ConfigValueDecoderCollectionInstances {
           .asScala
           .map(entry => dec.decode(Some(MapEntryKeyType), entry.getValue).map(entry.getKey -> _))
           .toList
+          .reverse
       ).map(_.toMap)
     }
 
