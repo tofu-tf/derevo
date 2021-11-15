@@ -41,7 +41,14 @@ class CirisSuite extends AnyFunSuite {
 
     val res = hoconSource[Data](cfg, "data").load[IO].unsafeRunSync()
 
-    assert(res == Data("Demo", List("1", "2", "3"), Map("wtf" -> 1, "lol" -> 2, "wut" -> 3), Rate(2, Option(Duration(100, "millis")))))
+    assert(
+      res == Data(
+        "Demo",
+        List("1", "2", "3"),
+        Map("wtf" -> 1, "lol" -> 2, "wut" -> 3),
+        Rate(2, Option(Duration(100, "millis")))
+      )
+    )
   }
 
   test("README.md example") {
@@ -67,4 +74,3 @@ class CirisSuite extends AnyFunSuite {
   }
 
 }
-
