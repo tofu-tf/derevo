@@ -5,6 +5,8 @@ package derevo {
     def macroTransform(annottees: Any*): Any = macro Derevo.deriveMacro
   }
 
+  class composite(instances: Any*) extends StaticAnnotation
+
   /** */
   trait PassTypeArgs
   trait KeepRefinements
@@ -25,6 +27,8 @@ package derevo {
   trait DerivationKN11[TC[alg[bf[_, _]]]]             extends InstanceDef
   trait DerivationKN17[TC[alg[btr[_, _], _, _]]]      extends InstanceDef
   trait SpecificDerivation[FromTC[_], ToTC[_], NT[_]] extends InstanceDef
+
+  class CompositeDerivation extends InstanceDef
 
 }
 
