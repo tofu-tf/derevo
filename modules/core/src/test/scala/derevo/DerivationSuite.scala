@@ -20,7 +20,13 @@ object DerivationSuite {
   @derive(Prefixed.dummy)
   sealed trait Baz
 
+  import Prefixed._
+
+  @derive(dummy)
+  sealed trait Bark
+
   def checkFoo[A: DummyTC] = implicitly[DummyTC[Foo[A]]]
   def checkBar             = implicitly[DummyTC[Bar.type]]
   def checkBaz             = implicitly[DummyTC[Baz]]
+  def checkBark            = implicitly[DummyTC[Bark]]
 }
