@@ -9,7 +9,7 @@ package derevo {
 
   /** */
   trait PassTypeArgs
-  trait KeepRefinements
+  trait Unqualified
 
   class delegating(to: String, args: Any*) extends StaticAnnotation
   class phantom                            extends StaticAnnotation
