@@ -20,4 +20,10 @@ package object reactivemongo {
       with NewTypeDerivation[BSONDocumentReader] {
     def instance[A]: BSONDocumentReader[A] = macro Derevo.delegate[BSONDocumentReader, A]
   }
+
+  @delegating("reactivemongo.bson.Macros.writer")
+  object bsonNewtypeWriter extends Derivation[BsonValueWriter] with NewTypeDerivation[BsonValueWriter]
+
+  @delegating("reactivemongo.bson.Macros.reader")
+  object bsonNewtypeReader extends Derivation[BsonValueReader] with NewTypeDerivation[BsonValueReader]
 }
