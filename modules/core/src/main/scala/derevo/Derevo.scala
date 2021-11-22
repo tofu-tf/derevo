@@ -108,15 +108,14 @@ class Derevo(val c: blackbox.Context) {
 
   def isConstructionOf(name: String)(t: Tree): Boolean = t match {
     case q"new $cls(...$_)" =>
-      val tts = c.typecheck(t, silent = true).symbol
-      tts.isMethod && {
-        val o = tts.asMethod.owner
-        o.isClass && o.asClass.fullName == name
-      }
+      val tts = c
+        .typecheck(cls, mode = c.TYPEmode, silent = true, withMacrosDisabled = true, withImplicitViewsDisabled = true)
+        .symbol
+      tts.isClass && tts.asClass.fullName == name
     case _                  => false
   }
 
-  def deriveMacro(annottees: Tree*): Tree = {
+  def deriveMacro(annottees: Tree*): Tree =
     annottees match {
       case Seq(obj: ModuleDef) =>
         obj match {
@@ -146,7 +145,6 @@ class Derevo(val c: blackbox.Context) {
            }
          """
     }
-  }
 
   private def injectInstances(defs: Seq[Tree], instances: List[Tree]): Seq[Tree] = {
     val (pre, post) = defs.span {
@@ -182,6 +180,7 @@ class Derevo(val c: blackbox.Context) {
         }
       case _                                                                       => None
     }
+
     c.prefix.tree match {
       case q"new $_(..${instances})" =>
         instances.flatMap(buildInstance(_, cls, newType))
