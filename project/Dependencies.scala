@@ -18,7 +18,7 @@ object Dependencies {
 
     val circeDerivation = "0.13.0-M5"
 
-    val pureConfig = "0.17.0"
+    val pureConfig = "0.17.1"
 
     val magnolia = "0.17.0"
 
