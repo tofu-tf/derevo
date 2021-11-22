@@ -28,7 +28,7 @@ object Dependencies {
 
     val reactivemongo = "0.20.13"
 
-    val tethys = "0.24.0"
+    val tethys = "0.25.0"
 
     val scalacheck = "1.15.4"
 
