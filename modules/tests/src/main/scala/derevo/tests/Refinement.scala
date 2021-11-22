@@ -4,12 +4,12 @@ import derevo._
 
 trait Trait[T]
 
-object refinedTrait extends Derivation[Trait] with KeepRefinements {
+object refinedTrait extends Derivation[Trait] with Unqualified {
   def apply[T, A](a: A): Trait[T] { type Refinement = A }                = new Trait[T] { type Refinement = A }
   def singleTparam[T](dummy: Int): Trait[T] { type Refinement = String } = new Trait[T] { type Refinement = String }
 }
 
-object refinedTraitWithInstanceMethod extends Derivation[Trait] with KeepRefinements {
+object refinedTraitWithInstanceMethod extends Derivation[Trait] with Unqualified {
   def instance[T]: Trait[T] { type Refinement = String } = new Trait[T] { type Refinement = String }
 }
 

@@ -9,11 +9,11 @@ class Derevo(val c: blackbox.Context) {
   type Newtype      = NewtypeP[Tree]
   type NameAndTypes = NameAndTypesP[Tree, c.Type]
 
-  val CompositeSymbol       = typeOf[composite].typeSymbol
-  val DelegatingSymbol      = typeOf[delegating].typeSymbol
-  val PhantomSymbol         = typeOf[phantom].typeSymbol
-  val PassTypeArgsSymbol    = typeOf[PassTypeArgs].typeSymbol
-  val KeepRefinementsSymbol = typeOf[KeepRefinements].typeSymbol
+  val CompositeSymbol    = typeOf[composite].typeSymbol
+  val DelegatingSymbol   = typeOf[delegating].typeSymbol
+  val PhantomSymbol      = typeOf[phantom].typeSymbol
+  val PassTypeArgsSymbol = typeOf[PassTypeArgs].typeSymbol
+  val UnqualifiedSymbol  = typeOf[Unqualified].typeSymbol
 
   val instanceDefs         = Vector(
   )
@@ -223,17 +223,25 @@ class Derevo(val c: blackbox.Context) {
       def fixFirstTypeParam = {
         val nothingT = c.typeOf[Nothing]
 
-        c.typecheck(mode.call, silent = true, withMacrosDisabled = true) match {
+        c.typecheck(mode.call.duplicate, silent = true, withMacrosDisabled = true) match {
           case q"$method[$nothing, ..$remainingTpes](..$args)" if nothing.tpe == nothingT =>
             q"$method[$outTyp, ..$remainingTpes](..$args)"
           case q"$method[$nothing, ..$remainingTpes]" if nothing.tpe == nothingT          =>
             q"$method[$outTyp, ..$remainingTpes]"
+          case EmptyTree                                                                  =>
+            mode.call match {
+              case q"$method(..$args)" =>
+                q"$method[$outTyp](..$args)"
+              case q"$method"          =>
+                q"$method[$outTyp]"
+              case _                   => tree
+            }
           case _                                                                          => tree
         }
       }
 
       if (allTparams.isEmpty || allTparams.length <= mode.drop) {
-        if (mode.keepRefinements) {
+        if (mode.unqualified) {
           q"""
           @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
           implicit val $tn = $fixFirstTypeParam
@@ -263,7 +271,7 @@ class Derevo(val c: blackbox.Context) {
             }
           else Nil
 
-        if (mode.keepRefinements) {
+        if (mode.unqualified) {
           q"""
           @java.lang.SuppressWarnings(scala.Array("org.wartremover.warts.All", "scalafix:All", "all"))
           implicit def $tn[..$tparams](implicit ..$implicits) = $fixFirstTypeParam
@@ -311,8 +319,18 @@ class Derevo(val c: blackbox.Context) {
     val mangledName = obj.toString.replaceAll("[^\\w]", "_")
     val name        = c.freshName(mangledName)
 
-    val objTyp = c.typecheck(obj).tpe
-    val call   = extractCall(tree, newType)
+    val call        = extractCall(tree, newType)
+    val tcheckedObj = c.typecheck(obj, silent = true)
+    if (tcheckedObj.isEmpty) {
+      c.warning(
+        c.enclosingPosition,
+        s"Could not typecheck `$obj`, will try unqualified mode. If you are using local import for derivation object - replace it with package-level import"
+      )
+
+      return List(new NameAndTypes(call, name, NoType, NoType, NoType, 0, false, true, false))
+    }
+
+    val objTyp = tcheckedObj.tpe
 
     val nt = objTyp match {
       case IsCompositeDerivation(subs)       =>
@@ -335,12 +353,12 @@ class Derevo(val c: blackbox.Context) {
       case _                => false
     }
 
-    val keepRefinements = objTyp.baseType(KeepRefinementsSymbol) match {
+    val unqualified = objTyp.baseType(UnqualifiedSymbol) match {
       case TypeRef(_, _, _) => true
       case _                => false
     }
 
-    nt.map(_.copy(passArgs = passArgs, keepRefinements = keepRefinements))
+    nt.map(_.copy(passArgs = passArgs, unqualified = unqualified))
   }
 
   trait DerivationMatcher {
@@ -394,7 +412,7 @@ object Derevo {
       newtype: typ,
       drop: Int,
       cascade: Boolean,
-      keepRefinements: Boolean = false,
+      unqualified: Boolean = false,
       passArgs: Boolean = false,
   )
 }
