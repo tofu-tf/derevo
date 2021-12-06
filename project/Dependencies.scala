@@ -24,7 +24,7 @@ object Dependencies {
 
     val typesafeConfig = "1.4.1"
 
-    val ciris = "1.2.1"
+    val ciris = "2.3.1"
 
     val reactivemongo = "0.20.13"
 
