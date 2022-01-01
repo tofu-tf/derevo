@@ -68,6 +68,10 @@ class Derevo(val c: blackbox.Context) {
   def delegateParam[TC[_], I, Arg](arg: c.Expr[Arg]): c.Expr[TC[I]] =
     c.Expr(delegation(c.prefix.tree, Some((method, args) => q"$method($arg, ..$args)")))
 
+  def delegateParamsV[TC[_], I, Arg](arg: c.Expr[Arg]*): c.Expr[TC[I]] = {
+    c.Expr(delegation(c.prefix.tree, Some((method, args) => q"$method(..${arg.map(_.tree) ++ args})")))
+
+  }
   def delegateParams2[TC[_], I, Arg1, Arg2](arg1: c.Expr[Arg1], arg2: c.Expr[Arg2]): c.Expr[TC[I]] =
     c.Expr(delegation(c.prefix.tree, Some((method, args) => q"$method($arg1, $arg2, ..$args)")))
 
