@@ -18,7 +18,6 @@ class SangriaDerivationSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "derive input object with customization" in {
-
     val derived =
       implicitly[InputObjectType[SangriaDerivationSpec.InputCustom]]
 
@@ -31,7 +30,6 @@ class SangriaDerivationSpec extends AnyFlatSpec with Matchers {
       implicitly[CtxObjectType[SangriaDerivationSpec.Response]]
 
     assertResult("Response")(derived.name)
-    println(derived)
     derived.fields.map(_.name) should contain theSameElementsAs List("data")
   }
 
@@ -40,7 +38,6 @@ class SangriaDerivationSpec extends AnyFlatSpec with Matchers {
       implicitly[CtxObjectType[SangriaDerivationSpec.ResponseCustom]]
 
     assertResult("RenamedResponse")(derived.name)
-    println(derived)
     derived.fields.map(_.name) should contain theSameElementsAs List("content")
   }
 }

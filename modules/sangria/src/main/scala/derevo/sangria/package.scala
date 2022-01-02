@@ -8,8 +8,8 @@ import _root_.sangria.macros.derive._
 
 package object sangria {
 
-  type Ctx              = Any
-  type CtxObjectType[A] = ObjectType[Ctx, A]
+  type Ctx                             = Any
+  type CtxObjectType[A]                = ObjectType[Ctx, A]
   type DeriveObjectSettingNoContext[A] = DeriveObjectSetting[Ctx, A]
 
   @delegating("sangria.macros.derive.deriveInputObjectType")
