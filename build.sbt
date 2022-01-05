@@ -50,6 +50,7 @@ lazy val derevo = project
     scalacheck,
     tethys,
     tethysMagnolia,
+    sangria,
     tests,
   )
 
@@ -151,6 +152,15 @@ lazy val scalacheck =
     .settings(
       name := "derevo-scalacheck",
       libraryDependencies ++= Seq(Dependencies.scalacheck, Dependencies.magnolia),
+    )
+    .dependsOn(core)
+
+lazy val sangria =
+  (project in file("modules/sangria"))
+    .settings(publishSettings)
+    .settings(
+      name := "derevo-sangria",
+      libraryDependencies ++= Seq(Dependencies.sangria),
     )
     .dependsOn(core)
 

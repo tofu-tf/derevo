@@ -39,6 +39,8 @@ object Dependencies {
     val kindProjector = "0.13.2"
 
     val macroParadise = "2.1.1"
+
+    val sangria = "2.1.6"
   }
 
   lazy val magnolia                = "com.propensive"        %% "magnolia"                  % Version.magnolia
@@ -56,6 +58,7 @@ object Dependencies {
   lazy val tethysCore              = "com.tethys-json"       %% "tethys-core"               % Version.tethys
   lazy val tethysDerivation        = "com.tethys-json"       %% "tethys-derivation"         % Version.tethys
   lazy val scalacheck              = "org.scalacheck"        %% "scalacheck"                % Version.scalacheck
+  lazy val sangria                 = "org.sangria-graphql"   %% "sangria"                   % Version.sangria
 
   lazy val circeParser   = "io.circe"        %% "circe-parser"   % Version.circe
   lazy val tethysJackson = "com.tethys-json" %% "tethys-jackson" % Version.tethys
