@@ -40,7 +40,7 @@ object Dependencies {
 
     val macroParadise = "2.1.1"
 
-    val sangria = "2.1.6"
+    val sangria = "3.0.0"
   }
 
   lazy val magnolia                = "com.propensive"        %% "magnolia"                  % Version.magnolia
