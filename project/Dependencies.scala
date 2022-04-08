@@ -30,7 +30,7 @@ object Dependencies {
 
     val tethys = "0.26.0"
 
-    val scalacheck = "1.15.4"
+    val scalacheck = "1.16.0"
 
     val estatico = "0.4.4"
 
