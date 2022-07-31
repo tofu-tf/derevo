@@ -6,7 +6,7 @@ object Dependencies {
 
     val scala213 = "2.13.8"
 
-    val scalatest = "3.2.12"
+    val scalatest = "3.2.13"
 
     val catsTagless = "0.14.0"
 
