@@ -12,13 +12,13 @@ object Dependencies {
 
     val cats = "2.7.0"
 
-    val circe = "0.14.2"
+    val circe = "0.14.5"
 
     val circeMagnolia = "0.7.0"
 
     val circeDerivation = "0.13.0-M5"
 
-    val pureConfig = "0.17.1"
+    val pureConfig = "0.17.4"
 
     val magnolia = "0.17.0"
 
