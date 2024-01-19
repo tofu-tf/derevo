@@ -14,7 +14,7 @@ If a library has support for `derevo`, you can simply write
 @derive(SomeCaseClass, AnotherCaseClass, fooDerivation, barDerivation(param1, param2))
 case class Foo(...)
 ```
-where `SomeCaseClass`, `AnotherCaseClass`, `fooDerivation`, `barDerivation` are some objects, extending one of the `InstanceDef` traits ([see module source](https://github.com/tofu-tf/derevo/blob/supertagged/core/src/main/scala/derevo/package.scala#L13:L21)).
+where `SomeCaseClass`, `AnotherCaseClass`, `fooDerivation`, `barDerivation` are some objects, extending one of the `InstanceDef` traits ([see module source](https://github.com/tofu-tf/derevo/blob/master/modules/core/src/main/scala/derevo/package.scala#L20:L29)).
 
 For every element of the `@derive` macro, there will be generated `implicit val` or `implicit def` (when `Foo` has type parameters) providing the corresponding typeclass.
 For simple type derivation, if `Foo` has type parameters, the instance will require an instance of the same or specified other typeclass for proper derivation.
@@ -34,7 +34,7 @@ If you have problems with the initialization order you can optionally put the
 
 
 ## Making your own derivation.
-First, extend the object (the companion object for your type is the best option) from one of the [`InstanceDef` traits](https://github.com/tofu-tf/derevo/blob/supertagged/core/src/main/scala/derevo/package.scala#L13:L21).
+First, extend the object (the companion object for your type is the best option) from one of the [`InstanceDef` traits](https://github.com/tofu-tf/derevo/blob/master/modules/core/src/main/scala/derevo/package.scala#L20:L29).
 
 Then implement the `instance` method for your object so it could derive the corresponding instance.
 Example:
@@ -51,7 +51,7 @@ object TypeClass extends Derivaton[TypeClass] {
 Also, you can define additional methods `def apply(...)` or `def foo(...)` in your derivation object. This will allow instance creation as
 `@derive(TypeClass(...))` or `@derive(TypeClass.foo(...))`.
 
-To support `newtype` derivation, extend your object with (`NewtypeDerivation`)[https://github.com/tofu-tf/derevo/blob/master/core/src/main/scala/derevo/NewTypeRepr.scala#L8]. Alternatively, your object may have the `newtype[R]` method with a single type parameter that receives the underlying type and returns another object that has the `instance` method that works as described earlier.
+To support `newtype` derivation, extend your object with [`NewtypeDerivation` trait](https://github.com/tofu-tf/derevo/blob/master/modules/core/src/main/scala/derevo/NewTypeRepr.scala#L8). Alternatively, your object may have the `newtype[R]` method with a single type parameter that receives the underlying type and returns another object that has the `instance` method that works as described earlier.
 
 Sometimes, the required constraint may differ from the provided typeclass, e.g. `circe.Encoder` which requires
 `Encoder` for each field but provides `Encoder.AsObject` for the target case class.
@@ -80,7 +80,7 @@ This works by adding the `@delegating` annotation to your delegator object:
 @delegating("full.qualified.method.path")
 ```
 Then call `macro Derevo.delegate`, `macro Derevo.delegateParams`, `macro Derevo.delegateParams2` or `macro Derevo.delegateParams3` in the corresponding methods.
-An example can be found [here](https://github.com/tofu-tf/derevo/blob/supertagged/circe/src/main/scala/derevo/circe/circe.scala).
+An example can be found [here](https://github.com/tofu-tf/derevo/blob/master/modules/circe/src/main/scala/derevo/circe/circe.scala).
 
 
 ## Installation
