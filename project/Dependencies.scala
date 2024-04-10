@@ -8,9 +8,9 @@ object Dependencies {
 
     val scalatest = "3.2.13"
 
-    val catsTagless = "0.14.0"
+    val catsTagless = "0.15.0"
 
-    val cats = "2.7.0"
+    val cats = "2.9.0"
 
     val circe = "0.14.2"
 
