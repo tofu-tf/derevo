@@ -41,6 +41,10 @@ object Dependencies {
     val macroParadise = "2.1.1"
 
     val sangria = "3.2.0"
+
+    val zioJson = "0.6.2"
+
+    val zioSchema = "1.1.1"
   }
 
   lazy val magnolia                = "com.propensive"        %% "magnolia"                  % Version.magnolia
@@ -65,6 +69,10 @@ object Dependencies {
   lazy val scalatest     = "org.scalatest"   %% "scalatest"      % Version.scalatest
   lazy val estatico      = "io.estatico"     %% "newtype"        % Version.estatico
   lazy val supertagged   = "org.rudogma"     %% "supertagged"    % Version.supertagged
+
+  lazy val zioSchema           = "dev.zio" %% "zio-schema"            % Version.zioSchema
+  lazy val zioSchemaDerivation = "dev.zio" %% "zio-schema-derivation" % Version.zioSchema
+  lazy val zioJson             = "dev.zio" %% "zio-json"              % Version.zioJson
 
   lazy val macroParadise = "org.scalamacros" % "paradise"       % Version.macroParadise cross CrossVersion.patch
   lazy val kindProjector = "org.typelevel"  %% "kind-projector" % Version.kindProjector cross CrossVersion.patch
