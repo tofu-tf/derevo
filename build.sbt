@@ -51,6 +51,7 @@ lazy val derevo = project
     tethys,
     tethysMagnolia,
     sangria,
+    vulcan,
     tests,
   )
 
@@ -161,6 +162,15 @@ lazy val sangria =
     .settings(
       name := "derevo-sangria",
       libraryDependencies ++= Seq(Dependencies.sangria),
+    )
+    .dependsOn(core)
+
+lazy val vulcan =
+  (project in file("modules/vulcan"))
+    .settings(publishSettings)
+    .settings(
+      name := "derevo-vulcan",
+      libraryDependencies ++= Seq(Dependencies.vulcanGeneric),
     )
     .dependsOn(core)
 

@@ -41,6 +41,8 @@ object Dependencies {
     val macroParadise = "2.1.1"
 
     val sangria = "3.2.0"
+
+    val vulcan = "1.10.1"
   }
 
   lazy val magnolia                = "com.propensive"        %% "magnolia"                  % Version.magnolia
@@ -65,6 +67,8 @@ object Dependencies {
   lazy val scalatest     = "org.scalatest"   %% "scalatest"      % Version.scalatest
   lazy val estatico      = "io.estatico"     %% "newtype"        % Version.estatico
   lazy val supertagged   = "org.rudogma"     %% "supertagged"    % Version.supertagged
+
+  lazy val vulcanGeneric = "com.github.fd4s" %% "vulcan-generic" % Version.vulcan
 
   lazy val macroParadise = "org.scalamacros" % "paradise"       % Version.macroParadise cross CrossVersion.patch
   lazy val kindProjector = "org.typelevel"  %% "kind-projector" % Version.kindProjector cross CrossVersion.patch
