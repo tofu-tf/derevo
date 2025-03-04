@@ -53,6 +53,7 @@ lazy val derevo = project
     sangria,
     zioJson,
     zioSchema,
+    vulcan,
     tests,
   )
 
@@ -181,6 +182,13 @@ lazy val zioSchema =
     .settings(
       name := "derevo-zio-schema",
       libraryDependencies ++= Seq(Dependencies.zioSchema, Dependencies.zioSchemaDerivation),
+
+lazy val vulcan =
+  (project in file("modules/vulcan"))
+    .settings(publishSettings)
+    .settings(
+      name := "derevo-vulcan",
+      libraryDependencies ++= Seq(Dependencies.vulcanGeneric),
     )
     .dependsOn(core)
 

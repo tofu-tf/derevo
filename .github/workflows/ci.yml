@@ -68,7 +68,7 @@ jobs:
         run: sbt ++${{ matrix.scala }} test
 
       - name: Compress target directories
-        run: tar cf targets.tar modules/zioJson/target modules/tests/target modules/tethys/target modules/pureconfig/target modules/catsTagless/target modules/ciris/target modules/scalacheck/target modules/circeMagnolia/target modules/circe/target target modules/tethysMagnolia/target modules/cats/target modules/zioSchema/target modules/core/target modules/sangria/target modules/reactivemongo/target project/target
+        run: tar cf targets.tar modules/tests/target modules/zioJson/target modules/tethys/target modules/pureconfig/target modules/catsTagless/target modules/ciris/target modules/scalacheck/target modules/circeMagnolia/target modules/circe/target target modules/tethysMagnolia/target modules/cats/target modules/core/target modules/vulcan/target modules/sangria/target modules/reactivemongo/target project/target
 
       - name: Upload target directories
         uses: actions/upload-artifact@v2
