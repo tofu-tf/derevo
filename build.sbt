@@ -182,6 +182,8 @@ lazy val zioSchema =
     .settings(
       name := "derevo-zio-schema",
       libraryDependencies ++= Seq(Dependencies.zioSchema, Dependencies.zioSchemaDerivation),
+    )
+    .dependsOn(core)
 
 lazy val vulcan =
   (project in file("modules/vulcan"))
