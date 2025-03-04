@@ -119,6 +119,7 @@ object jsonReader extends Derivation[JsonReader] with NewTypeDerivation[JsonRead
     def float(): Float      = illegal
     def double(): Double    = illegal
     def boolean(): Boolean  = illegal
+    def byte(): Byte        = illegal
   }
 
   private case class PrependStartObj(inner: TokenIterator) extends BaseTokenIterator {
@@ -140,6 +141,7 @@ object jsonReader extends Derivation[JsonReader] with NewTypeDerivation[JsonRead
     def float(): Float      = if (!first) inner.float() else illegal
     def double(): Double    = if (!first) inner.double() else illegal
     def boolean(): Boolean  = if (!first) inner.boolean() else illegal
+    def byte(): Byte        = if (!first) inner.byte() else illegal
   }
 
   private def fail(exp: String, it: TokenIterator)(implicit fn: FieldName) =

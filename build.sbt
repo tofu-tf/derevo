@@ -87,6 +87,8 @@ lazy val circe =
     .settings(publishSettings)
     .settings(
       name := "derevo-circe",
+
+      libraryDependencySchemes += "io.circe" %% "circe-core" % VersionScheme.Always,
       libraryDependencies ++= Seq(Dependencies.circeCore, Dependencies.circeDerivation),
       libraryDependencies ++= Seq(Dependencies.circeParser).map(_ % Test)
     )
@@ -197,4 +199,7 @@ lazy val vulcan =
 lazy val tests =
   (project in file("modules/tests"))
     .settings(noPublishSettings)
+    .settings(
+      libraryDependencySchemes += "io.circe" %% "circe-core" % VersionScheme.Always,
+    )
     .dependsOn(core, circe, ciris, tethys, reactivemongo, catsTagless, pureconfig)

@@ -4,21 +4,21 @@ object Dependencies {
   object Version {
     val scala212 = "2.12.16"
 
-    val scala213 = "2.13.12"
+    val scala213 = "2.13.16"
 
     val scalatest = "3.2.13"
 
-    val catsTagless = "0.14.0"
+    val catsTagless = "0.16.3"
 
-    val cats = "2.7.0"
+    val cats = "2.13.0"
 
-    val circe = "0.14.2"
+    val circe = "0.14.10"
 
     val circeMagnolia = "0.7.0"
 
     val circeDerivation = "0.13.0-M5"
 
-    val pureConfig = "0.17.1"
+    val pureConfig = "0.17.8"
 
     val magnolia = "0.17.0"
 
@@ -28,7 +28,7 @@ object Dependencies {
 
     val reactivemongo = "0.20.13"
 
-    val tethys = "0.26.0"
+    val tethys = "0.29.3"
 
     val scalacheck = "1.16.0"
 
@@ -36,17 +36,17 @@ object Dependencies {
 
     val supertagged = "2.0-RC2"
 
-    val kindProjector = "0.13.2"
+    val kindProjector = "0.13.3"
 
     val macroParadise = "2.1.1"
 
     val sangria = "3.2.0"
 
-    val zioJson = "0.6.2"
+    val zioJson = "0.7.37"
 
-    val zioSchema = "1.1.1"
+    val zioSchema = "1.6.3"
 
-    val vulcan = "1.10.1"
+    val vulcan = "1.11.1"
   }
 
   lazy val magnolia                = "com.propensive"        %% "magnolia"                  % Version.magnolia
@@ -66,11 +66,11 @@ object Dependencies {
   lazy val scalacheck              = "org.scalacheck"        %% "scalacheck"                % Version.scalacheck
   lazy val sangria                 = "org.sangria-graphql"   %% "sangria"                   % Version.sangria
 
-  lazy val circeParser   = "io.circe"        %% "circe-parser"   % Version.circe
-  lazy val tethysJackson = "com.tethys-json" %% "tethys-jackson" % Version.tethys
-  lazy val scalatest     = "org.scalatest"   %% "scalatest"      % Version.scalatest
-  lazy val estatico      = "io.estatico"     %% "newtype"        % Version.estatico
-  lazy val supertagged   = "org.rudogma"     %% "supertagged"    % Version.supertagged
+  lazy val circeParser   = "io.circe"        %% "circe-parser"      % Version.circe
+  lazy val tethysJackson = "com.tethys-json" %% "tethys-jackson213" % Version.tethys
+  lazy val scalatest     = "org.scalatest"   %% "scalatest"         % Version.scalatest
+  lazy val estatico      = "io.estatico"     %% "newtype"           % Version.estatico
+  lazy val supertagged   = "org.rudogma"     %% "supertagged"       % Version.supertagged
 
   lazy val zioSchema           = "dev.zio" %% "zio-schema"            % Version.zioSchema
   lazy val zioSchemaDerivation = "dev.zio" %% "zio-schema-derivation" % Version.zioSchema
