@@ -51,6 +51,8 @@ lazy val derevo = project
     tethys,
     tethysMagnolia,
     sangria,
+    zioJson,
+    zioSchema,
     vulcan,
     tests,
   )
@@ -162,6 +164,24 @@ lazy val sangria =
     .settings(
       name := "derevo-sangria",
       libraryDependencies ++= Seq(Dependencies.sangria),
+    )
+    .dependsOn(core)
+
+lazy val zioJson =
+  (project in file("modules/zioJson"))
+    .settings(publishSettings)
+    .settings(
+      name := "derevo-zio-json",
+      libraryDependencies ++= Seq(Dependencies.zioJson),
+    )
+    .dependsOn(core)
+
+lazy val zioSchema =
+  (project in file("modules/zioSchema"))
+    .settings(publishSettings)
+    .settings(
+      name := "derevo-zio-schema",
+      libraryDependencies ++= Seq(Dependencies.zioSchema, Dependencies.zioSchemaDerivation),
     )
     .dependsOn(core)
 
