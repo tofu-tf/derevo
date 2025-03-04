@@ -202,7 +202,7 @@ assert(parse("""{"stringName":"WWW","integerAge":20}""").flatMap(_.as[Bar]) == R
 ```
 
 To change default `io.circe.magnolia.configured.Configuration`:
-```
+```scala
 import derevo.derive
 import derevo.circe.magnolia.{customizableDecoder, customizableEncoder}
 
