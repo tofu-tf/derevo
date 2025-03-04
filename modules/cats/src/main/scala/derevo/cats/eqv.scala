@@ -31,10 +31,13 @@ object eqv extends Derivation[Eq] with NewTypeDerivation[Eq] {
   def eqExtendedImpl[T: c.WeakTypeTag](c: blackbox.Context)(eqFields: c.Expr[String]*): c.Tree = {
     import c.universe._
 
-    val T = weakTypeOf[T]
-    val eqFieldsSet = eqFields.map(_.tree).collect {
-      case Literal(Constant(field: String)) => field
-    }.toSet
+    val T           = weakTypeOf[T]
+    val eqFieldsSet = eqFields
+      .map(_.tree)
+      .collect { case Literal(Constant(field: String)) =>
+        field
+      }
+      .toSet
 
     val comparisons = T.decls.collect {
       case m: MethodSymbol if m.isCaseAccessor && eqFieldsSet.contains(m.name.toString) =>
