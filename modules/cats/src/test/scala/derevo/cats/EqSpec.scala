@@ -34,6 +34,15 @@ class EqSpec extends AnyFreeSpec {
         assert(Eq[Qux].eqv(Qux(1), Qux(1)))
         assert(Eq[Qux].neqv(Qux(1), Qux(-1)))
       }
+
+      "with ignoring fields" in {
+        @derive(eqv("bar"))
+        case class Foo(bar: Int, baz: Int)
+
+        assert(Eq[Foo].eqv(Foo(1, 2), Foo(1, 5)))
+        assert(Eq[Foo].neqv(Foo(2, 2), Foo(3, 2)))
+        assert(Eq[Foo].neqv(Foo(2, 2), Foo(3, 1)))
+      }
     }
   }
 }
