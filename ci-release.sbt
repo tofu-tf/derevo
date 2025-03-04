@@ -9,7 +9,7 @@ ThisBuild / githubWorkflowPublishTargetBranches := Seq(
   RefPredicate.StartsWith(Ref.Tag("v"))
 )
 
-ThisBuild / githubWorkflowJavaVersions          := Seq(JavaSpec.temurin("8"), JavaSpec.temurin("17"))
+ThisBuild / githubWorkflowJavaVersions          := Seq(JavaSpec.temurin("11"), JavaSpec.temurin("17"))
 
 ThisBuild / githubWorkflowBuildPreamble += WorkflowStep.Sbt(
   List("scalafmtCheckAll", "scalafmtSbtCheck"),
